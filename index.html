@@ -96,7 +96,6 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
   <button data-act="view" data-v="chrono">Chronométreurs</button>
 </nav>
 <button id="topbtn" aria-label="Remonter en haut" title="Remonter en haut" style="position:fixed;right:16px;bottom:82px;z-index:10;border:0;border-radius:50%;width:46px;height:46px;background:var(--accent);color:white;font-size:24px;box-shadow:0 2px 8px #0003;display:block" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-<button id="bottombtn" aria-label="Descendre en bas" title="Descendre en bas" style="position:fixed;right:16px;bottom:22px;z-index:10;border:0;border-radius:50%;width:46px;height:46px;background:var(--accent);color:white;font-size:24px;box-shadow:0 2px 8px #0003;display:block" onclick="window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})">↓</button>
 <script>
 (function(){
 var KEY="elo-site-v2",MINR=3,ALL={},CONTACT="";
@@ -105,7 +104,7 @@ var DISTS=["5 km","10 km","Semi-marathon","Marathon","Trail court","Trail moyen"
 var S={runners:[],races:[],chronos:[],me:null,view:"rank",dist:"Semi-marathon",group:"all"},msg={};
 S.chronos=S.chronos||[];
 try{var s=localStorage.getItem(KEY);if(s)S=Object.assign(S,JSON.parse(s))}catch(e){}
-S.chronos=S.chronos||[];S.view="rank";S.admin=false;S.q="";S.open=null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};
+S.view="rank";S.admin=false;S.q="";S.open=null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function $(q){return document.querySelector(q)}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
@@ -287,7 +286,7 @@ function parseRaceScore(txt){
     if(!name)name=clean(nameCell);
     var time=0;
     // Find the time wherever it sits; some copied tables include a blank Prénom cell.
-    for(var i=2;i<Math.min(cells.length,5);i++){var candidate=parseTime(cells[i]);if(candidate){time=candidate;break;}}
+    for(var i=2;i<cells.length;i++){var candidate=parseTime(cells[i]);if(candidate){time=candidate;break;}}
     if(!time||!name||/^(nom|prénom|prenom)$/i.test(name)||/^(pos\.?|vitesse|action)$/i.test(name))return;
     name=name.replace(/\s+/g,' ').trim();
     var key=(name+'|'+time).toLowerCase();if(seen[key])return;seen[key]=1;
@@ -430,8 +429,8 @@ function addRace(){
       var ws=norm(S.runners[i].name).trim().split(/\s+/).filter(Boolean);
       if(ws.length&&ws.every(function(w){return n.indexOf(" "+w+" ")>=0})&&!(auto&&en.sex&&S.runners[i].cat&&(S.runners[i].cat!==en.cat||S.runners[i].sex!==en.sex)))r=S.runners[i];
     }
-    if(!r&&auto){r={id:uid(),name:titleCase(en.name),sex:en.sex||"",cat:en.cat||""};S.runners.push(r);created++}
-    if(r&&seen[r.id]&&auto){r={id:uid(),name:titleCase(en.name)+" (2)",sex:en.sex||"",cat:en.cat||""};S.runners.push(r);created++}if(!r||seen[r.id])return;
+    if(!r&&auto&&en.sex){r={id:uid(),name:titleCase(en.name),sex:en.sex,cat:en.cat};S.runners.push(r);created++}
+    if(r&&seen[r.id]&&auto&&en.sex){r={id:uid(),name:titleCase(en.name)+" (2)",sex:en.sex,cat:en.cat};S.runners.push(r);created++}if(!r||seen[r.id])return;
     seen[r.id]=1;res.push({id:r.id,time:en.time,rk:en.rk||0});
   });
   var ex=S.races.filter(function(c){return !c.demo&&norm(c.name)===norm(name)&&c.dist===dist})[0];if(ex)name=ex.name;
@@ -454,14 +453,14 @@ function addRaceOld(){
       if(ws.every(function(w){return n.indexOf(" "+w+" ")>=0})){seen[r.id]=1;res.push({id:r.id,time:secs(m[0])});break}
     }
   });
-  if(res.length<2){msg.race="Moins de 2 coureurs retenus. "+(ents.length?ents.length+" lignes RaceScore reconnues. Active le mode test pour créer automatiquement les coureurs non inscrits.":"Aucun résultat reconnu : copie le tableau RaceScore complet.");return render2("races")}
+  if(res.length<2){msg.race="Moins de 2 inscrits trouvés sur "+lines.length+" lignes. Vérifie le texte collé.";return render2("races")}
   res.sort(function(a,b){return a.time-b.time});
   S.races.push({id:uid(),name:name,dist:$("#cdist").value,date:$("#cdate").value,results:res});
   S.races.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0});
   S.dist=$("#cdist").value;msg.race="";save();render2("rank");
 }
 function render2(v){S.view=v;render();window.scrollTo(0,0)}
-window.addEventListener("scroll",function(){var t=document.getElementById("topbtn"),b=document.getElementById("bottombtn");if(t)t.style.display="block";if(b)b.style.display="block"});
+window.addEventListener("scroll",function(){var t=document.getElementById("topbtn");if(t)t.style.display="block"});
 document.addEventListener("input",function(e){if(e.target.id==="bugtxt"){var a=$("#bugmail");if(a)a.href="mailto:"+CONTACT+"?subject="+encodeURIComponent("Bug Elo Course")+"&body="+encodeURIComponent(e.target.value+"\n\n---\nAppareil : "+navigator.userAgent)}});
 document.addEventListener("change",function(e){if(e.target.id==="cex"){if(e.target.value)$("#cn").value=e.target.value}else if(e.target.id==="tst"){S.test=e.target.checked;save();render()}else if(e.target.id==="srch"){S.q=e.target.value;render()}else if(e.target.id==="grp"){S.group=e.target.value;save();render()}});
 document.addEventListener("click",function(e){
@@ -479,15 +478,6 @@ document.addEventListener("click",function(e){
   else if(a==="demo"){demo();save();render()}
   else if(a==="delrace"){S.races=S.races.filter(function(c){return c.id!==v});save();render()}
   else if(a==="addrace")addRace();
-  else if(a==="addchrono"){
-    var cnm=$("#chname"),curl=$("#churl"),cfile=$("#chlogo"),cmsg=$("#chmsg");
-    var cname=cnm?cnm.value.trim():"",csite=curl?curl.value.trim():"",file=cfile&&cfile.files?cfile.files[0]:null;
-    if(!cname){if(cmsg)cmsg.textContent="Indique le nom du chronométreur.";return}
-    if(csite&&!/^https?:\/\//i.test(csite)){if(cmsg)cmsg.textContent="Le site doit commencer par https:// ou http://.";return}
-    function finishChrono(logo){S.chronos=S.chronos||[];S.chronos.push({id:uid(),name:cname,url:csite,logo:logo||""});save();render2("chrono")}
-    if(file){if(!/^image\/(png|jpeg|webp)$/.test(file.type)){if(cmsg)cmsg.textContent="Format de logo non pris en charge.";return}if(file.size>1500000){if(cmsg)cmsg.textContent="Logo trop lourd (maximum 1,5 Mo).";return}var reader=new FileReader();reader.onload=function(){finishChrono(String(reader.result||""))};reader.onerror=function(){if(cmsg)cmsg.textContent="Impossible de lire le logo."};reader.readAsDataURL(file)}else finishChrono("");
-  }
-  else if(a==="delchrono"){S.chronos=(S.chronos||[]).filter(function(c){return String(c.id)!==String(v)});save();render2("chrono")}
   else if(a==="reg"){
     var n=$("#rn").value.trim().replace(/\s+/g," ");
     if(n.split(" ").length<2){msg.reg="Écris ton nom et ton prénom.";return render()}
