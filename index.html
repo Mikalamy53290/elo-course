@@ -95,7 +95,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
   <button data-act="view" data-v="help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/></svg>Règles du jeu</button>
   <button data-act="view" data-v="chrono">Chronométreurs</button>
 </nav>
-<button id="topbtn" aria-label="Remonter en haut" title="Remonter en haut" style="position:fixed;right:16px;bottom:82px;z-index:10;border:0;border-radius:50%;width:46px;height:46px;background:var(--accent);color:white;font-size:24px;box-shadow:0 2px 8px #0003;display:block" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<button id="topbtn" aria-label="Remonter en haut" title="Remonter en haut" style="position:fixed;right:16px;bottom:82px;z-index:10;border:0;border-radius:50%;width:46px;height:46px;background:var(--accent);color:white;font-size:24px;box-shadow:0 2px 8px #0003" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <script>
 (function(){
 var KEY="elo-site-v2",MINR=3,ALL={},CONTACT="";
@@ -292,23 +292,6 @@ function parseRaceScore(txt){
     var key=(name+'|'+time).toLowerCase();if(seen[key])return;seen[key]=1;
     out.push({rk:Number(rm[0]),name:name,sex:'',cat:'',time:time});
   });
-  // Fallback for copied RaceScore result lists that arrive as plain text rather than Markdown tables.
-  // Accept a rank at the beginning and a finish time near the end of the line.
-  if(!out.length){
-    lines.forEach(function(line){
-      var l=clean(line).replace(/\u00a0/g,' ').trim(); if(!l)return;
-      var m=l.match(/^\s*(\d{1,4})(?:er|e|ème|º|\.)?\s+(.+?)\s+(?:(\d{1,2})h\s*)?(\d{1,2}:\d{2}(?::\d{2})?)\s*$/i);
-      if(!m)return;
-      var name=(m[2]||'').replace(/\s{2,}/g,' ').trim();
-      if(!name||/^(nom|prénom|prenom|athlète|athlete|coureur)$/i.test(name))return;
-      var timeText=(m[3]?m[3]+'h ':'')+m[4], tm=timeText.match(/(?:(\d+)h\s*)?(\d{1,2}):(\d{2})(?::(\d{2}))?/i);
-      if(!tm)return;
-      var secs=tm[4]!==undefined?Number(tm[1]||0)*3600+Number(tm[2])*60+Number(tm[3]):(tm[1]!==undefined?Number(tm[1])*3600+Number(tm[2])*60:Number(tm[2])*60+Number(tm[3]));
-      if(!secs)return;
-      var key=(name+'|'+secs).toLowerCase();if(seen[key])return;seen[key]=1;
-      out.push({rk:Number(m[1]),name:name,sex:'',cat:'',time:secs});
-    });
-  }
   return out;
 }
 
@@ -460,7 +443,7 @@ function addRaceOld(){
   S.dist=$("#cdist").value;msg.race="";save();render2("rank");
 }
 function render2(v){S.view=v;render();window.scrollTo(0,0)}
-window.addEventListener("scroll",function(){var t=document.getElementById("topbtn");if(t)t.style.display="block"});
+window.addEventListener("scroll",function(){var t=document.getElementById("topbtn");if(t)t.style.display=window.scrollY>250?"block":"none"});
 document.addEventListener("input",function(e){if(e.target.id==="bugtxt"){var a=$("#bugmail");if(a)a.href="mailto:"+CONTACT+"?subject="+encodeURIComponent("Bug Elo Course")+"&body="+encodeURIComponent(e.target.value+"\n\n---\nAppareil : "+navigator.userAgent)}});
 document.addEventListener("change",function(e){if(e.target.id==="cex"){if(e.target.value)$("#cn").value=e.target.value}else if(e.target.id==="tst"){S.test=e.target.checked;save();render()}else if(e.target.id==="srch"){S.q=e.target.value;render()}else if(e.target.id==="grp"){S.group=e.target.value;save();render()}});
 document.addEventListener("click",function(e){
