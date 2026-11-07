@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Elo Course – Sarthe, Mayenne et Maine-et-Loire</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{--bg:#0B1724;--surface:#172B3D;--ink:#F3F6FA;--muted:#AAB8C7;--line:#294155;--accent:#35D878;--accent-bg:#203F3A;--accent-ink:#071B14;--gold:#FFD166;--up:#35D878;--down:#F06B72;--route:#35D878;--trail:#F06B72;--general:#B8A2FF;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -118,12 +119,12 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 .pf-chip{display:inline-block;background:#0b1724;border:1px solid #2a4055;border-radius:999px;padding:1px 8px;font-size:12px;color:#d8e2eb;margin-right:4px}
 .pf-race-right{text-align:right;flex:none}
 .pf-time{font:700 24px/1 "Barlow Condensed","Arial Narrow",sans-serif;color:#f4f7fa}
-.pf-place{font-size:13px;color:#d7e2ec;margin-top:4px;font-weight:600}
+.pf-place{font-size:12px;color:#b8c7d5;margin-top:4px}
 @media (max-width:420px){.pf-big{font-size:46px}.pf-name{font-size:26px}.pf-hero{padding:12px;gap:12px}.pf-avatar{width:56px;height:56px;font-size:24px}}
 #topbtn{display:none}
 
 .pf-chart{background:#122235;border:1px solid #2a4055;border-radius:12px;padding:8px;margin-top:6px}.pf-chart svg{display:block;width:100%;height:auto}.pf .profile-section-title{font-size:18px}
-.pf-footnote{font-size:11px;color:#9eb0c1;margin:4px 0 10px}.pf-record{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;background:#122235;border:1px solid #2a4055;border-radius:9px;margin:6px 0}.pf-record b{display:block;font-size:13px}.pf-record small{display:block;font-size:11px;color:#9eb0c1}.pf-record strong{font:700 21px "Barlow Condensed",sans-serif;white-space:nowrap}.pf-medals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0}.pf-medal{display:flex;flex-direction:column;align-items:center;gap:5px;padding:16px 6px;background:linear-gradient(160deg,#1a3045,#102033);border:1px solid #36516a;border-radius:14px;box-shadow:0 5px 14px rgba(0,0,0,.18)}.pf-medal-icon{font-size:46px;line-height:1.1;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35))}.pf-medal b{font:700 29px "Barlow Condensed",sans-serif;color:#fff}.pf-medal small{font-size:11px;color:#b8c7d5}.pf-achievements{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.pf-achievement{background:#203f3a;border:1px solid #32684e;color:#9dffc1;border-radius:999px;padding:5px 10px;font-size:12px}.pf-achievement.muted{background:#122235;border-color:#2a4055;color:#b8c7d5}.pf-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.pf-categories>div{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px;background:#122235;border:1px solid #2a4055;border-radius:12px}.pf-categories span{font-size:11px;letter-spacing:.08em;color:#b8c7d5}.pf-categories b{font:700 28px "Barlow Condensed",sans-serif;color:#35d878}.pf-categories small{font-size:11px;color:#b8c7d5}.pf-admin-danger{margin-top:24px;padding:14px;border:1px solid #8e3d46;border-radius:12px;background:#351d28}.pf-admin-danger p{font-size:13px;color:#f2c6ca}.pf-delete{background:#a92f3d;color:white;border:0;border-radius:8px;padding:10px 12px;font-weight:700;max-width:100%}
+.pf-footnote{font-size:11px;color:#9eb0c1;margin:4px 0 10px}.pf-record{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;background:#122235;border:1px solid #2a4055;border-radius:9px;margin:6px 0}.pf-record b{display:block;font-size:13px}.pf-record small{display:block;font-size:11px;color:#9eb0c1}.pf-record strong{font:700 21px "Barlow Condensed",sans-serif;white-space:nowrap}.pf-medals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0}.pf-medal{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 5px;background:#122235;border:1px solid #2a4055;border-radius:12px}.pf-medal-icon{font-size:28px;line-height:1.2}.pf-medal b{font:700 25px "Barlow Condensed",sans-serif}.pf-medal small{font-size:11px;color:#b8c7d5}.pf-achievements{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.pf-achievement{background:#203f3a;border:1px solid #32684e;color:#9dffc1;border-radius:999px;padding:5px 10px;font-size:12px}.pf-achievement.muted{background:#122235;border-color:#2a4055;color:#b8c7d5}.pf-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.pf-categories>div{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px;background:#122235;border:1px solid #2a4055;border-radius:12px}.pf-categories span{font-size:11px;letter-spacing:.08em;color:#b8c7d5}.pf-categories b{font:700 28px "Barlow Condensed",sans-serif;color:#35d878}.pf-categories small{font-size:11px;color:#b8c7d5}.pf-admin-danger{margin-top:24px;padding:14px;border:1px solid #8e3d46;border-radius:12px;background:#351d28}.pf-admin-danger p{font-size:13px;color:#f2c6ca}.pf-delete{background:#a92f3d;color:white;border:0;border-radius:8px;padding:10px 12px;font-weight:700;max-width:100%}
 
 
 /* ===== Téléphone : menu en bas, comme une application ===== */
@@ -139,32 +140,8 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
   #botbtn{bottom:86px!important}
   #topbtn{bottom:136px!important}
 }
-.topinfo{max-width:1000px;margin:8px auto 0;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.topcount,.toprunner,.toplogin{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:13px}.topcount strong,.toprunner strong{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:20px;color:var(--accent);margin-right:4px}.toprunner{margin-left:auto;text-align:right;cursor:pointer;color:var(--ink)}.toplogin{background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:10px;padding:8px 13px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}.toplogin:hover{filter:brightness(1.08)}.toplogin:focus-visible{outline:2px solid var(--ink);outline-offset:2px}.toprunner .meta{display:block;font-size:11px}.toprunner:focus-visible{outline:2px solid var(--accent);outline-offset:2px}@media(max-width:759px){.topinfo{padding:0 12px;margin-top:6px}.topcount,.toprunner,.toplogin{padding:6px 8px;font-size:12px}.topcount strong,.toprunner strong{font-size:18px}}
+.topinfo{max-width:1000px;margin:8px auto 0;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}.topcount,.toprunner{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:13px}.topcount strong,.toprunner strong{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:20px;color:var(--accent);margin-right:4px}.toprunner{margin-left:auto;text-align:right;cursor:pointer;color:var(--ink)}.toprunner .meta{display:block;font-size:11px}.toprunner:focus-visible{outline:2px solid var(--accent);outline-offset:2px}@media(max-width:759px){.topinfo{padding:0 12px;margin-top:6px}.topcount,.toprunner{padding:6px 8px;font-size:12px}.topcount strong,.toprunner strong{font-size:18px}}
 .sitefoot{font-size:13px;color:var(--muted);text-align:center;margin:18px 0 0;padding:0 8px}.sitefoot a{color:var(--accent)}
-
-/* ELO COURSE — finition profil coureur */
-.pf{box-shadow:0 12px 32px rgba(0,0,0,.22)}
-.pf-hero{background:radial-gradient(circle at 90% 0%,rgba(53,216,120,.20),transparent 42%),linear-gradient(135deg,#173c35,#102338 72%);border:1px solid #356b58}
-.pf-avatar{width:82px;height:82px;border:3px solid #35d878;box-shadow:0 0 0 4px rgba(53,216,120,.12)}
-.pf-name{letter-spacing:.01em}
-.pf-elo-main{box-shadow:inset 0 1px rgba(255,255,255,.06),0 8px 18px rgba(0,0,0,.16)}
-.pf-medal-icon.gold{filter:drop-shadow(0 2px 5px rgba(255,193,7,.38))}
-.pf-medal-icon.silver{filter:drop-shadow(0 2px 5px rgba(190,205,220,.38))}
-.pf-medal-icon.bronze{filter:drop-shadow(0 2px 5px rgba(190,115,55,.38))}
-.pf-strava{display:inline-flex;align-items:center;gap:8px;background:#fc4c02;color:#fff!important;text-decoration:none;border-radius:9px;padding:9px 14px;font-weight:700;margin:6px 0}
-.pf-strava:hover{filter:brightness(1.08)}
-.pf-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
-.pf-detail-tile{background:#122235;border:1px solid #2a4055;border-radius:10px;padding:10px}
-.pf-detail-tile small{display:block;color:#9eb0c1;font-size:11px;margin-bottom:3px}
-.pf-detail-tile strong{color:#f4f7fa}
-.pf .card{border-radius:13px}
-@media(max-width:520px){.pf-avatar{width:70px;height:70px}.pf-medal-icon{font-size:40px}.pf-medal{padding:13px 4px}.pf-details-grid{grid-template-columns:1fr}}
-
-.pf-history-medal{display:inline-flex;align-items:center;gap:5px;font-size:21px;line-height:1.15;font-weight:700;vertical-align:middle}
-.pf-history-medal b{font-size:12px;letter-spacing:.01em}
-.pf-history-medal.gold{color:#ffd45c;text-shadow:0 1px 5px rgba(255,190,30,.28)}
-.pf-history-medal.silver{color:#dce5ee;text-shadow:0 1px 5px rgba(210,225,240,.25)}
-.pf-history-medal.bronze{color:#e5a06b;text-shadow:0 1px 5px rgba(190,115,55,.28)}
 </style>
 </head>
 <body>
@@ -184,7 +161,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
   <button data-act="view" data-v="me"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</button>
   <button data-act="view" data-v="help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/></svg><span class="full">Règles du jeu</span><span class="short">Règles</span></button>
   <button data-act="view" data-v="chrono"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5M12 2.5V5"/></svg><span class="full">Chronométreurs</span><span class="short">Chrono</span></button>
-  <button id="nav-admin" data-act="view" data-v="races" aria-label="Ouvrir l’administration"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>Administration</button>
+  <button id="nav-admin" data-act="view" data-v="races" hidden aria-label="Ouvrir l’administration"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>Administration</button>
 </nav>
 <button id="botbtn" aria-label="Aller en bas de la page" title="Aller en bas" onclick="window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})">↓</button>
 <button id="topbtn" aria-label="Remonter en haut" title="Remonter en haut" style="position:fixed;right:16px;bottom:82px;z-index:10;border:0;border-radius:50%;width:46px;height:46px;background:var(--accent);color:white;font-size:24px;box-shadow:0 2px 8px #0003" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -205,7 +182,7 @@ S.test=false;S.view="rank";S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:
 function save(){
   // N'invalider les calculs ELO que si les courses ou les résultats ont changé.
   // Les changements d'onglet, de profil ou de filtre ne doivent pas relancer les calculs lourds.
-  var nextFingerprint=S.races.map(function(c){return [c.id,c.date,c.dist,(c.results||[]).map(function(a){return (a.id||a.pendingKey||'')+':'+a.time+':'+(a.pendingName||'')}).join(',')].join('~')}).join('|');
+  var nextFingerprint=S.races.map(function(c){return [c.id,c.date,c.dist,(c.results||[]).map(function(a){return (a.id||a.pendingKey||'')+':'+a.time+':'+(a.pending?1:0)+':'+(a.pendingName||'')}).join(',')].join('~')}).join('|');
   if(nextFingerprint!==eloFingerprint){eloCache={};eloFingerprint=nextFingerprint;}
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){var w=document.getElementById("savewarn");if(w)w.hidden=false}
   if(remoteReady && S.admin){
@@ -243,23 +220,31 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function compute(pred,scope){
   var cacheable=!pred,cacheKey=""+(scope||"all");
   if(cacheable&&eloCache[cacheKey])return eloCache[cacheKey];
-  pred=pred||function(){return true};function kd(c){return scope?"X":c.dist}
+  pred=pred||function(){return true};
+  function kd(c){return scope?"X":c.dist}
   var st={};
   function g(id,d){var k=id+"|"+d;return st[k]||(st[k]={elo:1500,n:0,hist:[1500]})}
   S.races.filter(function(c){return inScope(c.dist,scope)}).forEach(function(c){
-    var r=c.results.filter(function(a){return !a.pending&&!!a.id&&pred(a.id)}),m=r.length;if(m<2)return;
-    var dl={};r.forEach(function(a){dl[a.id]=0});
-    for(var i=0;i<m;i++)for(var j=i+1;j<m;j++){
-      var a=r[i],b=r[j],pa=g(a.id,kd(c)),pb=g(b.id,kd(c));
-      var ea=1/(1+Math.pow(10,(pb.elo-pa.elo)/400));
-      var sa=a.time<b.time?1:a.time>b.time?0:.5;
-      // Un duel doit être strictement équilibré : les deux coureurs utilisent
-      // le même coefficient K afin que les points gagnés et perdus se compensent.
-      // Le coefficient reste élevé tant que l'un des deux coureurs est débutant.
-      var k=(pa.n<5||pb.n<5)?40:24;
-      dl[a.id]+=k/(m-1)*(sa-ea);dl[b.id]+=k/(m-1)*((1-sa)-(1-ea));
+    // Seuls les résultats officiels associés à un profil entrent dans le calcul.
+    var r=c.results.filter(function(a){return !a.pending&&!!a.id&&pred(a.id)}),m=r.length;
+    if(m<2)return;
+    var P=new Array(m),T=new Float64Array(m),D=new Float64Array(m),i,j;
+    for(i=0;i<m;i++){P[i]=g(r[i].id,kd(c));T[i]=r[i].time}
+    // Même formule et même coefficient K symétrique que la version précédente,
+    // avec des tableaux numériques pour réduire le travail du navigateur.
+    for(i=0;i<m-1;i++){
+      var pi=P[i],ti=T[i],di=0;
+      for(j=i+1;j<m;j++){
+        var pj=P[j],ea=1/(1+Math.pow(10,(pj.elo-pi.elo)/400));
+        var sa=ti<T[j]?1:ti>T[j]?0:.5;
+        var k=(pi.n<5||pj.n<5)?40:24;
+        var delta=k/(m-1)*(sa-ea);
+        di+=delta;
+        D[j]-=delta;
+      }
+      D[i]+=di;
     }
-    r.forEach(function(a){var p=g(a.id,kd(c));p.elo+=dl[a.id];p.n++;p.hist.push(p.elo)});
+    for(i=0;i<m;i++){var p=P[i];p.elo+=D[i];p.n++;p.hist.push(p.elo)}
   });
   if(cacheable)eloCache[cacheKey]=st;
   return st;
@@ -321,8 +306,6 @@ function eloChart(hist,dates){
   return '<div class="pf-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Évolution de l’ELO après chaque course">'+g+'<polyline points="'+pts+'" fill="none" stroke="#35D878" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+'<text x="'+L+'" y="'+(H-12)+'" fill="#9EB0C1" font-size="22">'+esc(dates[0]||'')+'</text><text x="'+(W-R)+'" y="'+(H-12)+'" text-anchor="end" fill="#9EB0C1" font-size="22">'+esc(dates[n-1]||'')+'</text></svg><div class="meta" style="padding:0 6px 6px">Départ à 1500, puis le niveau après chaque course. Une course = un point.</div></div>';
 }
 function runnerProfile(id,isMine){
-  // Si le profil consulté est celui du compte connecté, conserver les commandes de modification même depuis le classement public.
-  isMine=!!(isMine||(linkedRunner&&linkedRunner===id)||(S.me&&S.me===id));
   var r=S.runners.filter(function(x){return x.id===id})[0];
   if(!r)return '<h2>Profil coureur</h2><p class="empty">Ce profil est introuvable.</p><button class="ghost" data-act="backrank">Retour au classement</button>';
   var allState=compute(undefined,"all"),routeState=compute(undefined,"route"),trailState=compute(undefined,"trail");
@@ -377,23 +360,19 @@ function runnerProfile(id,isMine){
   var records={};mine.forEach(function(c){var a=c.results.filter(function(x){return x.id===id})[0],key=c.dist||'Distance non renseignée';if(a&&Number.isFinite(Number(a.time))&&(!records[key]||Number(a.time)<records[key].time))records[key]={time:Number(a.time),race:c.name,date:c.date}});
   var recordHTML=Object.keys(records).sort(function(a,b){return a.localeCompare(b,'fr')}).map(function(k){return '<div class="pf-record"><div><b>'+esc(k)+'</b><small>'+esc(records[k].race)+'</small></div><strong>'+formatTime(records[k].time)+'</strong></div>'}).join('');
   var races=mine.slice().sort(function(a,b2){return String(b2.date||'').localeCompare(String(a.date||''))});
-  var hist=races.map(function(c){var a=c.results.filter(function(x){return x.id===id})[0],pl=place(c),rank=pl===1?'<span class="pf-history-medal gold">🥇 <b>1re place</b></span>':pl===2?'<span class="pf-history-medal silver">🥈 <b>2e place</b></span>':pl===3?'<span class="pf-history-medal bronze">🥉 <b>3e place</b></span>':pl+'e';return '<div class="pf-race"><div class="pf-race-main"><div class="pf-race-name">'+esc(c.name)+'</div><div class="pf-race-meta"><span class="pf-chip">'+esc(c.dist)+'</span> '+(c.date?new Date(c.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}):'Date non renseignée')+'</div></div><div class="pf-race-right"><div class="pf-time">'+formatTime(a.time)+'</div><div class="pf-place">'+rank+' / '+c.results.length+'</div></div></div>'}).join('');
+  var hist=races.map(function(c){var a=c.results.filter(function(x){return x.id===id})[0],pl=place(c),rank=pl===1?'🥇':pl===2?'🥈':pl===3?'🥉':pl+'e';return '<div class="pf-race"><div class="pf-race-main"><div class="pf-race-name">'+esc(c.name)+'</div><div class="pf-race-meta"><span class="pf-chip">'+esc(c.dist)+'</span> '+(c.date?new Date(c.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}):'Date non renseignée')+'</div></div><div class="pf-race-right"><div class="pf-time">'+formatTime(a.time)+'</div><div class="pf-place">'+rank+' / '+c.results.length+'</div></div></div>'}).join('');
   var adminDelete=S.admin?'<div class="pf-admin-danger"><strong>Administration</strong><p>Profil créé par erreur ? Tu peux le déplacer dans la corbeille. Ses résultats seront conservés pour permettre sa restauration.</p><button class="pf-delete" data-act="delrunner" data-v="'+esc(id)+'">Placer ce profil dans la corbeille</button></div>':'';
   var dates=['Départ'];if(p&&p.hist&&p.hist.length>1){S.races.filter(function(c){return c.results.length>=2&&c.results.some(function(a){return a.id===id})}).forEach(function(c){dates.push(c.date?new Date(c.date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'}):'')})}
   return '<div class="pf">'+top+hero+acts+quick+'<h3 class="profile-section-title">Médailles et distinctions</h3>'+medalHTML+'<p class="pf-footnote">Podiums calculés à partir du rang officiel importé, ou du temps si le rang n’est pas disponible. Les distinctions sont calculées à partir des courses, podiums, distances, ELO et J’aime enregistrés.</p><div class="pf-achievements">'+achievements.join('')+'</div><h3 class="profile-section-title">Meilleurs temps</h3>'+(recordHTML||'<p class="empty">Aucun temps enregistré.</p>')+'<h3 class="profile-section-title">Classement ELO</h3>'+main+'<h3 class="profile-section-title">Spécialités</h3>'+categories+'<h3 class="profile-section-title">Progression</h3>'+eloChart(p&&p.hist?p.hist:[1500],dates)+'<h3 class="profile-section-title">Historique des courses</h3>'+(hist||'<p class="empty">Aucun résultat enregistré.</p>')+'<div id="profiledetails">'+profileDetailsHTML(id,isMine)+'</div>'+nextRaceHTML(id,isMine)+avatarEditorHTML(id,isMine)+'<div id="socialpanel" class="card"><p class="meta">Chargement des échanges…</p></div>'+adminDelete+'</div>';
 }
 function escapeAttr(s){return esc(s).replace(/'/g,'&#39;')}
 function profileDetailsHTML(id,isMine){
-  var d=runnerDetails[id]||{},strava=(d.strava_url||'').trim(),objective=(d.objective||'').trim(),safeStrava=/^https:\/\/(www\.)?strava\.com\/[^\s"'<>]+$/i.test(strava),html='<div class="card"><strong>Présentation</strong>';
-  html+='<div class="pf-details-grid">';
-  if(d.club)html+='<div class="pf-detail-tile"><small>CLUB</small><strong>'+esc(d.club)+'</strong></div>';
-  if(d.city)html+='<div class="pf-detail-tile"><small>VILLE</small><strong>'+esc(d.city)+'</strong></div>';
-  html+='</div>';
+  var d=runnerDetails[id]||{},html='<div class="card"><strong>Présentation</strong>';
+  if(d.club)html+='<p><b>Club :</b> '+esc(d.club)+'</p>';
+  if(d.city)html+='<p><b>Ville :</b> '+esc(d.city)+'</p>';
   if(d.bio)html+='<p style="white-space:pre-wrap">'+esc(d.bio)+'</p>';
-  if(objective)html+='<div class="pf-detail-tile" style="margin-top:8px"><small>MON OBJECTIF</small><strong>'+esc(objective)+'</strong></div>';
-  if(safeStrava)html+='<a class="pf-strava" href="'+escapeAttr(strava)+'" target="_blank" rel="noopener noreferrer">↗ Voir mon profil Strava</a>';
-  if(!d.club&&!d.city&&!d.bio&&!objective&&!safeStrava)html+='<p class="meta">'+(isMine?'Ajoute ton club, ta ville, quelques mots et ton lien Strava.':'Ce coureur n’a pas encore renseigné sa présentation.')+'</p>';
-  if(isMine&&linkedRunner===id){html+='<details open style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Modifier ma présentation</summary><label for="profileclub">Club</label><input id="profileclub" maxlength="80" value="'+escapeAttr(d.club||'')+'" placeholder="Mon club de running"><label for="profilecity">Ville</label><input id="profilecity" maxlength="80" value="'+escapeAttr(d.city||'')+'" placeholder="Ma ville"><label for="profilestrava">Lien vers mon profil Strava</label><input id="profilestrava" type="url" maxlength="250" value="'+escapeAttr(strava)+'" placeholder="https://www.strava.com/athletes/..."><label for="profileobjective">Mon objectif sportif</label><input id="profileobjective" maxlength="160" value="'+escapeAttr(objective)+'" placeholder="Ex. passer sous les 50 min au 10 km"><label for="profilebio">Quelques mots sur moi</label><textarea id="profilebio" maxlength="500" rows="3" placeholder="Présente-toi en quelques mots…">'+esc(d.bio||'')+'</textarea><button class="ghost" data-act="saveprofiledetails">Enregistrer ma présentation</button></details>'}
+  if(!d.club&&!d.city&&!d.bio)html+='<p class="meta">'+(isMine?'Ajoute ton club, ta ville et quelques mots pour te présenter.':'Ce coureur n’a pas encore renseigné sa présentation.')+'</p>';
+  if(isMine&&linkedRunner===id){html+='<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Modifier ma présentation</summary><label for="profileclub">Club</label><input id="profileclub" maxlength="80" value="'+escapeAttr(d.club||'')+'" placeholder="Mon club de running"><label for="profilecity">Ville</label><input id="profilecity" maxlength="80" value="'+escapeAttr(d.city||'')+'" placeholder="Ma ville"><label for="profilebio">Quelques mots sur moi</label><textarea id="profilebio" maxlength="500" rows="3" placeholder="Mes objectifs, mes courses préférées…">'+esc(d.bio||'')+'</textarea><button class="ghost" data-act="saveprofiledetails">Enregistrer ma présentation</button></details>'}
   return html+'</div>';
 }
 function avatarEditorHTML(id,isMine){
@@ -422,7 +401,7 @@ async function loadSocial(id){
     ]);
     // Les informations personnelles sont facultatives. Une table non encore migrée
     // ne doit pas empêcher le chargement des commentaires, photos ou prochaines courses.
-    try{var dq=await sb.from('runner_profile_details').select('runner_id,club,city,bio,objective').eq('runner_id',id).maybeSingle();if(!dq.error&&dq.data)runnerDetails[id]=dq.data;try{var sq=await sb.from('runner_profile_details').select('strava_url').eq('runner_id',id).maybeSingle();if(!sq.error&&sq.data)runnerDetails[id]=Object.assign(runnerDetails[id]||{},sq.data);}catch(ignoreStrava){}}catch(ignoreDetails){}
+    try{var dq=await sb.from('runner_profile_details').select('runner_id,club,city,bio').eq('runner_id',id).maybeSingle();if(!dq.error&&dq.data)runnerDetails[id]=dq.data;}catch(ignoreDetails){}
     var detailsBox=document.getElementById('profiledetails');if(detailsBox)detailsBox.innerHTML=profileDetailsHTML(id,linkedRunner===id);
     if(av.data)av.data.forEach(function(x){avatarMap[x.runner_id]=x.avatar_url});
     if(nx.data)window.eloNextRaces[id]=nx.data;else delete window.eloNextRaces[id];var nr=document.getElementById('nextracepanel');if(nr)nr.innerHTML=nextRaceHTML(id,!!(S.me===id));
@@ -549,10 +528,12 @@ function topInfoHTML(st){
   var b=board(st,"X"),me=S.runners.filter(function(r){return r.id===S.me})[0],html='<div class="topcount"><strong>'+S.runners.length.toLocaleString("fr-FR")+'</strong> coureurs inscrits</div>';
   if(me){
     var item=b.ranked.concat(b.prov).filter(function(x){return x.r.id===me.id})[0];
-    if(item){var rank=b.ranked.findIndex(function(x){return x.r.id===me.id})+1,catInfo=categoryRankInfo(st,me.id);html+='<button class="toprunner" data-act="view" data-v="me"><span class="meta">MON CLASSEMENT ELO</span><strong>'+(rank>0?rank:'Provisoire')+'</strong> · '+Math.round(item.p.elo)+' pts'+(catInfo?'<span class="meta">Catégorie '+esc(catInfo.category)+' : '+(catInfo.rank?'#'+catInfo.rank+' / '+catInfo.total:'Pas encore classé')+'</span>':'')+'</button>'}
+    if(item){
+      var rank=b.ranked.findIndex(function(x){return x.r.id===me.id})+1,catInfo=categoryRankInfo(st,me.id);
+      html+='<button class="toprunner" data-act="view" data-v="me"><span class="meta">MON CLASSEMENT ELO</span><strong>'+(rank>0?'#'+rank:'Provisoire')+'</strong> · '+Math.round(item.p.elo)+' pts'+(catInfo?'<span class="meta">Catégorie '+esc(catInfo.category)+' : '+(catInfo.rank?'#'+catInfo.rank+' / '+catInfo.total:'Pas encore classé')+'</span>':'')+'</button>'
+    }
     else html+='<button class="toprunner" data-act="view" data-v="me"><span class="meta">MON PROFIL</span><strong>Voir ma fiche</strong></button>';
   }else html+='<button class="toprunner" data-act="view" data-v="me"><span class="meta">MON CLASSEMENT ELO</span><strong>Choisir mon profil</strong></button>';
-  html+='<button class="toplogin" data-act="view" data-v="me">'+(authUser?'Mon compte':'Connexion')+'</button>';
   if(S.admin)html+='<button class="ghost" data-act="adminoff" style="white-space:nowrap;border:1px solid var(--line);border-radius:10px;padding:8px 10px">Quitter l’administration</button>';
   return html;
 }
@@ -565,11 +546,11 @@ async function loadPendingAccounts(){
 }
 function render(){setTimeout(arrows,30);MINR=1;
   var st=compute(undefined,S.dist||"all");ALL=st;var stM=st;
-  var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(st);
+  var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(compute(undefined,"all"));
   $("#v-rank").innerHTML=S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st);$("#v-races").innerHTML=racesHTML();if(S.view==="me")$("#v-me").innerHTML=meHTML(stM);$("#v-help").innerHTML=helpHTML();$("#v-chrono").innerHTML=chronoHTML();
   ["rank","races","me","help","chrono"].forEach(function(v){$("#v-"+v).classList.toggle("on",v===S.view)});
-  var adminNav=document.getElementById("nav-admin");if(adminNav)adminNav.hidden=false;
-  document.querySelectorAll(".nav button").forEach(function(b){b.setAttribute("aria-current",b.dataset.v===S.view?"true":"false")});
+  var adminNav=document.getElementById("nav-admin");if(adminNav)adminNav.hidden=!S.admin;
+  document.querySelectorAll(".nav button").forEach(function(b){b.setAttribute("aria-current",b.dataset.v===S.view&&(!b.id||b.id!=="nav-admin"||S.admin)?"true":"false")});
   var activeProfile=S.publicProfile||(S.view==="me"?S.me:null);if(activeProfile)loadSocial(activeProfile);if(S.admin&&S.view==="races")loadPendingAccounts();
 }
 function demo(){
@@ -1034,14 +1015,13 @@ document.addEventListener("click",function(e){
   else if(a==='saveprofiledetails'){
     (async function(){try{
       if(!authUser||!linkedRunner)throw new Error('Connecte-toi avec ton compte coureur lié pour modifier cette présentation.');
-      var club=(document.getElementById('profileclub').value||'').trim(),city=(document.getElementById('profilecity').value||'').trim(),bio=(document.getElementById('profilebio').value||'').trim(),objective=(document.getElementById('profileobjective').value||'').trim(),strava=(document.getElementById('profilestrava').value||'').trim();
-      if(strava&&!/^https:\/\/(www\.)?strava\.com\/[A-Za-z0-9_\-/?=&%.]+$/i.test(strava))throw new Error('Le lien doit être une adresse https://www.strava.com/…');
-      var q=await sb.from('runner_profile_details').upsert({runner_id:linkedRunner,user_id:authUser.id,club:club,city:city,bio:bio,objective:objective,strava_url:strava||null,updated_at:new Date().toISOString()},{onConflict:'runner_id'});
-      if(q.error)throw q.error;runnerDetails[linkedRunner]={runner_id:linkedRunner,club:club,city:city,bio:bio,objective:objective,strava_url:strava};msg.runnerAccount='Présentation mise à jour.';render();
+      var club=(document.getElementById('profileclub').value||'').trim(),city=(document.getElementById('profilecity').value||'').trim(),bio=(document.getElementById('profilebio').value||'').trim();
+      var q=await sb.from('runner_profile_details').upsert({runner_id:linkedRunner,user_id:authUser.id,club:club,city:city,bio:bio,updated_at:new Date().toISOString()},{onConflict:'runner_id'});
+      if(q.error)throw q.error;runnerDetails[linkedRunner]={runner_id:linkedRunner,club:club,city:city,bio:bio};msg.runnerAccount='Présentation mise à jour.';render();
     }catch(err){msg.runnerAccount='Impossible d’enregistrer la présentation : '+(err.message||'erreur Supabase');render();}})();
   }
   else if(a==='uploadavatar'){
-    (async function(){try{var f=document.getElementById('avatarfile').files[0];if(!f||!/^image\/(jpeg|png|webp)$/.test(f.type)||f.size>2097152)throw new Error('Choisis une image JPG, PNG ou WebP de 2 Mo maximum.');var path=authUser.id+'/'+Date.now()+'-'+f.name.replace(/[^a-zA-Z0-9._-]/g,'_');var up=await sb.storage.from('elo-avatars').upload(path,f,{upsert:true,contentType:f.type});if(up.error)throw up.error;var pub=sb.storage.from('elo-avatars').getPublicUrl(path).data.publicUrl;var saved=await sb.from('runner_avatars').upsert({user_id:authUser.id,runner_id:linkedRunner,avatar_url:pub,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(saved.error)throw saved.error;avatarMap[linkedRunner]=pub;msg.runnerAccount='Photo mise à jour.';render();}catch(err){msg.runnerAccount='Photo non enregistrée : '+(err.message||'Erreur inconnue');render();var am=document.getElementById('avatarmessage');if(am)am.textContent=msg.runnerAccount;}})();
+    (async function(){try{var f=document.getElementById('avatarfile').files[0];if(!f||!/^image\/(jpeg|png|webp)$/.test(f.type)||f.size>2097152)throw new Error('Choisis une image JPG, PNG ou WebP de 2 Mo maximum.');var path=authUser.id+'/'+Date.now()+'-'+f.name.replace(/[^a-zA-Z0-9._-]/g,'_');var up=await sb.storage.from('photos-coureurs').upload(path,f,{upsert:true,contentType:f.type});if(up.error)throw up.error;var pub=sb.storage.from('photos-coureurs').getPublicUrl(path).data.publicUrl;var saved=await sb.from('runner_avatars').upsert({user_id:authUser.id,runner_id:linkedRunner,avatar_url:pub,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(saved.error)throw saved.error;avatarMap[linkedRunner]=pub;msg.runnerAccount='Photo mise à jour.';render();}catch(err){msg.runnerAccount=err.message||'Erreur lors de l’envoi de la photo.';render();}})();
   }
   else if(a==='savenextrace'){
     (async function(){try{var c=S.races.filter(function(x){return x.id===document.getElementById('nextrace').value})[0];if(!c||['Klikego','Breizh Chrono','IPITOS'].indexOf(c.provider)<0)throw new Error('Choisis une course future importée par un chronométreur autorisé.');var q=await sb.from('runner_next_races').upsert({runner_id:linkedRunner,race_id:c.id,race_name:c.name,race_date:c.date,distance:c.dist,provider:c.provider,updated_at:new Date().toISOString()},{onConflict:'runner_id'});if(q.error)throw q.error;window.eloNextRaces[linkedRunner]={runner_id:linkedRunner,race_id:c.id,race_name:c.name,race_date:c.date,distance:c.dist,provider:c.provider};render();}catch(err){msg.runnerAccount=err.message;render();}})();
