@@ -188,7 +188,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 .catelo{font-size:17px;flex:none}.catitle{margin:6px 0 10px;font-size:22px}
 
 
-/* ===== Améliorations Page Profil & Accueil — version 0.9.12 ===== */
+/* ===== Améliorations Page Profil & Accueil — version 0.9.13 ===== */
 .home-hero{background:linear-gradient(135deg,#0f3d28 0%,#102236 70%);color:#f4f7fa;border:1px solid #2a445d;border-radius:16px;padding:clamp(20px,4vw,34px);margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.22)}
 .home-hero:after{content:"";position:absolute;width:210px;height:210px;border:24px solid rgba(53,216,120,.09);border-radius:50%;right:-65px;top:-80px;pointer-events:none}
 .home-hero h2{color:#fff;font-size:clamp(30px,5vw,44px);line-height:1.02;margin:0 0 10px;max-width:650px}
@@ -238,7 +238,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
   <section class="view" id="v-chrono" aria-label="Chronométreurs"></section>
   <section class="view" id="v-organizer" aria-label="Espace organisateur"></section>
   <section class="view" id="v-upcoming" aria-label="Courses à venir"></section>
-<p class="sitefoot">Les résultats viennent des classements officiels publiés par les chronométreurs. Pour demander le retrait de ton nom, <a id="rmlink" href="#">écris-nous</a>. · <button class="ghost" style="display:inline;padding:0 3px;text-decoration:underline" data-act="history">ELO COURSE version 0.9.12</button></p></main>
+<p class="sitefoot">Les résultats viennent des classements officiels publiés par les chronométreurs. Pour demander le retrait de ton nom, <a id="rmlink" href="#">écris-nous</a>. · <button class="ghost" style="display:inline;padding:0 3px;text-decoration:underline" data-act="history">ELO COURSE version 0.9.13</button></p></main>
 <nav class="nav" aria-label="Navigation">
   <button data-act="view" data-v="accueil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span class="full">Accueil</span><span class="short">Accueil</span></button>
   <button data-act="view" data-v="rank"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM5 5H3v2a3 3 0 0 0 3 3M19 5h2v2a3 3 0 0 1-3 3"/></svg>Classement</button>
@@ -1298,7 +1298,7 @@ document.addEventListener("click",function(e){
     if(!authUser||!confirm('Retirer cette course de la page publique ?'))return;
     (async function(){var q=await sb.from('elo_upcoming_courses').delete().eq('id',v).eq('user_id',authUser.id);if(q.error){msg.organizer='Suppression impossible : '+q.error.message;}else{upcomingCourses=upcomingCourses.filter(function(x){return x.id!==v});msg.organizer='Course retirée de la publication.';}render();})();return;
   }
-  if(a==='history'){alert('Historique ELO COURSE\n\nVersion 0.9.12 — 14 novembre 2026\n• Accueil réorganisé avec accès directs, dernières courses et compteurs de coureurs uniques, courses et résultats.\n• Connexion administrateur réservée au compte coureur autorisé ; le retour en mode coureur conserve la session pour permettre une reconnexion.\n• Suppression d’un résultat ciblée sur sa ligne exacte, sans supprimer les autres résultats du même coureur.\n• Classement officiel accessible dès la première course, avec un ELO qui se précise au fil des participations.\n\nÉvolutions précédentes : courses à venir publiées directement par les organisateurs, profils coureurs et inscription sécurisée, classement officiel dès la première course.');return;}
+  if(a==='history'){alert('Historique ELO COURSE\n\nVersion 0.9.13 — 14 novembre 2026\n• Progression ELO recalculée dans l’ordre chronologique des courses ; chaque point du graphique affiche sa date et sa valeur au survol.\n• Partage individuel ajouté à chaque résultat de l’historique du profil.\n• Compteurs séparés entre profils uniques et coureurs réellement classés, pour rendre visible l’écart à analyser.\n\n• Accueil réorganisé avec accès directs, dernières courses et compteurs de coureurs uniques, courses et résultats.\n• Connexion administrateur réservée au compte coureur autorisé ; le retour en mode coureur conserve la session pour permettre une reconnexion.\n• Suppression d’un résultat ciblée sur sa ligne exacte, sans supprimer les autres résultats du même coureur.\n• Classement officiel accessible dès la première course, avec un ELO qui se précise au fil des participations.\n\nÉvolutions précédentes : courses à venir publiées directement par les organisateurs, profils coureurs et inscription sécurisée, classement officiel dès la première course.');return;}
   if(a==='testPreview'){S.testPreview=v==='organizer'?'organizer':'runner';accountPopoverOpen=false;S.view='rank';render();window.scrollTo(0,0);return;}
   if(a==='closeTestPreview'){S.testPreview=null;render();return;}
   if(a==='testOrganizerPublish'){var m=document.getElementById('testorgmsg');if(m)m.textContent='Simulation réussie : la course apparaîtrait dans Courses à venir. Rien n’a été publié.';return;}
