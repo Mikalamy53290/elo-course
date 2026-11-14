@@ -197,7 +197,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 .home-kicker:before{content:"";width:22px;height:2px;background:#35d878}
 .home-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px;position:relative;z-index:1}
 .home-actions .btn,.home-actions .ghost{min-height:44px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
-.home-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.home-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
 .home-stat{background:linear-gradient(160deg,#16293d,#0f1d2c);border:1px solid #2a445d;border-radius:13px;padding:14px;text-align:center}
 .home-stat strong{display:block;font:700 clamp(28px,5vw,36px)/1 "Barlow Condensed",sans-serif;color:#fff}
 .home-stat span{display:block;font-size:12px;color:#9eb5c9;margin-top:4px}
@@ -310,6 +310,7 @@ function isAnonymousRunnerName(value){
 function secs(v){var p=v.split(":").map(Number),t=0;p.forEach(function(x){t=t*60+x});return t}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function uniqueRunnerCount(){var ids=new Set();S.runners.forEach(function(r){if(r&&r.id!==undefined&&r.id!==null&&String(r.id)!=="")ids.add(String(r.id));});return ids.size;}
+function classifiedRunnerCount(st){st=st||compute(undefined,"all");var ids=new Set();S.runners.forEach(function(r){var p=r&&st[r.id+"|X"];if(p&&p.n>=MINR)ids.add(String(r.id));});return ids.size;}
 function totalResultCount(){return S.races.reduce(function(total,c){return total+(Array.isArray(c.results)?c.results.length:0);},0);}
 
 function compute(pred,scope){
@@ -702,11 +703,11 @@ function trashHTML(){
   }).join(''):'<p class="empty">La corbeille est vide.</p>';
   return '<section class="card" id="admintrash" style="margin:18px 0;border:1px solid #8e3d46!important"><h2>Corbeille administrateur ('+items.length+')</h2><p class="meta">Les profils placés ici ne figurent plus dans le classement. Leurs résultats sont conservés jusqu’à restauration ou suppression définitive.</p>'+body+'</section>';
 }
-function accueilHTML(){
-  var totalRunners=uniqueRunnerCount().toLocaleString("fr-FR"),totalRaces=S.races.length.toLocaleString("fr-FR"),totalResults=totalResultCount().toLocaleString("fr-FR");
+function accueilHTML(st){
+  var totalRunners=uniqueRunnerCount().toLocaleString("fr-FR"),totalRanked=classifiedRunnerCount(st).toLocaleString("fr-FR"),totalRaces=S.races.length.toLocaleString("fr-FR"),totalResults=totalResultCount().toLocaleString("fr-FR");
   var latest=S.races.slice().filter(function(c){return c.date;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));}).slice(0,3);
   var h='<div class="home-hero"><div class="home-kicker">Sarthe · Mayenne · Maine-et-Loire</div><h2>Les courses de la région.<br>Les coureurs à leur juste niveau.</h2><p>Consulte les résultats officiels, découvre les profils des coureurs et suis l’évolution du classement ELO au fil des compétitions.</p><div class="home-actions"><button class="btn" data-act="view" data-v="rank">Voir le classement ELO</button><button class="ghost" data-act="view" data-v="races">Consulter les résultats</button><button class="ghost" data-act="view" data-v="me">Trouver mon profil</button></div></div>';
-  h+='<div class="home-stats"><div class="home-stat"><strong>'+totalRunners+'</strong><span>Coureurs uniques</span></div><div class="home-stat"><strong>'+totalRaces+'</strong><span>Courses enregistrées</span></div><div class="home-stat"><strong>'+totalResults+'</strong><span>Résultats enregistrés</span></div></div>';
+  h+='<div class="home-stats"><div class="home-stat"><strong>'+totalRunners+'</strong><span>Profils uniques</span></div><div class="home-stat"><strong>'+totalRanked+'</strong><span>Coureurs classés</span></div><div class="home-stat"><strong>'+totalRaces+'</strong><span>Courses enregistrées</span></div><div class="home-stat"><strong>'+totalResults+'</strong><span>Résultats enregistrés</span></div></div>';
   h+='<h3 class="home-section-title">Bienvenue sur ELO COURSE</h3><div class="home-info-grid"><div class="home-info"><strong>Un classement basé sur les duels</strong><p>Le score ELO évolue selon les coureurs devancés ou qui te devancent, et pas uniquement selon le temps réalisé.</p><button class="ghost" data-act="view" data-v="rank" style="margin-top:9px">Découvrir le classement</button></div><div class="home-info"><strong>Ton profil coureur</strong><p>Retrouve tes résultats, tes performances, tes records et ta progression au fil des courses.</p><button class="ghost" data-act="view" data-v="me" style="margin-top:9px">Accéder aux profils</button></div><div class="home-info"><strong>Les prochaines courses</strong><p>Consulte les épreuves annoncées par les organisateurs dans les trois départements.</p><button class="ghost" data-act="view" data-v="upcoming" style="margin-top:9px">Voir les courses à venir</button></div><div class="home-info"><strong>Comprendre le classement</strong><p>Découvre les règles, le fonctionnement des points et les conditions d’entrée dans le classement officiel.</p><button class="ghost" data-act="view" data-v="help" style="margin-top:9px">Lire les règles</button></div></div>';
   if(latest.length){h+='<h3 class="home-section-title">Dernières courses enregistrées</h3><div class="home-latest">';h+=latest.map(function(c){return '<div class="card"><strong>'+esc(c.name)+'</strong><p class="meta">'+esc(c.dist||'Distance non précisée')+(c.date?' · '+new Date(c.date+'T12:00:00').toLocaleDateString('fr-FR'):'')+' · '+((c.results||[]).length.toLocaleString('fr-FR'))+' résultats</p><button class="ghost" data-act="homerace" data-v="'+esc(c.id)+'">Voir cette course</button></div>';}).join('')+'</div>';}
   h+='<p class="meta" style="margin-top:14px">Les classements sont établis à partir des résultats officiels des courses chronométrées. Un profil entre dans le classement ELO officiel dès une course.</p>';
@@ -795,7 +796,7 @@ function chronoHTML(){
   return h;
 }
 function topInfoHTML(st){
-  var html='<div class="topcount"><strong>'+S.runners.length.toLocaleString("fr-FR")+'</strong> coureurs inscrits</div>';
+  var html='<div class="topcount"><strong>'+uniqueRunnerCount().toLocaleString("fr-FR")+'</strong> profils uniques</div>';
   if(authUser&&S.view!=="accueil"){
     var runner=linkedRunner?S.runners.filter(function(r){return r.id===linkedRunner})[0]:null;
     html+='<div class="top-account-group">';
@@ -836,10 +837,10 @@ function testPreviewHTML(){
 }
 function render(){setTimeout(arrows,30);MINR=1;
   // Le calcul ELO reste partagé, mais seule la rubrique visible est reconstruite.
-  var needsStats=S.view==="rank"||S.view==="me"||(S.view!=="accueil"&&!!(authUser&&linkedRunner));
+  var needsStats=S.view==="rank"||S.view==="me"||S.view==="accueil"||(S.view!=="accueil"&&!!(authUser&&linkedRunner));
   var st=needsStats?compute(undefined,S.dist||"all"):(ALL||{});if(needsStats)ALL=st;
   var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(st);var pop=document.getElementById("accountpopover");if(pop){pop.hidden=!accountPopoverOpen;pop.innerHTML=accountPopoverOpen?accountPanelHTML():"";}
-  if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML();
+  if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML(st);
   if(S.view==="rank")$("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));
   else if(S.view==="races")$("#v-races").innerHTML=racesHTML();
   else if(S.view==="me")$("#v-me").innerHTML=meHTML(st);
