@@ -272,7 +272,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_publishable_jiboviI5BaRii9_Lz9JK_A_qwXsVC-O";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
-var eloCache={},eloFingerprint=null,authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
+var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={};
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
@@ -290,7 +290,7 @@ function save(){
   // N'invalider les calculs ELO que si les courses ou les résultats ont changé.
   // Les changements d'onglet, de profil ou de filtre ne doivent pas relancer les calculs lourds.
   var nextFingerprint=S.races.map(function(c){return [c.id,c.date,c.dist,(c.results||[]).map(function(a){return (a.id||a.pendingKey||'')+':'+a.time+':'+(a.pendingName||'')}).join(',')].join('~')}).join('|');
-  if(nextFingerprint!==eloFingerprint){eloCache={};eloFingerprint=nextFingerprint;}
+  if(nextFingerprint!==eloFingerprint){eloCache={};eloVersion++;eloPending={};eloFingerprint=nextFingerprint;}
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){var w=document.getElementById("savewarn");if(w)w.hidden=false}
   if(remoteReady && S.admin){
     clearTimeout(saveTimer);
@@ -327,9 +327,64 @@ function uniqueRunnerCount(){var ids=new Set();S.runners.forEach(function(r){if(
 function classifiedRunnerCount(st){st=st||compute(undefined,"all");var ids=new Set();S.runners.forEach(function(r){var p=r&&st[r.id+"|X"];if(p&&p.n>=MINR)ids.add(String(r.id));});return ids.size;}
 function totalResultCount(){return S.races.reduce(function(total,c){return total+(Array.isArray(c.results)?c.results.length:0);},0);}
 
+function computeEloWorker(payload){
+  var TRAIL=["Trail court","Trail moyen","Trail long"],scope=payload.scope||"all",races=payload.races||[],st={};
+  function inScope(d,s){if(!s||s==="all")return true;if(s==="route")return TRAIL.indexOf(d)<0;if(s==="trail")return TRAIL.indexOf(d)>=0;return d===s}
+  function g(id,d){var k=id+"|"+d;return st[k]||(st[k]={elo:1500,n:0,hist:[1500]})}
+  races.slice().sort(function(a,b){return String(a.date||"").localeCompare(String(b.date||""));}).filter(function(c){return inScope(c.dist,scope)}).forEach(function(c){
+    var r=(c.results||[]).filter(function(a){return !a.pending&&!!a.id}),m=r.length;if(m<2)return;
+    var dl={};r.forEach(function(a){dl[a.id]=0});
+    for(var i=0;i<m;i++)for(var j=i+1;j<m;j++){
+      var a=r[i],b=r[j],pa=g(a.id,"X"),pb=g(b.id,"X");
+      var ea=1/(1+Math.pow(10,(pb.elo-pa.elo)/400));
+      var sa=a.time<b.time?1:a.time>b.time?0:.5;
+      var k=(pa.n<5||pb.n<5)?40:24;
+      dl[a.id]+=k/(m-1)*(sa-ea);
+      dl[b.id]+=k/(m-1)*((1-sa)-(1-ea));
+    }
+    r.forEach(function(a){var p=g(a.id,"X");p.elo+=dl[a.id];p.n++;p.hist.push(p.elo)});
+  });
+  return st;
+}
+function requestEloCompute(scope){
+  var key=String(scope||"all");
+  if(eloCache[key])return true;
+  if(eloPending[key]===eloVersion)return true;
+  if(eloWorkerFailed||!window.Worker||!window.Blob||!window.URL||!URL.createObjectURL)return false;
+  try{
+    if(!eloWorker){
+      var source="self.onmessage=function(e){try{var data=("+computeEloWorker.toString()+")(e.data);self.postMessage({key:e.data.key,version:e.data.version,data:data});}catch(err){self.postMessage({key:e.data.key,version:e.data.version,error:String(err&&err.message||err)});}};";
+      eloWorkerUrl=URL.createObjectURL(new Blob([source],{type:"text/javascript"}));
+      eloWorker=new Worker(eloWorkerUrl);
+      eloWorker.onmessage=function(event){
+        var result=event.data||{};
+        if(result.version!==eloVersion)return;
+        delete eloPending[result.key];
+        if(result.error){eloWorkerFailed=true;try{eloWorker.terminate();}catch(ignoreTerminate){}eloWorker=null;render();return;}
+        eloCache[result.key]=result.data||{};
+        if(result.key==="all")ALL=eloCache[result.key];
+        render();
+      };
+      eloWorker.onerror=function(){
+        eloWorkerFailed=true;eloPending={};
+        try{eloWorker.terminate();}catch(ignoreTerminate){}
+        eloWorker=null;render();
+      };
+    }
+    eloPending[key]=eloVersion;
+    eloWorker.postMessage({key:key,version:eloVersion,scope:key,races:S.races});
+    return true;
+  }catch(error){
+    eloWorkerFailed=true;eloPending={};
+    try{if(eloWorker)eloWorker.terminate();}catch(ignoreTerminate2){}
+    eloWorker=null;
+    return false;
+  }
+}
 function compute(pred,scope){
   var cacheable=!pred,cacheKey=""+(scope||"all");
   if(cacheable&&eloCache[cacheKey])return eloCache[cacheKey];
+  if(cacheable&&requestEloCompute(cacheKey))return {};
   pred=pred||function(){return true};function kd(c){return scope?"X":c.dist}
   var st={};
   function g(id,d){var k=id+"|"+d;return st[k]||(st[k]={elo:1500,n:0,hist:[1500]})}
@@ -689,6 +744,7 @@ function catRankHTML(st){
   h+='<p class="meta" style="margin:10px 0 0">Classement calculé à partir des coureurs ayant au moins '+MINR+' course(s) enregistrée(s). 100 coureurs par page.</p>';return h;
 }
 function rankHTML(st){
+  if(eloPending[String(S.dist||"all")]===eloVersion)return '<h2>Classement</h2><p class="empty">Préparation du classement… Tu peux patienter quelques instants.</p>';
   if(S.rankMode==="cat")return catRankHTML(st);
   var g=groupPred(S.group),b=board(st,"X"),ranked=b.ranked.filter(function(x){return g(x.r.id)}),prov=b.prov.filter(function(x){return g(x.r.id)});
   var all=ranked.map(function(x,i){return {x:x,rank:i+1}}).concat(prov.map(function(x){return {x:x,rank:0}})).filter(function(item){return qOK(item.x.r.name)});
@@ -718,7 +774,7 @@ function trashHTML(){
   return '<section class="card" id="admintrash" style="margin:18px 0;border:1px solid #8e3d46!important"><h2>Corbeille administrateur ('+items.length+')</h2><p class="meta">Les profils placés ici ne figurent plus dans le classement. Leurs résultats sont conservés jusqu’à restauration ou suppression définitive.</p>'+body+'</section>';
 }
 function accueilHTML(st){
-  var totalRunners=uniqueRunnerCount().toLocaleString("fr-FR"),totalRanked=classifiedRunnerCount(st).toLocaleString("fr-FR"),totalRaces=S.races.length.toLocaleString("fr-FR"),totalResults=totalResultCount().toLocaleString("fr-FR");
+  var totalRunners=uniqueRunnerCount().toLocaleString("fr-FR"),totalRanked=(eloPending[String(S.dist||"all")]===eloVersion?"Calcul…":classifiedRunnerCount(st).toLocaleString("fr-FR")),totalRaces=S.races.length.toLocaleString("fr-FR"),totalResults=totalResultCount().toLocaleString("fr-FR");
   var latest=S.races.slice().filter(function(c){return c.date;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));}).slice(0,3);
   var h='<section class="gem-home-hero"><div class="gem-hero-copy"><div class="gem-eyebrow"><span class="gem-live-dot"></span> LE CLASSEMENT RUNNING RÉGIONAL</div><h2>Chaque course<br><em>fait évoluer</em> ton ELO.</h2><p>Les résultats officiels de Sarthe, Mayenne et Maine-et-Loire réunis dans un classement unique. Retrouve les coureurs, leurs performances et leur progression.</p><div class="home-actions"><button class="btn gem-primary" data-act="view" data-v="rank">Explorer le classement <span aria-hidden="true">→</span></button><button class="ghost gem-secondary" data-act="view" data-v="races">Voir les résultats</button></div><div class="gem-trust"><span>✓ Résultats officiels</span><span>✓ Classement dès une course</span><span>✓ Profils coureurs</span></div></div><div class="gem-hero-art" aria-hidden="true"><div class="gem-ring gem-ring-one"></div><div class="gem-ring gem-ring-two"></div><div class="gem-runner-mark">ELO<span>+</span></div><div class="gem-art-label">SARTHE&nbsp; · &nbsp;MAYENNE&nbsp; · &nbsp;MAINE-ET-LOIRE</div></div></section>';
   h+='<section class="gem-stats" aria-label="Les chiffres ELO COURSE"><div class="gem-stat"><span class="gem-stat-icon">◎</span><div><strong>'+totalRunners+'</strong><span>Profils uniques</span></div></div><div class="gem-stat gem-stat-highlight"><span class="gem-stat-icon">↗</span><div><strong>'+totalRanked+'</strong><span>Coureurs classés</span></div></div><div class="gem-stat"><span class="gem-stat-icon">⚑</span><div><strong>'+totalRaces+'</strong><span>Courses enregistrées</span></div></div><div class="gem-stat"><span class="gem-stat-icon">◷</span><div><strong>'+totalResults+'</strong><span>Résultats enregistrés</span></div></div></section>';
@@ -855,7 +911,7 @@ function render(){setTimeout(arrows,30);MINR=1;
   var st=needsStats?compute(undefined,S.dist||"all"):(ALL||{});if(needsStats)ALL=st;
   var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(st);var pop=document.getElementById("accountpopover");if(pop){pop.hidden=!accountPopoverOpen;pop.innerHTML=accountPopoverOpen?accountPanelHTML():"";}
   if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML(st);
-  if(S.view==="rank")$("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));
+  if(S.view==="rank"){if(S.publicProfile&&(!eloCache.all||!eloCache.route||!eloCache.trail)){compute(undefined,"all");compute(undefined,"route");compute(undefined,"trail");$("#v-rank").innerHTML='<p class="empty">Préparation du profil et de son historique ELO…</p>';}else $("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));}
   else if(S.view==="races")$("#v-races").innerHTML=racesHTML();
   else if(S.view==="me")$("#v-me").innerHTML=meHTML(st);
   else if(S.view==="help")$("#v-help").innerHTML=helpHTML();
