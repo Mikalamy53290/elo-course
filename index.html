@@ -938,7 +938,7 @@ function parseDelimitedResults(txt,provider){
     if(cells.every(function(x){return !x||/^[-:]+$/.test(x)}))continue;
     var ri=header?idx(header,[/\bpos/,/position/,/\brang/,/\bplace/]):0;
     var ni=header?idx(header,[/nom/,/coureur/,/athlete/]):2;
-    var si=header?idx(header,[/sexe/,/\bsex\b/]):(provider==='klikego'?4:5);
+    var si=header?idx(header,[/sexe/,/\bsex\b/]):(provider==='klikego'?4:5),bi=header?idx(header,[/dossard/,/bib/]):-1;
     var ci=header?idx(header,[/categorie/,/\bcat\b/]):(provider==='klikego'?5:4);var vi=header?idx(header,[/ville/,/city/]):(provider==='klikego'?ci+1:-1);
     var rk=rank(cells[ri]);if(!rk)continue;
     // Sans en-tête, Klikego place parfois FRA (nationalité) avant le nom.
@@ -948,9 +948,9 @@ function parseDelimitedResults(txt,provider){
       var nat=-1;for(var z=1;z<Math.min(cells.length,4);z++)if(/^[A-Z]{3}$/.test(clean(cells[z]))){nat=z;break;}
       si=-1;for(var z=(nat>=0?nat+2:1);z<Math.min(cells.length,6);z++)if(/^(F|M|H|FEMME|HOMME)$/i.test(clean(cells[z]))){si=z;break;}
       if(nat>=0)ni=nat+1;else if(si>=2)ni=si-2;
-      ci=-1;if(si>=0)for(var z=si+1;z<Math.min(cells.length,si+6);z++)if(/^(CA|JU|ES|SE|M\d{1,2})$/i.test(clean(cells[z]))){ci=z;break;}vi=ci>=0?ci+1:-1;
+      ci=-1;if(si>=0)for(var z=si+1;z<Math.min(cells.length,si+6);z++)if(/^(CA|JU|ES|SE|M\d{1,2})$/i.test(clean(cells[z]))){ci=z;break;}vi=ci>=0?ci+1:-1;bi=si-1;
     }
-    var name=clean(cells[ni]);if(!name||/^(nom|prénom|prenom|coureur|FRA)$/i.test(name))continue;
+    var name=clean(cells[ni]),bib=bi>=0?clean(cells[bi]):'';if(bib&&/^\d+$/.test(bib))name=name.replace(/\s*\(\d+\)$/,'');if(!name||/^(nom|prénom|prenom|coureur|FRA)$/i.test(name))continue;
     var sex=si>=0?clean(cells[si]).toUpperCase():'';
     if(!/^(F|M|H|FEMME|HOMME)$/.test(sex))sex='';
     var cat=ci>=0?clean(cells[ci]):'';var cm=cat.match(/\b(CA|JU|ES|SE|M\d{1,2})\b/i);cat=cm?cm[1].toUpperCase():'SE';
@@ -959,7 +959,7 @@ function parseDelimitedResults(txt,provider){
     if(!tm){for(var j=0;j<cells.length;j++){var t=time(cells[j]);if(t){tm=t;break}}}
     if(!tm)continue;
     var key=(name+'|'+tm).toLowerCase();if(seen[key])continue;seen[key]=1;
-    var city=vi>=0?clean(cells[vi]):'';out.push({rk:rk,name:name,sex:sex==='F'||sex==='FEMME'?'F':'H',cat:cat,time:tm,city:city});
+    var city=vi>=0?clean(cells[vi]):'';out.push({rk:rk,name:name,bib:/^\d+$/.test(bib)?bib:'',sex:sex==='F'||sex==='FEMME'?'F':'H',cat:cat,time:tm,city:city});
   }
   return out;
 }
@@ -1149,11 +1149,11 @@ async function addRace(){
       unmatched++;var label=en.name+(matches.length>1?' (doublon : '+matches.length+' fiches)':(sourceCity?' (ville à vérifier : '+en.city+')':' (identité insuffisante)'));
       if(matches.length>1)ambiguousNames.push(label);else unmatchedNames.push(label);
       var pk=norm(en.name)+'|'+Number(en.time)+'|'+Number(en.rk||0);
-      if(!seenPending[pk]){seenPending[pk]=1;pendingResults.push({pending:true,pendingKey:'pending_'+uid(),pendingName:String(en.name||'').trim(),pendingCity:String(en.city||'').trim(),pendingSex:normalizeSex(en.sex)||'',pendingCat:normalizeCategory(en.cat)||'',time:Number(en.time),rk:en.rk||0,reason:matches.length>1?'doublon':'ville_a_verifier'});}
+      if(!seenPending[pk]){seenPending[pk]=1;pendingResults.push({pending:true,pendingKey:'pending_'+uid(),pendingName:String(en.name||'').trim(),pendingBib:String(en.bib||''),pendingCity:String(en.city||'').trim(),pendingSex:normalizeSex(en.sex)||'',pendingCat:normalizeCategory(en.cat)||'',time:Number(en.time),rk:en.rk||0,reason:matches.length>1?'doublon':'ville_a_verifier'});}
       return;
     }
     if(seen[r.id])return;
-    seen[r.id]=1;res.push({id:r.id,time:en.time,rk:en.rk||0});
+    seen[r.id]=1;res.push({id:r.id,time:en.time,rk:en.rk||0,bib:String(en.bib||'')});
   });
   var ex=S.races.filter(function(c){return !c.demo&&norm(c.name)===norm(name)&&c.dist===dist})[0];if(ex)name=ex.name;
   if(!ex&&res.length<2){
