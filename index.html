@@ -389,15 +389,13 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 .fight-top{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:8px;align-items:stretch}
 .fight-fighter{min-width:0;display:flex;align-items:center;gap:10px;padding:9px;border-radius:13px;background:linear-gradient(145deg,#174c39,#102c29);border:1px solid #42c981;box-shadow:0 0 16px #16a35a22}
 .fight-fighter.blue{flex-direction:row-reverse;text-align:right;background:linear-gradient(145deg,#17466d,#10243b);border-color:#46a8ff;box-shadow:0 0 16px #168bff22}
-.fight-portrait{width:clamp(58px,12vw,104px);height:clamp(66px,13vw,116px);flex:none;object-fit:cover;border-radius:10px;border:2px solid #7de6a7;background:#122235}
-.fight-fighter.blue .fight-portrait{border-color:#8acbff}
+.fight-portrait{width:clamp(58px,12vw,104px);height:clamp(58px,12vw,104px);flex:none;display:grid;place-items:center;overflow:hidden;border-radius:50%;border:2px solid #7de6a7;background:#183d30;color:#fff;font:700 clamp(20px,3vw,34px) "Barlow Condensed",sans-serif;letter-spacing:.04em}
+.fight-fighter.blue .fight-portrait{border-color:#8acbff;background:#183750}
+.fight-portrait.has-photo{background:#122235}
+.fight-portrait img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .fight-fighter-info{min-width:0}.fight-fighter-name{font:700 clamp(17px,2.6vw,27px)/1.05 "Barlow Condensed",sans-serif;color:#fff;overflow-wrap:anywhere}
 .fight-fighter-meta{font-size:12px;color:#c7d5df;margin-top:5px}
 .fight-vs{align-self:center;text-align:center;font:900 clamp(25px,5vw,48px)/1 "Barlow Condensed",sans-serif;font-style:italic;color:#ffd34e;text-shadow:0 3px 0 #9d3d12,0 0 16px #ff9b18}
-.fight-avatars{position:relative;display:flex;gap:6px;overflow-x:auto;padding:10px 2px 7px;margin:5px 0 10px}
-.fight-avatar-choice{width:49px;height:55px;flex:none;padding:2px;border:1px solid #50677e;border-radius:9px;background:#101d2b;cursor:pointer}
-.fight-avatar-choice img{width:100%;height:100%;object-fit:cover;border-radius:6px}
-.fight-avatar-choice.selected{border:2px solid #ffd34e;box-shadow:0 0 12px #ffd34e88}
 .fight-score-title{text-align:center;font:800 15px "Barlow Condensed",sans-serif;letter-spacing:.16em;color:#e8eef5;margin:8px 0}
 .fight-stats{position:relative;display:flex;flex-direction:column;gap:7px}
 .fight-stat{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(90px,.8fr) minmax(0,1fr) 38px;gap:7px;align-items:center;padding:7px 9px;border:1px solid #506174;border-radius:9px;background:linear-gradient(90deg,#111d2b,#1c2734 50%,#111d2b);box-shadow:inset 0 1px #ffffff14}
@@ -659,19 +657,12 @@ function eloChart(hist,dates){
   return '<div class="pf-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Évolution de l’ELO après chaque course">'+g+'<polyline points="'+pts+'" fill="none" stroke="#278A50" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+'<text x="'+L+'" y="'+(H-12)+'" fill="#9EB0C1" font-size="22">'+esc(dates[0]||'')+'</text><text x="'+(W-R)+'" y="'+(H-12)+'" text-anchor="end" fill="#9EB0C1" font-size="22">'+esc(dates[n-1]||'')+'</text></svg><div class="meta" style="padding:0 6px 6px">Départ à 1500, puis le niveau après chaque course. Une course = un point.</div></div>';
 }
 
-function fighterAvatarSvg(index){
-  var skins=["#f2c6a0","#d99b72","#a96848","#f0d0b0","#784a35"],hair=["#211a19","#5a3425","#d7a642","#aeb9c7","#342b55","#8d2e32","#1d5960","#252525","#c77b42","#eee0c4"],shirts=["#18834d","#176fb1","#b83d62","#8053b5","#d18a20"];
-  var skin=skins[index%5],h=hair[Math.floor(index/5)%10],shirt=shirts[Math.floor(index/50)%5],female=index%2===1,style=Math.floor(index/10)%5;
-  var hairPath=style===0?"M25 57 Q17 9 60 8 Q105 8 95 58 L88 43 Q70 30 51 37 Q38 39 25 57Z":style===1?"M22 54 Q18 7 61 8 Q101 9 99 56 L87 40 Q65 23 43 39Z":style===2?"M23 48 Q18 11 60 8 Q98 12 96 50 Q79 28 56 31 Q35 30 23 48Z":style===3?"M20 57 Q11 12 57 8 Q104 6 100 56 L91 75 Q83 43 72 34 Q48 23 28 55Z":"M21 52 Q20 5 62 8 Q103 7 99 51 Q82 33 61 36 Q37 33 21 52Z";
-  var hairBack=female?'<path d="M25 48 Q9 15 38 8 Q69 -3 91 16 Q111 36 96 83 L91 116 L77 111 L82 66 Q63 42 42 65 L39 115 L25 121 L18 78Z" fill="'+h+'"/>':'';
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#203e5c"/><stop offset="1" stop-color="#101b2b"/></linearGradient><linearGradient id="shirt" x2="0" y2="1"><stop stop-color="'+shirt+'"/><stop offset="1" stop-color="#101d2b"/></linearGradient><radialGradient id="face"><stop stop-color="'+skin+'"/><stop offset="1" stop-color="'+skin+'"/></radialGradient></defs><rect width="120" height="140" rx="13" fill="url(#bg)"/><path d="M10 140 Q15 99 42 95 L78 95 Q106 100 112 140" fill="url(#shirt)"/><path d="M47 89 L73 89 L78 110 Q60 124 42 110Z" fill="'+skin+'"/><ellipse cx="60" cy="58" rx="34" ry="43" fill="url(#face)"/>'+hairBack+'<path d="'+hairPath+'" fill="'+h+'"/><path d="M29 63 Q26 79 39 91" fill="none" stroke="'+skin+'" stroke-width="7" stroke-linecap="round"/><path d="M91 63 Q94 79 81 91" fill="none" stroke="'+skin+'" stroke-width="7" stroke-linecap="round"/><path d="M40 57 Q49 51 55 57 M66 57 Q74 51 81 57" fill="none" stroke="#392b2b" stroke-width="3" stroke-linecap="round"/><ellipse cx="48" cy="63" rx="3" ry="4" fill="#17202a"/><ellipse cx="72" cy="63" rx="3" ry="4" fill="#17202a"/><path d="M57 72 Q60 75 63 72" fill="none" stroke="#9a5b4b" stroke-width="2"/><path d="M48 82 Q60 91 73 82" fill="none" stroke="#783d3a" stroke-width="3" stroke-linecap="round"/><path d="M39 99 L60 113 L81 99" fill="none" stroke="#e8f4ff" stroke-width="3"/><path d="M12 132 L108 132" stroke="#ffffff" stroke-opacity=".18" stroke-width="2"/></svg>';
+function runnerInitials(name){
+  return String(name||'?').trim().split(/\\s+/).filter(Boolean).slice(0,2).map(function(part){return part.charAt(0)}).join('').toUpperCase()||'?';
 }
-function fighterAvatarUrl(index){return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(fighterAvatarSvg(index));}
-function fighterAvatarGallery(id){
-  var selected=avatarMap[id]||'';
-  var html='<div class="fight-avatars" aria-label="Choisir un avatar">';
-  for(var i=0;i<100;i++){var url=fighterAvatarUrl(i),on=selected===url;html+='<button type="button" class="fight-avatar-choice'+(on?' selected':'')+'" data-act="selectfighteravatar" data-v="'+i+'" aria-label="Choisir avatar '+(i+1)+'" title="Avatar '+(i+1)+'"><img src="'+url+'" alt=""></button>';}
-  return html+'</div>';
+function runnerAvatarMarkup(runnerId,name){
+  var photo=avatarMap[runnerId]||'';
+  return '<div class="fight-portrait'+(photo?' has-photo':'')+'" data-fight-avatar-for="'+esc(runnerId)+'" aria-label="'+(photo?'Photo de ':'Initiales de ')+esc(name)+'">'+(photo?'<img src="'+esc(photo)+'" alt="">':esc(runnerInitials(name)))+'</div>';
 }
 function fightDistanceKm(course){
   var d=String(course.dist||'').toLowerCase().replace(',','.');
@@ -779,7 +770,7 @@ function runnerProfile(id,isMine){
   var compareMap=S.profileOpponentByRunner||{},selectedOpponentId=compareMap[id]||null;
   var duelOpponent=selectedOpponentId?S.runners.filter(function(x){return x.id===selectedOpponentId&&x.id!==id;})[0]||null:null;
   var compareOptions=S.runners.filter(function(x){return x.id!==id;}).slice().sort(function(a,b){return String(a.name||'').localeCompare(String(b.name||''),'fr');}).map(function(x){return '<option value="'+escapeAttr(x.name)+'"></option>';}).join('');
-  var duelPanel='<section class="pf-tab-panel '+(tab==='duel'?'active':'')+'" data-profile-panel="duel"><h3 class="profile-section-title">Comparer avec un autre coureur</h3><div class="pf-compare-search"><input id="compareRunnerSearch" list="compareRunnerOptions" placeholder="Rechercher un coureur par son nom…" value="'+(duelOpponent?escapeAttr(duelOpponent.name):'')+'"><datalist id="compareRunnerOptions">'+compareOptions+'</datalist><button type="button" class="btn" data-act="compareRunner" data-v="'+escapeAttr(id)+'">Comparer</button></div>';
+  var duelPanel='<section class="pf-tab-panel '+(tab==='duel'?'active':'')+'" data-profile-panel="duel"><h3 class="profile-section-title">Choisis ton adversaire</h3><div class="pf-compare-search"><input id="compareRunnerSearch" list="compareRunnerOptions" placeholder="Rechercher un coureur par son nom…" value="'+(duelOpponent?escapeAttr(duelOpponent.name):'')+'"><datalist id="compareRunnerOptions">'+compareOptions+'</datalist><button type="button" class="btn" data-act="compareRunner" data-v="'+escapeAttr(id)+'">Comparer</button></div>';
 
   if(duelOpponent){
     var opponentId=duelOpponent.id,opponentState=allState[opponentId+'|X'],opponentRank=officialRank(allState,opponentId);
@@ -803,13 +794,11 @@ function runnerProfile(id,isMine){
       rows+='<div class="fight-stat"><div class="fight-stat-value green">'+(valid?Math.round(a):'—')+'</div><div class="fight-bar left"><div class="fight-fill green" style="width:'+leftWidth+'%"></div></div><div class="fight-stat-label">'+c.label+'</div><div class="fight-bar"><div class="fight-fill blue" style="width:'+rightWidth+'%"></div></div><div class="fight-stat-value blue">'+(valid?Math.round(b):'—')+'</div><div class="fight-note" style="grid-column:1/-1;margin:0">'+esc(String(av))+' <span style="opacity:.65">VS</span> '+esc(String(bv))+'</div></div>';
     });
     var winner=winsA>winsB?r.name:winsB>winsA?duelOpponent.name:'ÉGALITÉ';
-    var myAvatar=avatarMap[id]||fighterAvatarUrl(0),oppAvatar=avatarMap[opponentId]||fighterAvatarUrl(1);
-    duelPanel+='<div class="fight-arena"><div class="fight-top"><div class="fight-fighter"><img class="fight-portrait" data-fight-avatar-for="'+esc(id)+'" src="'+esc(myAvatar)+'" alt="Avatar de '+esc(r.name)+'"><div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(r.name)+'</div><div class="fight-fighter-meta">ELO '+myScore+' · Rang '+myRankText+'</div></div></div><div class="fight-vs">VS</div><div class="fight-fighter blue"><img class="fight-portrait" data-fight-avatar-for="'+esc(opponentId)+'" src="'+esc(oppAvatar)+'" alt="Avatar de '+esc(duelOpponent.name)+'"><div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(duelOpponent.name)+'</div><div class="fight-fighter-meta">ELO '+oppScore+' · Rang '+oppRankText+'</div></div></div></div>';
-    if(isMine&&linkedRunner===id)duelPanel+='<div class="fight-score-title">CHOISIS TON COMBATTANT</div>'+fighterAvatarGallery(id);
-    duelPanel+='<div class="fight-score-title">JAUGES DU COMBAT</div><div class="fight-stats">'+rows+'</div><div class="fight-result">'+(winner==='ÉGALITÉ'?'MATCH NUL':esc(winner)+' REMPORTE LE DUEL !')+'</div><p class="fight-note">Les valeurs affichées sous les jauges sont les données réelles. Les jauges montrent la comparaison relative entre les deux coureurs.</p></div>';
+    duelPanel+='<div class="fight-arena"><div class="fight-top"><div class="fight-fighter">'+runnerAvatarMarkup(id,r.name)+'<div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(r.name)+'</div><div class="fight-fighter-meta">ELO '+myScore+' · Rang '+myRankText+'</div></div></div><div class="fight-vs">VS</div><div class="fight-fighter blue">'+runnerAvatarMarkup(opponentId,duelOpponent.name)+'<div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(duelOpponent.name)+'</div><div class="fight-fighter-meta">ELO '+oppScore+' · Rang '+oppRankText+'</div></div></div></div>';
+    duelPanel+='<div class="fight-score-title">INDICATEURS DE COMPARAISON</div><div class="fight-stats">'+rows+'</div><div class="fight-result">'+(winner==='ÉGALITÉ'?'ÉGALITÉ SUR LES INDICATEURS':'AVANTAGE : '+esc(winner))+'</div><p class="fight-note">Les valeurs affichées sous les jauges sont les données réelles. Les jauges montrent la comparaison relative entre les deux coureurs.</p></div>';
     duelPanel+='<h3 class="profile-section-title">Face-à-face sur les courses communes</h3><p class="pf-section-copy">'+sharedRaces.length+' course(s) courue(s) ensemble : '+duelWins+' victoire(s), '+duelLosses+' défaite(s) et '+duelDraws+' égalité(s).</p>';
     duelPanel+=sharedRaces.length?'<div class="pf-duel-history">'+sharedRaces.slice().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''));}).map(function(c){var a=c.results.filter(function(x){return x.id===id;})[0],b=c.results.filter(function(x){return x.id===opponentId;})[0];return '<div class="pf-duel-row"><div><strong>'+esc(c.name)+'</strong><div class="meta">'+esc(c.dist||'Distance non renseignée')+' · '+esc(c.date||'')+'</div></div><span class="pf-duel-score">'+formatTime(a.time)+' / '+formatTime(b.time)+'</span></div>';}).join('')+'</div>':'<p class="empty">Aucune course commune pour le moment.</p>';
-  }else{duelPanel+='<div class="fight-empty">Choisis un adversaire pour lancer le combat !</div>';}
+  }else{duelPanel+='<div class="fight-empty">Choisis un coureur pour afficher la comparaison.</div>';}
   duelPanel+='</section>';
   var infosPanel='<section class="pf-tab-panel '+(tab==='infos'?'active':'')+'" data-profile-panel="infos"><div id="profiledetails">'+profileDetailsHTML(id,isMine)+'</div>'+nextRaceHTML(id,isMine)+avatarEditorHTML(id,isMine)+'<div id="socialpanel" class="card"><p class="meta">Chargement des échanges…</p></div></section>';
   return '<div class="pf">'+top+hero+acts+tabNav+overviewPanel+recordsPanel+coursesPanel+duelPanel+infosPanel+adminDelete+'</div>';
@@ -911,9 +900,8 @@ function profileDetailsHTML(id,isMine){
 }
 function avatarEditorHTML(id,isMine){
   if(!isMine||!linkedRunner||linkedRunner!==id)return '';
-  var html='<div class="card"><strong>Mon avatar de combattant</strong><p class="meta">Choisis parmi 100 portraits originaux, mélange illustration 3D et manga. Ton choix sera repris dans les comparaisons.</p><div class="fight-avatars">';
-  for(var i=0;i<100;i++){var url=fighterAvatarUrl(i);html+='<button type="button" class="fight-avatar-choice'+(avatarMap[id]===url?' selected':'')+'" data-act="selectfighteravatar" data-v="'+i+'" aria-label="Choisir avatar '+(i+1)+'"><img src="'+url+'" alt="Avatar '+(i+1)+'"></button>';}
-  html+='</div><p class="meta">Tu peux aussi conserver ta propre photo :</p><input id="avatarfile" type="file" accept="image/jpeg,image/png,image/webp"><button class="ghost" data-act="uploadavatar">Enregistrer ma photo</button><p class="msg" id="avatarmessage"></p></div>';
+  var html='<div class="card"><strong>Ma photo de profil</strong><p class="meta">Ajoute une photo : elle remplacera automatiquement tes initiales sur ton profil et dans les comparaisons. Sans photo, tes initiales seront affichées.</p>';
+  html+='<input id="avatarfile" type="file" accept="image/jpeg,image/png,image/webp"><button class="ghost" data-act="uploadavatar">Enregistrer ma photo</button><p class="msg" id="avatarmessage"></p></div>';
   return html;
 }
 function nextRaceHTML(id,isMine){
@@ -948,7 +936,7 @@ async function loadSocial(id){
     try{var dq=await sb.from('runner_profile_details').select('runner_id,club,city,bio,objective,motto,favorite_race_id,favorite_race_note,favorite_race_photo_url').eq('runner_id',id).maybeSingle();if(!dq.error&&dq.data)runnerDetails[id]=dq.data;try{var sq=await sb.from('runner_profile_details').select('strava_url').eq('runner_id',id).maybeSingle();if(!sq.error&&sq.data)runnerDetails[id]=Object.assign(runnerDetails[id]||{},sq.data);}catch(ignoreStrava){}}catch(ignoreDetails){}
     if(linkedRunner===id){try{var pv=await sb.from('runner_signup_private').select('sex,date_of_birth').eq('user_id',authUser.id).maybeSingle();if(!pv.error&&pv.data)privateRunnerDetails[id]=pv.data;}catch(ignorePrivate){}}
     var detailsBox=document.getElementById('profiledetails');if(detailsBox)detailsBox.innerHTML=profileDetailsHTML(id,linkedRunner===id);
-    if(av.data)av.data.forEach(function(x){avatarMap[x.runner_id]=x.avatar_url;var fightPortrait=document.querySelector('[data-fight-avatar-for="'+x.runner_id+'"]');if(fightPortrait)fightPortrait.src=x.avatar_url;});avatarIds.forEach(function(rid){if(avatarMap[rid])return;try{var localAvatar=localStorage.getItem('elo-fighter-avatar-'+rid);if(localAvatar){avatarMap[rid]=localAvatar;var portrait=document.querySelector('[data-fight-avatar-for="'+rid+'"]');if(portrait)portrait.src=localAvatar;}}catch(ignoreLocalAvatar){}});
+    if(av.data)av.data.forEach(function(x){if(!x.avatar_url)return;avatarMap[x.runner_id]=x.avatar_url;var fightPortrait=document.querySelector('[data-fight-avatar-for="'+x.runner_id+'"]');if(fightPortrait){fightPortrait.classList.add('has-photo');fightPortrait.innerHTML='<img src="'+esc(x.avatar_url)+'" alt="">';}});
     if(nx.data)window.eloNextRaces[id]=nx.data;else delete window.eloNextRaces[id];var nr=document.getElementById('nextracepanel');if(nr)nr.innerHTML=nextRaceHTML(id,!!(S.me===id));
     var comments=cr.data||[],notifs=nt.data||[],names={};S.runners.forEach(function(r){names[r.id]=r.name});
     var html=(linkedRunner===id&&notifs.length?'<div><strong>Notifications</strong> <button class="ghost" data-act="readnotifications">Tout marquer comme lu</button>'+notifs.map(function(n){return '<p class="meta">'+esc(names[n.actor_runner_id]||'Un coureur')+' '+(n.kind==='reply'?'a répondu à ton commentaire':'a commenté ton profil')+' · '+new Date(n.created_at).toLocaleDateString('fr-FR')+'</p>'}).join('')+'</div>':'')+'<h3>Commentaires sur les courses</h3>';
@@ -1820,14 +1808,6 @@ document.addEventListener("click",function(e){
       msg.runnerAccount='Informations privées mises à jour. Le classement sera recalculé avec le bon sexe et la catégorie.';render();
     }catch(err){msg.runnerAccount='Impossible de mettre à jour les informations : '+(err.message||'erreur Supabase');render();}})();return;
   }
-  else if(a==='selectfighteravatar'){
-    (async function(){try{
-      if(!authUser||!linkedRunner)throw new Error('Connecte-toi avec ton compte coureur lié pour choisir un avatar.');
-      var chosenAvatar=fighterAvatarUrl(Number(v));if(!Number.isInteger(Number(v))||Number(v)<0||Number(v)>=100)throw new Error('Avatar invalide.');
-      var saved=await sb.from('runner_avatars').upsert({user_id:authUser.id,runner_id:linkedRunner,avatar_url:chosenAvatar,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-      avatarMap[linkedRunner]=chosenAvatar;try{localStorage.setItem('elo-fighter-avatar-'+linkedRunner,chosenAvatar);}catch(ignoreAvatarStorage){}var portrait=document.querySelector('[data-fight-avatar-for=\"'+linkedRunner+'\"]');if(portrait)portrait.src=chosenAvatar;if(saved.error)throw saved.error;msg.runnerAccount='Avatar enregistré.';render();
-    }catch(err){alert('Impossible d’enregistrer cet avatar : '+(err.message||'erreur Supabase'));}})();
-  }
   else if(a==='uploadavatar'){
     (async function(){
       var am=document.getElementById('avatarmessage');
@@ -1845,6 +1825,8 @@ document.addEventListener("click",function(e){
         avatarMap[linkedRunner]=pub;
         var avatar=document.querySelector('.pf-hero .pf-avatar');
         if(avatar)avatar.innerHTML='<img src="'+esc(pub)+'" alt="Ma photo de profil" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+        var fightPortrait=document.querySelector('[data-fight-avatar-for="'+linkedRunner+'"]');
+        if(fightPortrait){fightPortrait.classList.add('has-photo');fightPortrait.innerHTML='<img src="'+esc(pub)+'" alt="">';}
         if(am)am.textContent='Photo de profil enregistrée.';
         if(input)input.value='';
       }catch(err){
