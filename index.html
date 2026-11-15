@@ -814,7 +814,7 @@ function runnerProfile(id,isMine){
      var myRank=idx>=0?idx+1:null,oppRank=officialRank(allState,opponentId)>=0?officialRank(allState,opponentId)+1:null;
      var myMax=p&&p.hist&&p.hist.length?Math.round(Math.max.apply(null,p.hist)):null,oppMax=opponentState&&opponentState.hist&&opponentState.hist.length?Math.round(Math.max.apply(null,opponentState.hist)):null;
      var myProgress=p&&p.n?Math.round(p.elo-1500):null,oppProgress=opponentState&&opponentState.n?Math.round(opponentState.elo-1500):null;
-     function duelCell(value,other,lowerWins){var a=Number(value),b=Number(other),valid=value!==null&&other!==null&&Number.isFinite(a)&&Number.isFinite(b),win=valid&&(lowerWins?a<b:a>b);return '<strong class="duel-cell '+(win?'is-best':'')+'">'+(value===null?'—':String(value))+'</strong>';}
+     function duelCell(value,other,lowerWins){var a=lowerWins?fightTimeSeconds(value):Number(value),b=lowerWins?fightTimeSeconds(other):Number(other),valid=value!==null&&other!==null&&Number.isFinite(a)&&Number.isFinite(b),win=valid&&(lowerWins?a<b:a>b);return '<strong class="duel-cell '+(win?'is-best':'')+'">'+(value===null?'—':String(value))+'</strong>';}
      function duelStat(label,left,right,lowerWins){return '<div class="duel-row"><span>'+label+'</span>'+duelCell(left,right,lowerWins)+duelCell(right,left,lowerWins)+'</div>';}
      var sharedRaces=mine.filter(function(c){return (c.results||[]).some(function(a){return a.id===opponentId;});});
      var duelWins=0,duelLosses=0,duelDraws=0;
