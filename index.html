@@ -310,7 +310,7 @@ function saveOld(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function $(q){return document.querySelector(q)}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function norm(t){return" "+t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()+" "}
-function isExcludedRace(c){if(!c)return false;var fields=[c.dist,c.distance,c.name,c.race_name,c.event,c.type,c.discipline,c.race_type,c.format,c.category,c.description];var label=norm(fields.filter(Boolean).join(" "));return /\b(trail|cross)\b/.test(label);}
+function isExcludedRace(c){if(!c)return false;var fields=[c.dist,c.distance,c.name,c.race_name,c.event,c.type,c.discipline,c.race_type,c.format,c.category];var label=norm(fields.filter(Boolean).join(" "));return /\b(trail|cross)\b/.test(label);}
 function isRoadRace(c){return !isExcludedRace(c);}
 if(S.dist&&isExcludedRace({dist:S.dist}))S.dist="all";
 function isAnonymousRunnerName(value){
@@ -332,7 +332,7 @@ function totalResultCount(){return S.races.reduce(function(total,c){return total
 
 function computeEloWorker(payload){
   var scope=payload.scope||"all",races=payload.races||[],st={};
-  function isExcludedRace(c){var fields=[c&&c.dist,c&&c.distance,c&&c.name,c&&c.race_name,c&&c.event,c&&c.type,c&&c.discipline,c&&c.race_type,c&&c.format,c&&c.category,c&&c.description];var label=fields.filter(Boolean).join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ");return /\b(trail|cross)\b/.test(label);}
+  function isExcludedRace(c){var fields=[c&&c.dist,c&&c.distance,c&&c.name,c&&c.race_name,c&&c.event,c&&c.type,c&&c.discipline,c&&c.race_type,c&&c.format,c&&c.category];var label=fields.filter(Boolean).join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ");return /\b(trail|cross)\b/.test(label);}
   function inScope(c,s){if(isExcludedRace(c))return false;if(!s||s==="all"||s==="route")return true;return c.dist===s}
   function g(id,d){var k=id+"|"+d;return st[k]||(st[k]={elo:1500,n:0,hist:[1500]})}
   races.slice().sort(function(a,b){return String(a.date||"").localeCompare(String(b.date||""));}).filter(function(c){return inScope(c,scope)}).forEach(function(c){
@@ -1408,7 +1408,7 @@ document.addEventListener("click",function(e){
     var raceToDelete=S.races.filter(function(c){return String(c.id)===String(v)})[0];if(!raceToDelete)return;
     var raceResultCount=Array.isArray(raceToDelete.results)?raceToDelete.results.length:0;
     var raceLabel=(raceToDelete.event?raceToDelete.event+" — ":"")+(raceToDelete.name||"course")+" ("+(raceToDelete.dist||"distance non renseignée")+")";
-    if(!confirm("Êtes-vous sûr de vouloir supprimer cette course ?\\n\\n"+raceLabel+"\\n"+raceResultCount+" résultat(s) associés seront supprimés.\\n\\nLes autres distances du même événement seront conservées."))return;
+    if(!confirm("Êtes-vous sûr de vouloir supprimer cette course ?\n\n"+raceLabel+"\n"+raceResultCount+" résultat(s) associés seront supprimés.\n\nLes autres distances du même événement seront conservées."))return;
     S.races=S.races.filter(function(c){return String(c.id)!==String(v)});if(String(S.open)===String(v))S.open=null;save();msg.race="La course "+raceLabel+" a été supprimée. Les autres courses de l’événement sont conservées.";render();
   }
   else if(a==="delrunner"){
