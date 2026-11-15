@@ -281,6 +281,104 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 .pf-share-profile{display:inline-flex;align-items:center;gap:7px;margin:10px 0 0;padding:9px 13px}
 @media(max-width:520px){.pf .pf-q{padding:10px 8px;min-height:72px}.pf .pf-q b{font-size:25px}.pf .pf-q span{font-size:12px}.pf-form-list{grid-template-columns:repeat(2,minmax(0,1fr))}.pf-tabs button{padding:9px 12px;font-size:14px}}
 
+
+/* ===== Duel coureur : comparaison en colonnes clairement séparées ===== */
+.duel-head{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) repeat(2,minmax(0,1fr));
+  gap:8px;
+  align-items:stretch;
+  margin:8px 0 10px;
+}
+.duel-head>strong{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow-wrap:anywhere;
+  padding:12px 9px;
+  border-radius:10px;
+  font-size:15px;
+  line-height:1.2;
+  color:#fff;
+  background:linear-gradient(145deg,#17613f,#123b31);
+  border:1px solid #32845b;
+}
+.duel-head>strong:last-child{
+  background:linear-gradient(145deg,#244f78,#18344f);
+  border-color:#477eae;
+}
+.duel-compare{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin:8px 0 16px;
+  padding:9px;
+  border:1px solid #2a4055;
+  border-radius:13px;
+  background:#0d1d2c;
+}
+.duel-compare .duel-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) repeat(2,minmax(0,1fr));
+  gap:8px;
+  align-items:stretch;
+  margin:0;
+  padding:0;
+  border:0;
+}
+.duel-compare .duel-row>span{
+  display:flex;
+  align-items:center;
+  min-width:0;
+  padding:10px 9px;
+  color:#c2d0dc;
+  font-size:13px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+  background:#172b3d;
+  border:1px solid #2a4055;
+  border-radius:9px;
+}
+.duel-compare .duel-row>strong{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  padding:10px 6px;
+  color:#d8f7e5;
+  font:700 20px/1.1 "Barlow Condensed",sans-serif;
+  text-align:center;
+  overflow-wrap:anywhere;
+  white-space:normal;
+  background:#153b30;
+  border:1px solid #2d7652;
+  border-radius:9px;
+}
+.duel-compare .duel-row>strong:last-child{
+  color:#d9eaff;
+  background:#18344e;
+  border-color:#3b668d;
+}
+@media(max-width:520px){
+  .duel-head,.duel-compare .duel-row{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .duel-head>span{display:none}
+  .duel-head>strong{font-size:13px;padding:10px 6px}
+  .duel-compare{padding:7px}
+  .duel-compare .duel-row>span{
+    grid-column:1/-1;
+    padding:7px 9px 3px;
+    border:0;
+    background:transparent;
+    font-size:12px;
+  }
+  .duel-compare .duel-row>strong{font-size:19px;padding:9px 4px}
+}
+
 </style>
 </head>
 <body>
