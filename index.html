@@ -458,7 +458,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_publishable_jiboviI5BaRii9_Lz9JK_A_qwXsVC-O";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
-var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheValue=null,boardCacheState=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
+var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={};
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
@@ -602,7 +602,7 @@ function compute(pred,scope){
   return st;
 }
 function board(st,d){
-  if(boardCacheState!==st){boardCacheState=st;boardCacheValue={};}
+  if(boardCacheState!==st||boardCacheRunners!==S.runners){boardCacheState=st;boardCacheRunners=S.runners;boardCacheValue={};}
   var key=String(d||"all");if(boardCacheValue[key])return boardCacheValue[key];
   var rows=S.runners.map(function(r){var p=st[r.id+"|"+d];return p&&p.n?{r:r,p:p}:null}).filter(Boolean);
   rows.sort(function(a,b){return b.p.elo-a.p.elo});
@@ -638,7 +638,7 @@ function categoryRankInfo(st,runnerId){
   return {category:category,sex:sex,rank:index>=0?index+1:0,total:rows.length};
 }
 function profileRankIndex(st){
-  if(profileRankCacheState===st&&profileRankCacheValue)return profileRankCacheValue;
+  if(profileRankCacheState===st&&profileRankCacheCacheRunners===S.runners&&profileRankCacheValue)return profileRankCacheValue;
   var rows=board(st,"X").ranked,global={},sexRanks={},sexTotals={},categoryRanks={},categoryTotals={};
   rows.forEach(function(x,i){
     var id=x.r.id,sex=normalizeSex(x.r.sex),cat=normalizeCategory(x.r.cat);
@@ -646,7 +646,7 @@ function profileRankIndex(st){
     if(sex){sexTotals[sex]=(sexTotals[sex]||0)+1;sexRanks[id]=sexTotals[sex];}
     if(sex&&cat){var key=sex+"|"+cat;categoryTotals[key]=(categoryTotals[key]||0)+1;categoryRanks[id]=categoryTotals[key];}
   });
-  profileRankCacheState=st;
+  profileRankCacheState=st;profileRankCacheCacheRunners=S.runners;
   profileRankCacheValue={global:global,total:rows.length,sexRanks:sexRanks,sexTotals:sexTotals,categoryRanks:categoryRanks,categoryTotals:categoryTotals};
   return profileRankCacheValue;
 }
