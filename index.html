@@ -516,7 +516,7 @@ function totalResultCount(){return S.races.reduce(function(total,c){return total
 function computeEloWorker(payload){
   var TRAIL=["Trail court","Trail moyen","Trail long"],scope=payload.scope||"all",races=payload.races||[],st={};
   function inScope(d,s){if(!s||s==="all")return true;if(s==="route")return TRAIL.indexOf(d)<0;if(s==="trail")return TRAIL.indexOf(d)>=0;return d===s}
-  function timeSec(v){if(typeof v==="number"&&isFinite(v))return v;var raw=String(v||"").trim();if(/^\\d+(?:\\.\\d+)?$/.test(raw))return Number(raw);if(raw.indexOf(":")>=0){var p=raw.split(":").map(Number);if(p.every(isFinite)){var n=0;p.forEach(function(x){n=n*60+x});return n}}return 0}
+  function timeSec(v){if(typeof v==="number"&&isFinite(v))return v;var raw=String(v||"").trim();if(/^\d+(?:\.\d+)?$/.test(raw))return Number(raw);if(raw.indexOf(":")>=0){var p=raw.split(":").map(Number);if(p.every(isFinite)){var n=0;p.forEach(function(x){n=n*60+x});return n}}return 0}
   function gapMultiplier(a,b){var ta=timeSec(a.time),tb=timeSec(b.time);if(!(ta>0&&tb>0))return 1;var gap=Math.abs(ta-tb)/Math.min(ta,tb);return Math.min(1.5,1+0.5*Math.log(1+gap/0.01))}
   function g(id,d){var k=id+"|"+d;return st[k]||(st[k]={elo:1500,n:0,hist:[1500]})}
   races.slice().sort(function(a,b){return String(a.date||"").localeCompare(String(b.date||""));}).filter(function(c){return inScope(c.dist,scope)}).forEach(function(c){
@@ -525,7 +525,7 @@ function computeEloWorker(payload){
     for(var i=0;i<m;i++)for(var j=i+1;j<m;j++){
       var a=r[i],b=r[j],pa=g(a.id,"X"),pb=g(b.id,"X");
       var ea=1/(1+Math.pow(10,(pb.elo-pa.elo)/400));
-      var sa=a.time<b.time?1:a.time>b.time?0:.5;
+      var ta=timeSec(a.time),tb=timeSec(b.time),sa=ta<tb?1:ta>tb?0:.5;
       var k=(pa.n<5||pb.n<5)?40:24;
       // ELO V2 expérimental : l'écart relatif de chrono module l'amplitude du duel.
       // Paramètres de test : g0=1 %, alpha=0,5, multiplicateur plafonné à 1,5.
@@ -578,7 +578,7 @@ function compute(pred,scope){
   if(cacheable&&requestEloCompute(cacheKey))return {};
   pred=pred||function(){return true};function kd(c){return scope?"X":c.dist}
   var st={};
-  function timeSec(v){if(typeof v==="number"&&isFinite(v))return v;var raw=String(v||"").trim();if(/^\\d+(?:\\.\\d+)?$/.test(raw))return Number(raw);if(raw.indexOf(":")>=0){var p=raw.split(":").map(Number);if(p.every(isFinite)){var n=0;p.forEach(function(x){n=n*60+x});return n}}return 0}
+  function timeSec(v){if(typeof v==="number"&&isFinite(v))return v;var raw=String(v||"").trim();if(/^\d+(?:\.\d+)?$/.test(raw))return Number(raw);if(raw.indexOf(":")>=0){var p=raw.split(":").map(Number);if(p.every(isFinite)){var n=0;p.forEach(function(x){n=n*60+x});return n}}return 0}
   function gapMultiplier(a,b){var ta=timeSec(a.time),tb=timeSec(b.time);if(!(ta>0&&tb>0))return 1;var gap=Math.abs(ta-tb)/Math.min(ta,tb);return Math.min(1.5,1+0.5*Math.log(1+gap/0.01))}
   function g(id,d){var k=id+"|"+d;return st[k]||(st[k]={elo:1500,n:0,hist:[1500]})}
   S.races.slice().sort(function(a,b){return String(a.date||"").localeCompare(String(b.date||""));}).filter(function(c){return inScope(c.dist,scope)}).forEach(function(c){
@@ -587,7 +587,7 @@ function compute(pred,scope){
     for(var i=0;i<m;i++)for(var j=i+1;j<m;j++){
       var a=r[i],b=r[j],pa=g(a.id,kd(c)),pb=g(b.id,kd(c));
       var ea=1/(1+Math.pow(10,(pb.elo-pa.elo)/400));
-      var sa=a.time<b.time?1:a.time>b.time?0:.5;
+      var ta=timeSec(a.time),tb=timeSec(b.time),sa=ta<tb?1:ta>tb?0:.5;
       // Un duel doit être strictement équilibré : les deux coureurs utilisent
       // le même coefficient K afin que les points gagnés et perdus se compensent.
       // Le coefficient reste élevé tant que l'un des deux coureurs est débutant.
