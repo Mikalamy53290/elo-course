@@ -279,6 +279,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 .pf2-avatar-default{font-size:39px;line-height:1}
 .pf2-id{gap:18px!important}
 @media(max-width:560px){.pf2-quick{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.pf2-stat{padding:9px!important;grid-template-columns:27px minmax(0,1fr);column-gap:6px}.pf2-stat b{font-size:24px!important}.pf2-stat-l{font-size:11px!important}.pf2-form{gap:6px!important;padding:10px!important}.pf2-form-v{font-size:16px!important}.pf2-form-l{font-size:10px!important}.pf2-avatar{width:64px!important;height:64px!important}}
+.pf2-quick{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}.pf2-stat{background:linear-gradient(145deg,#172d43,#102238)!important;border:1px solid #38536d!important;border-radius:13px!important;box-shadow:0 3px 10px #0003!important}.pf2-chart-point{cursor:pointer;outline:none}.pf2-chart-point:focus circle:last-child{stroke:#fff;stroke-width:5}.pf2-avatar img{display:block!important}
 </style>
 </head>
 <body>
@@ -618,7 +619,7 @@ function eloChartPro(hist,dates){
  var mn=Math.min.apply(null,hist),mx=Math.max.apply(null,hist),pad=Math.max(10,(mx-mn)*.2);mn-=pad;mx+=pad;
  function X(i){return L+(W-L-R)*i/(n-1)}function Y(v){return T+(H-T-B)*(1-(v-mn)/(mx-mn))}
  var grid='',i,v;for(i=0;i<=3;i++){v=mn+(mx-mn)*i/3;grid+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#2A4055" stroke-dasharray="4 6"/><text x="'+(L-10)+'" y="'+(Y(v)+7)+'" text-anchor="end" fill="#9EB0C1" font-size="20">'+Math.round(v)+'</text>'}
- var pts=hist.map(function(e,k){return X(k)+','+Y(e)}),dots=hist.map(function(e,k){return '<circle cx="'+X(k)+'" cy="'+Y(e)+'" r="7" fill="#35D878" stroke="#071b35" stroke-width="3"/>';}).join(''),area='M'+X(0)+','+(H-B)+' L'+pts.join(' L')+' L'+X(n-1)+','+(H-B)+' Z',last=hist[n-1],lx=X(n-1),ly=Y(last),lab=String(Math.round(last)),bw=18+lab.length*14;
+ var pts=hist.map(function(e,k){return X(k)+','+Y(e)}),dots=hist.map(function(e,k){var delta=k?Math.round(Number(e)-Number(hist[k-1])):0,date=dates[k]||'Départ';return '<g class="pf2-chart-point" role="button" tabindex="0" data-act="chartpoint" data-date="'+esc(date)+'" data-elo="'+Math.round(e)+'" data-delta="'+delta+'"><title>'+esc(date)+' · ELO '+Math.round(e)+(k?' · '+(delta>0?'+':'')+delta+' points':' · ELO initial')+'</title><circle cx="'+X(k)+'" cy="'+Y(e)+'" r="13" fill="transparent"/><circle cx="'+X(k)+'" cy="'+Y(e)+'" r="7" fill="#35D878" stroke="#071b35" stroke-width="3"/></g>';}).join(''),area='M'+X(0)+','+(H-B)+' L'+pts.join(' L')+' L'+X(n-1)+','+(H-B)+' Z',last=hist[n-1],lx=X(n-1),ly=Y(last),lab=String(Math.round(last)),bw=18+lab.length*14;
  return '<div class="pf2-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Progression ELO"><defs><linearGradient id="pf2area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#35D878" stop-opacity=".4"/><stop offset="1" stop-color="#35D878" stop-opacity="0"/></linearGradient></defs>'+grid+'<path d="'+area+'" fill="url(#pf2area)"/><polyline points="'+pts.join(' ')+'" fill="none" stroke="#35D878" stroke-width="5" stroke-linecap="round"/>'+dots+'<circle cx="'+lx+'" cy="'+ly+'" r="10" fill="#fff" stroke="#35D878" stroke-width="5"/><rect x="'+(lx-bw+5)+'" y="'+(ly-40)+'" width="'+bw+'" height="28" rx="7" fill="#35D878"/><text x="'+(lx-bw/2+5)+'" y="'+(ly-20)+'" text-anchor="middle" fill="#06130b" font-size="20" font-weight="700">'+lab+'</text><text x="'+L+'" y="'+(H-10)+'" fill="#9EB0C1" font-size="18">'+esc(dates[0]||'')+'</text><text x="'+(W-R)+'" y="'+(H-10)+'" text-anchor="end" fill="#9EB0C1" font-size="18">'+esc(dates[dates.length-1]||'')+'</text></svg></div>';
 }
 function duelHTML(myId,otherId,st){
@@ -780,7 +781,7 @@ async function loadSocial(id){
     if(linkedRunner)html+='<label for="commentrace">Course concernée</label><select id="commentrace"><option value="">Choisir une course du profil</option>'+S.races.filter(function(c){return isRoadRace(c)&&c.results.some(function(a){return a.id===id})}).map(function(c){return '<option value="'+esc(c.id)+'">'+esc(c.name)+' · '+esc(c.dist)+'</option>'}).join('')+'</select><textarea id="commentbody" maxlength="1000" placeholder="Écrire un commentaire…"></textarea><button class="btn" data-act="postcomment">Publier</button>';
     else if(!linkedRunner)html+='<p class="meta">Connecte-toi avec un compte coureur lié à ton profil pour commenter.</p>';
     panel.innerHTML=html;
-    var profile=document.querySelector('.pf-hero .pf-avatar');if(profile&&avatarMap[id])profile.innerHTML='<img src="'+esc(avatarMap[id])+'" alt="Photo de profil" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    var profile=document.querySelector('.pf2-hero .pf2-avatar, .pf-hero .pf-avatar');if(profile&&avatarMap[id])profile.innerHTML='<img src="'+esc(avatarMap[id])+'" alt="Photo de profil" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
   }catch(e){panel.innerHTML='<p class="meta">Les commentaires seront disponibles après l’activation de la base sociale.</p>';}
 }
 function accountPanelHTML(){
@@ -1477,6 +1478,7 @@ document.addEventListener("click",function(e){
   if(a==='closeTestPreview'){S.testPreview=null;render();return;}
   if(a==='testOrganizerPublish'){var m=document.getElementById('testorgmsg');if(m)m.textContent='Simulation réussie : la course apparaîtrait dans Courses à venir. Rien n’a été publié.';return;}
   if(a==='toggleAccountPanel'){accountPopoverOpen=true;accountMode=v==='login'?'login':'signup';render();return;}
+  if(a==='chartpoint'){var delta=Number(b.dataset.delta||0);alert((b.dataset.date||'Course')+'\nELO : '+b.dataset.elo+'\n'+(b.dataset.date==='Départ'?'Valeur initiale':'Points ELO : '+(delta>0?'+':'')+delta));return;}
   if(a==='shareprofile'){shareProfileLink(v);return;}
   if(a==='shareRecord'){shareRecordCard(v,b.dataset.dist||'');return;}
   if(a==='shareRaceResult'){shareRaceResultCard(v,b.dataset.race||'');return;}
