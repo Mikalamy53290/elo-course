@@ -513,13 +513,18 @@ function computeEloWorker(payload){
   races.slice().sort(function(a,b){return String(a.date||"").localeCompare(String(b.date||""));}).filter(function(c){return inScope(c.dist,scope)}).forEach(function(c){
     var r=(c.results||[]).filter(function(a){return !a.pending&&!!a.id}),m=r.length;if(m<2)return;
     var dl={};r.forEach(function(a){dl[a.id]=0});
+    function timeSeconds(v){if(typeof v==="number"&&isFinite(v))return v;var n=Number(v);if(isFinite(n)&&n>0)return n;var p=String(v||"").split(":").map(Number),t=0;p.forEach(function(x){t=t*60+x});return t}
     for(var i=0;i<m;i++)for(var j=i+1;j<m;j++){
       var a=r[i],b=r[j],pa=g(a.id,"X"),pb=g(b.id,"X");
       var ea=1/(1+Math.pow(10,(pb.elo-pa.elo)/400));
       var sa=a.time<b.time?1:a.time>b.time?0:.5;
-      var k=(pa.n<5||pb.n<5)?40:24;
-      dl[a.id]+=k/(m-1)*(sa-ea);
-      dl[b.id]+=k/(m-1)*((1-sa)-(1-ea));
+      var ta=timeSeconds(a.time),tb=timeSeconds(b.time),fast=Math.min(ta,tb),gapPct=fast>0?Math.abs(ta-tb)/fast*100:0;
+      // Coefficient progressif : 1 + 0,5 × écart(%) / (écart(%) + 1).
+      // Il vaut 1 sans écart et tend vers 1,5 sans jamais le dépasser.
+      var gapFactor=1+0.5*gapPct/(gapPct+1);
+      var k=(pa.n<5||pb.n<5)?40:24,transfer=k/(m-1)*(sa-ea)*gapFactor;
+      dl[a.id]+=transfer;
+      dl[b.id]-=transfer;
     }
     r.forEach(function(a){var p=g(a.id,"X");p.elo+=dl[a.id];p.n++;p.hist.push(p.elo)});
   });
@@ -570,15 +575,16 @@ function compute(pred,scope){
   S.races.slice().sort(function(a,b){return String(a.date||"").localeCompare(String(b.date||""));}).filter(function(c){return inScope(c.dist,scope)}).forEach(function(c){
     var r=c.results.filter(function(a){return !a.pending&&!!a.id&&pred(a.id)}),m=r.length;if(m<2)return;
     var dl={};r.forEach(function(a){dl[a.id]=0});
+    function timeSeconds(v){if(typeof v==="number"&&isFinite(v))return v;var n=Number(v);if(isFinite(n)&&n>0)return n;var p=String(v||"").split(":").map(Number),t=0;p.forEach(function(x){t=t*60+x});return t}
     for(var i=0;i<m;i++)for(var j=i+1;j<m;j++){
       var a=r[i],b=r[j],pa=g(a.id,kd(c)),pb=g(b.id,kd(c));
       var ea=1/(1+Math.pow(10,(pb.elo-pa.elo)/400));
       var sa=a.time<b.time?1:a.time>b.time?0:.5;
-      // Un duel doit être strictement équilibré : les deux coureurs utilisent
-      // le même coefficient K afin que les points gagnés et perdus se compensent.
-      // Le coefficient reste élevé tant que l'un des deux coureurs est débutant.
-      var k=(pa.n<5||pb.n<5)?40:24;
-      dl[a.id]+=k/(m-1)*(sa-ea);dl[b.id]+=k/(m-1)*((1-sa)-(1-ea));
+      // Même coefficient pour les deux coureurs : le transfert reste équilibré.
+      var ta=timeSeconds(a.time),tb=timeSeconds(b.time),fast=Math.min(ta,tb),gapPct=fast>0?Math.abs(ta-tb)/fast*100:0;
+      var gapFactor=1+0.5*gapPct/(gapPct+1);
+      var k=(pa.n<5||pb.n<5)?40:24,transfer=k/(m-1)*(sa-ea)*gapFactor;
+      dl[a.id]+=transfer;dl[b.id]-=transfer;
     }
     r.forEach(function(a){var p=g(a.id,kd(c));p.elo+=dl[a.id];p.n++;p.hist.push(p.elo)});
   });
@@ -1103,9 +1109,10 @@ function adminGate(){
 }
 function helpHTML(){
   return '<h2>Comment ça marche</h2>'+'<div class="card"><div class="nm">Pour qui ?</div><p>Elo Course est le classement des coureurs de la Sarthe, de la Mayenne et du Maine-et-Loire. Seules les courses organisées dans ces trois départements sont ajoutées.</p><p>Un coureur d’un autre département est le bienvenu : il peut s’inscrire, et ses courses dans ces trois départements comptent comme celles des autres.</p></div>'+
-  '<div class="card"><div class="nm">Le principe</div><p>Chaque coureur démarre à 1500 points. Dans une course, chacun est comparé à tous les autres : celui qui arrive devant gagne le duel. Seuls comptent les duels, jamais le temps brut. Un trail difficile et un 10 km rapide se traitent donc de la même façon.</p></div>'+
-  '<div class="card"><div class="nm">Battre plus fort que soi rapporte plus</div><p>Le calcul prévoit qui devrait gagner d’après les points de chacun. Une victoire attendue rapporte peu, une surprise rapporte beaucoup. Exemple, dans une course à deux seulement, entre un coureur à 1500 et un à 1000 : si le favori gagne, il prend environ 2 points et l’autre en perd 2. Si l’outsider gagne, il prend environ 38 points et le favori en perd 38.</p></div>'+
-  '<div class="card"><div class="nm">Le calcul pas à pas</div><p>1. Chaque coureur démarre à 1500 points.</p><p>2. Dans une course, chacun est comparé à tous les autres. Celui qui arrive devant gagne le duel.</p><p>3. Pour chaque duel, le site estime la chance de gagner de chacun d’après l’écart de points : à points égaux, 50 % chacun ; avec 500 points d’écart, le favori a environ 95 % de chances.</p><p>4. Battre un favori rapporte beaucoup, battre un coureur plus faible rapporte peu.</p><p>5. Le total des duels est limité : au plus 40 points gagnés ou perdus par course pendant les 5 premières courses, puis 24 au plus.</p></div><div class="card"><div class="nm">Exemple : la première course</div><p>Quand tout le monde part à 1500, le gain d’un coureur est : 20 × (n + 1 − 2 × rang) ÷ (n − 1), où n est le nombre de coureurs. Le 1er gagne environ +20, le dernier perd environ −20.</p><p>Sur un semi à 464 coureurs, chaque place change le gain d’environ 0,09 point : les 6 premiers affichent +20 une fois arrondis. Sur un 5 km à 125 coureurs, chaque place change le gain d’environ 0,32 point : seuls les 2 premiers affichent +20.</p><p>Les points sont arrondis à l’affichage, mais le calcul garde les valeurs exactes.</p></div><div class="card"><div class="nm">Quelles courses comptent ?</div><p>Seules les courses chronométrées avec puce, d’après les résultats officiels. L’organisateur du site les ajoute après chaque course.</p></div><div class="card"><div class="nm">Égalités</div><p>Deux coureurs arrivés dans le même temps font match nul : chacun gagne ou perd la moitié d’un duel gagné.</p></div>'+
+  '<div class="card"><div class="nm">Le principe</div><p>Chaque coureur démarre à 1500 points. Dans une course, chacun est comparé à tous les autres. Le résultat du duel et l'écart de temps déterminent ensemble le transfert de points. Les temps ne sont comparés qu'entre coureurs d'une même course : un 10 km sur route n'est jamais comparé en chrono à un trail.</p></div>'+
+  '<div class="card"><div class="nm">Battre plus fort que soi rapporte plus</div><p>Le calcul estime d'abord les chances de chacun à partir de son ELO. Une victoire attendue rapporte peu ; une surprise rapporte beaucoup. Le nouvel ajustement lié au temps amplifie ensuite le transfert lorsque l'écart à l'arrivée est important.</p></div>'+
+  '<div class="card"><div class="nm">Le calcul pas à pas</div><p><strong>1. ELO de départ.</strong> Chaque coureur commence à 1500 points. Avant chaque course, le site reprend son ELO acquis jusque-là.</p><p><strong>2. Comparaison des coureurs.</strong> Dans la même course, chaque coureur est comparé à chacun des autres. Celui qui termine devant remporte le duel ; un temps identique donne une égalité.</p><p><strong>3. Probabilité de résultat.</strong> Le site calcule la probabilité théorique avec les ELO : E = 1 ÷ (1 + 10<sup>(ELO adverse − ELO du coureur) ÷ 400</sup>). À ELO égaux, chacun a 50 % de chances. Un coureur mieux classé au départ est favori.</p><p><strong>4. Écart de temps.</strong> Le site calcule l'écart en pourcentage entre les deux temps, par rapport au temps du plus rapide : écart (%) = (temps du plus lent − temps du plus rapide) ÷ temps du plus rapide × 100.</p><p><strong>5. Coefficient d'écart.</strong> Le transfert est multiplié par un coefficient progressif : C = 1 + 0,5 × écart(%) ÷ (écart(%) + 1). Sans écart, C = 1. Avec 1 % d'écart, C = 1,25 ; avec 5 %, C ≈ 1,42. Le coefficient ne dépasse jamais 1,5.</p><p><strong>6. Transfert de points.</strong> Pour chaque duel : transfert = K ÷ (nombre de coureurs − 1) × (résultat − probabilité) × C. Le résultat vaut 1 pour une victoire, 0,5 pour une égalité et 0 pour une défaite. K vaut 40 si au moins un des deux coureurs a moins de 5 courses, sinon 24.</p><p><strong>7. Équilibre.</strong> Les points gagnés par un coureur sont exactement retirés à son adversaire dans ce duel. L'écart de temps amplifie donc le transfert dans les deux sens, sans créer de points.</p><p><strong>8. Mise à jour.</strong> Tous les duels de la course sont additionnés, puis le nouvel ELO est enregistré dans l'historique de calcul. Les valeurs restent précises ; seul l'affichage est arrondi.</p></div>'+
+  '<div class="card"><div class="nm">Exemples de l'effet de l'écart</div><p>À résultat et ELO identiques, un écart de 0 % conserve le transfert de base. Un écart de 1 % le multiplie par 1,25. Un écart de 5 % le multiplie par environ 1,42. Un écart très important se rapproche du plafond de 1,5.</p><p>Le coefficient s'applique de façon identique aux deux coureurs : le gagnant reçoit davantage et le perdant cède exactement le même nombre de points supplémentaires.</p></div><div class="card"><div class="nm">Quelles courses comptent ?</div><p>Seules les courses chronométrées avec puce, d’après les résultats officiels. L’organisateur du site les ajoute après chaque course.</p></div><div class="card"><div class="nm">Égalités</div><p>Deux coureurs arrivés dans le même temps font match nul : chacun gagne ou perd la moitié d’un duel gagné.</p></div>'+
   '<div class="card"><div class="nm">Les gains diminuent avec l’expérience</div><p>Pendant les 5 premières courses, un coureur peut gagner ou perdre jusqu’à 40 points par course, pour trouver vite son niveau. Ensuite, 24 au maximum. Courir souvent ne gonfle pas le score : si tu perds tes duels, tu descends.</p></div>'+
   '<div class="card"><div class="nm">Un seul ELO</div><p>Chaque coureur a un seul ELO, calculé sur toutes ses courses : route et trail, toutes distances. Tu peux filtrer la liste par sexe ou par catégorie, mais les points restent les mêmes pour tous.</p></div>'+
   '<div class="card"><div class="nm">Le classement</div><p>Le classement ELO officiel est accessible dès la première course officielle, toutes disciplines confondues (route et trail). L’ELO devient plus fiable et représentatif à mesure que le coureur participe à plusieurs courses.</p></div><div class="card"><div class="nm">Les catégories</div><p>Elles suivent la Fédération française d’athlétisme : SE, puis M0 à M10 par tranches de 5 ans. Elles changent chaque année au 1er septembre.</p></div>'+
