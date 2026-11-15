@@ -458,7 +458,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_publishable_jiboviI5BaRii9_Lz9JK_A_qwXsVC-O";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
-var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheValue=null,boardCacheState=null,boardCacheValue={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
+var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheValue=null,boardCacheState=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={};
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
@@ -713,6 +713,8 @@ function fightTimeSeconds(value){
   return 0;
 }
 function fightRunnerMetrics(runnerId,st){
+  if(fightMetricCacheState!==st){fightMetricCacheState=st;fightMetricCache={};}
+  if(fightMetricCache[runnerId])return fightMetricCache[runnerId];
   var races=S.races.filter(function(c){return (c.results||[]).some(function(x){return x.id===runnerId&&!x.pending;});});
   var speeds=[],forces=[];
   races.forEach(function(c){var result=(c.results||[]).filter(function(x){return x.id===runnerId&&!x.pending;})[0];if(!result)return;
@@ -727,7 +729,8 @@ function fightRunnerMetrics(runnerId,st){
   var variance=mean===null?null:forces.reduce(function(sum,x){return sum+Math.pow(x-mean,2);},0)/Math.max(1,forces.length);
   var regularity=variance===null?null:Math.max(0,100-Math.sqrt(variance)*1.5);
   var p=st[runnerId+'|X'],elo=p&&p.n?Math.round(p.elo):1500;
-  return {races:races.length,speed:speed,force:force,regularity:regularity,elo:elo};
+  fightMetricCache[runnerId]={races:races.length,speed:speed,force:force,regularity:regularity,elo:elo};
+  return fightMetricCache[runnerId];
 }
 function fightPairScores(a,b,key){
   var av=a[key],bv=b[key];if(av===null||bv===null||!Number.isFinite(Number(av))||!Number.isFinite(Number(bv)))return [null,null];
