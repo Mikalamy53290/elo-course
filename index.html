@@ -451,7 +451,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_publishable_jiboviI5BaRii9_Lz9JK_A_qwXsVC-O";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
-var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
+var ELO_TIME_GAP_ENABLED=true,eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={};
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
@@ -522,7 +522,7 @@ function computeEloWorker(payload){
       var ta=raceTimes[a.id],tb=raceTimes[b.id],fast=Math.min(ta,tb),gapPct=fast>0?Math.abs(ta-tb)/fast*100:0;
       // Coefficient progressif : 1 + 0,5 × écart(%) / (écart(%) + 1).
       // Il vaut 1 sans écart et tend vers 1,5 sans jamais le dépasser.
-      var gapFactor=1+0.5*gapPct/(gapPct+1);
+      var gapFactor=payload.timeGapEnabled===false?1:1+0.5*gapPct/(gapPct+1);
       var k=(pa.n<5||pb.n<5)?40:24,transfer=k/(m-1)*(sa-ea)*gapFactor;
       dl[a.id]+=transfer;
       dl[b.id]-=transfer;
@@ -557,7 +557,7 @@ function requestEloCompute(scope){
       };
     }
     eloPending[key]=eloVersion;
-    eloWorker.postMessage({key:key,version:eloVersion,scope:key,races:S.races});
+    eloWorker.postMessage({key:key,version:eloVersion,scope:key,races:S.races,timeGapEnabled:ELO_TIME_GAP_ENABLED});
     return true;
   }catch(error){
     eloWorkerFailed=true;eloPending={};
@@ -584,7 +584,7 @@ function compute(pred,scope){
       var sa=a.time<b.time?1:a.time>b.time?0:.5;
       // Même coefficient pour les deux coureurs : le transfert reste équilibré.
       var ta=raceTimes[a.id],tb=raceTimes[b.id],fast=Math.min(ta,tb),gapPct=fast>0?Math.abs(ta-tb)/fast*100:0;
-      var gapFactor=1+0.5*gapPct/(gapPct+1);
+      var gapFactor=ELO_TIME_GAP_ENABLED?1+0.5*gapPct/(gapPct+1):1;
       var k=(pa.n<5||pb.n<5)?40:24,transfer=k/(m-1)*(sa-ea)*gapFactor;
       dl[a.id]+=transfer;dl[b.id]-=transfer;
     }
