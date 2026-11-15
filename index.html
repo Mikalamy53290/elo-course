@@ -738,6 +738,29 @@ function fightPairScores(a,b,key){
   var sum=Number(av)+Number(bv);if(sum<=0)return [50,50];return [100*Number(av)/sum,100*Number(bv)/sum];
 }
 
+function fightScorePanelHTML(id,opponentId,nameA,nameB,st,rankA,rankB){
+  var aMetrics=fightRunnerMetrics(id,st),bMetrics=fightRunnerMetrics(opponentId,st);
+  var eloA=Math.round(aMetrics.elo),eloB=Math.round(bMetrics.elo);
+  var criteria=[{key:'elo',label:'ELO',weight:30},{key:'force',label:'FORCE',weight:25},{key:'speed',label:'VITESSE',weight:20},{key:'regularity',label:'RÉGULARITÉ',weight:15},{key:'races',label:'EXPÉRIENCE',weight:10}];
+  var rows='',weightedA=0,weightTotal=0;
+  criteria.forEach(function(c){
+    var pair;
+    if(c.key==='races'){var ea=Math.sqrt(Math.max(0,aMetrics.races)),eb=Math.sqrt(Math.max(0,bMetrics.races)),sum=ea+eb;pair=sum>0?[100*ea/sum,100*eb/sum]:[50,50];}
+    else pair=fightPairScores(aMetrics,bMetrics,c.key);
+    var a=pair[0],b=pair[1],valid=a!==null&&b!==null;
+    if(valid){weightedA+=c.weight*a/100;weightTotal+=c.weight;}
+    var av=c.key==='speed'?(aMetrics.speed===null?'—':aMetrics.speed.toFixed(1)+' km/h'):c.key==='force'||c.key==='regularity'?(aMetrics[c.key]===null?'—':Math.round(aMetrics[c.key])+'/100'):c.key==='elo'?eloA:aMetrics.races;
+    var bv=c.key==='speed'?(bMetrics.speed===null?'—':bMetrics.speed.toFixed(1)+' km/h'):c.key==='force'||c.key==='regularity'?(bMetrics[c.key]===null?'—':Math.round(bMetrics[c.key])+'/100'):c.key==='elo'?eloB:bMetrics.races;
+    var leftWidth=valid?Math.max(0,Math.min(100,a)):0,rightWidth=valid?Math.max(0,Math.min(100,b)):0;
+    var leftClass=!valid?'neutral':a>b?'green':a<b?'red':'neutral',rightClass=!valid?'neutral':b>a?'green':b<a?'red':'neutral';
+    rows+='<div class="fight-stat"><div class="fight-stat-value '+leftClass+'">'+(valid?Math.round(a):'—')+'</div><div class="fight-bar left"><div class="fight-fill '+(valid?leftClass:'blue')+'" style="width:'+leftWidth+'%"></div></div><div class="fight-stat-label">'+c.label+' <span style="opacity:.7">('+c.weight+'%)</span></div><div class="fight-bar"><div class="fight-fill '+(valid?rightClass:'blue')+'" style="width:'+rightWidth+'%"></div></div><div class="fight-stat-value '+rightClass+'">'+(valid?Math.round(b):'—')+'</div><div class="fight-note" style="grid-column:1/-1;margin:0">'+esc(String(av))+' <span style="opacity:.65">VS</span> '+esc(String(bv))+'</div></div>';
+  });
+  var scoreA=weightTotal?100*weightedA/weightTotal:50,scoreB=100-scoreA;
+  var scoreAText=scoreA.toFixed(1).replace('.',','),scoreBText=scoreB.toFixed(1).replace('.',',');
+  var winner=scoreA>scoreB?nameA:scoreB>scoreA?nameB:'ÉGALITÉ';
+  return '<div class="fight-arena"><div class="fight-top"><div class="fight-fighter">'+fightAvatarHTML(id,nameA,false)+'<div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(nameA)+'</div><div class="fight-fighter-meta">ELO '+eloA+' · Rang '+rankA+'</div></div></div><div class="fight-vs">VS</div><div class="fight-fighter blue">'+fightAvatarHTML(opponentId,nameB,true)+'<div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(nameB)+'</div><div class="fight-fighter-meta">ELO '+eloB+' · Rang '+rankB+'</div></div></div></div><div class="fight-score-title">JAUGES DU COMBAT</div><div class="fight-stats">'+rows+'</div><div class="fight-total"><div class="fight-total-side '+(scoreA>scoreB?'winner':scoreA<scoreB?'loser':'')+'"><span>'+esc(nameA)+'</span><strong>'+scoreAText+' / 100</strong></div><div class="fight-total-label">TOTAL FINAL</div><div class="fight-total-side '+(scoreB>scoreA?'winner':scoreB<scoreA?'loser':'')+'"><span>'+esc(nameB)+'</span><strong>'+scoreBText+' / 100</strong></div></div><div class="fight-result">'+(winner==='ÉGALITÉ'?'FAVORIS À ÉGALITÉ':'FAVORI STATISTIQUE : '+esc(winner))+'</div><p class="fight-note">Score indicatif avant course : ELO 30 %, Force 25 %, Vitesse 20 %, Régularité 15 %, Expérience 10 %. Les données manquantes sont exclues puis les pondérations restantes ajustées. Les deux scores totalisent toujours 100 points. Le vainqueur réel d’un duel officiel dépendra du résultat publié de la course.</p></div>';
+}
+
 function runnerProfile(id,isMine){
   // Si le profil consulté est celui du compte connecté, conserver les commandes de modification même depuis le classement public.
   isMine=!!(isMine||(linkedRunner&&linkedRunner===id)||(S.me&&S.me===id));
@@ -816,30 +839,8 @@ function runnerProfile(id,isMine){
     var duelWins=0,duelLosses=0,duelDraws=0;
     sharedRaces.forEach(function(c){var a=c.results.filter(function(x){return x.id===id;})[0],b=c.results.filter(function(x){return x.id===opponentId;})[0];if(!a||!b)return;if(fightTimeSeconds(a.time)<fightTimeSeconds(b.time))duelWins++;else if(fightTimeSeconds(a.time)>fightTimeSeconds(b.time))duelLosses++;else duelDraws++;});
     var myRankText=idx>=0?(idx+1)+'e':'Non classé',oppRankText=opponentRank>=0?(opponentRank+1)+'e':'Non classé';
-    var myMetrics=fightRunnerMetrics(id,allState),oppMetrics=fightRunnerMetrics(opponentId,allState);
-    var myScore=Math.round(myMetrics.elo),oppScore=Math.round(oppMetrics.elo);
-    var criteria=[{key:'elo',label:'ELO',unit:'pts',weight:30},{key:'force',label:'FORCE',unit:'/100',weight:25},{key:'speed',label:'VITESSE',unit:'km/h',weight:20},{key:'regularity',label:'RÉGULARITÉ',unit:'/100',weight:15},{key:'races',label:'EXPÉRIENCE',unit:'courses',weight:10}];
-    var rows='',weightedA=0,weightedB=0,weightTotal=0;
-    criteria.forEach(function(c){
-      var pair;
-      if(c.key==='races'){
-        var ea=Math.sqrt(Math.max(0,myMetrics.races)),eb=Math.sqrt(Math.max(0,oppMetrics.races)),sumExp=ea+eb;
-        pair=sumExp>0?[100*ea/sumExp,100*eb/sumExp]:[50,50];
-      }else pair=fightPairScores(myMetrics,oppMetrics,c.key);
-      var a=pair[0],b=pair[1],valid=a!==null&&b!==null;
-      if(valid){weightedA+=c.weight*a/100;weightedB+=c.weight*b/100;weightTotal+=c.weight;}
-      var av=c.key==='speed'?(myMetrics.speed===null?'—':myMetrics.speed.toFixed(1)+' km/h'):c.key==='force'||c.key==='regularity'?(myMetrics[c.key]===null?'—':Math.round(myMetrics[c.key])+'/100'):c.key==='elo'?myScore:myMetrics.races;
-      var bv=c.key==='speed'?(oppMetrics.speed===null?'—':oppMetrics.speed.toFixed(1)+' km/h'):c.key==='force'||c.key==='regularity'?(oppMetrics[c.key]===null?'—':Math.round(oppMetrics[c.key])+'/100'):c.key==='elo'?oppScore:oppMetrics.races;
-      var leftWidth=valid?Math.max(0,Math.min(100,a)):0,rightWidth=valid?Math.max(0,Math.min(100,b)):0;
-      var leftClass=!valid?'neutral':a>b?'green':a<b?'red':'neutral',rightClass=!valid?'neutral':b>a?'green':b<a?'red':'neutral';
-      rows+='<div class="fight-stat"><div class="fight-stat-value '+leftClass+'">'+(valid?Math.round(a):'—')+'</div><div class="fight-bar left"><div class="fight-fill '+(valid?leftClass:'blue')+'" style="width:'+leftWidth+'%"></div></div><div class="fight-stat-label">'+c.label+' <span style="opacity:.7">('+c.weight+'%)</span></div><div class="fight-bar"><div class="fight-fill '+(valid?rightClass:'blue')+'" style="width:'+rightWidth+'%"></div></div><div class="fight-stat-value '+rightClass+'">'+(valid?Math.round(b):'—')+'</div><div class="fight-note" style="grid-column:1/-1;margin:0">'+esc(String(av))+' <span style="opacity:.65">VS</span> '+esc(String(bv))+'</div></div>';
-    });
-    var scoreA=weightTotal?100*weightedA/weightTotal:50,scoreB=100-scoreA;
-    var scoreAText=scoreA.toFixed(1).replace('.',','),scoreBText=scoreB.toFixed(1).replace('.',',');
-    var winner=scoreA>scoreB?r.name:scoreB>scoreA?comparisonOpponent.name:'ÉGALITÉ';
-    comparisonPanel+='<div class="fight-arena"><div class="fight-top"><div class="fight-fighter">'+fightAvatarHTML(id,r.name,false)+'<div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(r.name)+'</div><div class="fight-fighter-meta">ELO '+myScore+' · Rang '+myRankText+'</div></div></div><div class="fight-vs">VS</div><div class="fight-fighter blue">'+fightAvatarHTML(opponentId,comparisonOpponent.name,true)+'<div class="fight-fighter-info"><div class="fight-fighter-name">'+esc(comparisonOpponent.name)+'</div><div class="fight-fighter-meta">ELO '+oppScore+' · Rang '+oppRankText+'</div></div></div></div>';
-        comparisonPanel+='<div class="fight-score-title">JAUGES DU COMBAT</div><div class="fight-stats">'+rows+'</div><div class="fight-total"><div class="fight-total-side '+(scoreA>scoreB?'winner':scoreA<scoreB?'loser':'')+'"><span>'+esc(r.name)+'</span><strong>'+scoreAText+' / 100</strong></div><div class="fight-total-label">TOTAL FINAL</div><div class="fight-total-side '+(scoreB>scoreA?'winner':scoreB<scoreA?'loser':'')+'"><span>'+esc(comparisonOpponent.name)+'</span><strong>'+scoreBText+' / 100</strong></div></div><div class="fight-result">'+(winner==='ÉGALITÉ'?'MATCH NUL':esc(winner)+' REMPORTE LE DUEL !')+'</div><p class="fight-note">Les jauges affichent la part relative de chaque critère. Le total final additionne les cinq critères pondérés (ELO 30 %, Force 25 %, Vitesse 20 %, Régularité 15 %, Expérience 10 %). Si une donnée manque, les autres pondérations sont ajustées proportionnellement. Le total des deux scores est toujours égal à 100.</p></div>';
-    comparisonPanel+='<h3 class="profile-section-title">Face-à-face sur les courses communes</h3><p class="pf-section-copy">'+sharedRaces.length+' course(s) courue(s) ensemble : '+duelWins+' victoire(s), '+duelLosses+' défaite(s) et '+duelDraws+' égalité(s).</p>';
+    comparisonPanel+=fightScorePanelHTML(id,opponentId,r.name,comparisonOpponent.name,allState,myRankText,oppRankText);
+        comparisonPanel+='<h3 class="profile-section-title">Face-à-face sur les courses communes</h3><p class="pf-section-copy">'+sharedRaces.length+' course(s) courue(s) ensemble : '+duelWins+' victoire(s), '+duelLosses+' défaite(s) et '+duelDraws+' égalité(s).</p>';
     comparisonPanel+=sharedRaces.length?'<div class="pf-duel-history">'+sharedRaces.slice().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''));}).map(function(c){var a=c.results.filter(function(x){return x.id===id;})[0],b=c.results.filter(function(x){return x.id===opponentId;})[0];var ta=fightTimeSeconds(a.time),tb=fightTimeSeconds(b.time),ca=ta<tb?'is-win':ta>tb?'is-loss':'',cb=tb<ta?'is-win':tb>ta?'is-loss':'';return '<div class="pf-duel-row"><div><strong>'+esc(c.name)+'</strong><div class="meta">'+esc(c.dist||'Distance non renseignée')+' · '+esc(c.date||'')+'</div></div><span class="pf-duel-score"><span class="'+ca+'">'+formatTime(a.time)+'</span> / <span class="'+cb+'">'+formatTime(b.time)+'</span></span></div>';}).join('')+'</div>':'<p class="empty">Aucune course commune pour le moment.</p>';
   }else{comparisonPanel+='<div class="fight-empty">Choisis un adversaire pour lancer le combat !</div>';}
   comparisonPanel+='</section>';
@@ -863,6 +864,7 @@ function runnerProfile(id,isMine){
      duelPanel+='<h3 class="profile-section-title">Meilleurs chronos — distances communes</h3>';
      duelPanel+=Object.keys(distanceKeys).length?'<div class="duel-compare">'+Object.keys(distanceKeys).sort(function(a,b){return a.localeCompare(b,'fr');}).map(function(d){return duelStat(d,bestFor(id,d),bestFor(opponentId,d),true);}).join('')+'</div>':'<p class="empty">Aucune distance commune enregistrée.</p>';
      duelPanel+='<h3 class="profile-section-title">Courses courues ensemble</h3><p class="pf-section-copy">'+sharedRaces.length+' course(s) commune(s) : '+duelWins+' victoire(s), '+duelLosses+' défaite(s) et '+duelDraws+' égalité(s).</p>';
+     duelPanel+=fightScorePanelHTML(id,opponentId,r.name,duelOpponent.name,allState,myRank?myRank+'e':'Non classé',oppRank?oppRank+'e':'Non classé');
    }else{duelPanel+='<p class="empty">Choisis un adversaire pour comparer vos chiffres. Le meilleur résultat apparaît en vert.</p>';}
    duelPanel+='</section>';
 var infosPanel='<section class="pf-tab-panel '+(tab==='infos'?'active':'')+'" data-profile-panel="infos"><div id="profiledetails">'+profileDetailsHTML(id,isMine)+'</div>'+nextRaceHTML(id,isMine)+avatarEditorHTML(id,isMine)+'<div id="socialpanel" class="card"><p class="meta">Chargement des échanges…</p></div></section>';
