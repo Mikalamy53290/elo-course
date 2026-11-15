@@ -458,7 +458,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_publishable_jiboviI5BaRii9_Lz9JK_A_qwXsVC-O";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
-var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
+var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheValue=null,authUser=null,linkedRunner=null,pendingRunner=null,avatarMap={},runnerDetails={},socialBusy=false;
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={};
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
@@ -634,6 +634,19 @@ function categoryRankInfo(st,runnerId){
   var index=rows.findIndex(function(x){return x.r.id===runnerId});
   return {category:category,sex:sex,rank:index>=0?index+1:0,total:rows.length};
 }
+function profileRankIndex(st){
+  if(profileRankCacheState===st&&profileRankCacheValue)return profileRankCacheValue;
+  var rows=board(st,"X").ranked,global={},sexRanks={},sexTotals={},categoryRanks={},categoryTotals={};
+  rows.forEach(function(x,i){
+    var id=x.r.id,sex=normalizeSex(x.r.sex),cat=normalizeCategory(x.r.cat);
+    global[id]=i+1;
+    if(sex){sexTotals[sex]=(sexTotals[sex]||0)+1;sexRanks[id]=sexTotals[sex];}
+    if(sex&&cat){var key=sex+"|"+cat;categoryTotals[key]=(categoryTotals[key]||0)+1;categoryRanks[id]=categoryTotals[key];}
+  });
+  profileRankCacheState=st;
+  profileRankCacheValue={global:global,total:rows.length,sexRanks:sexRanks,sexTotals:sexTotals,categoryRanks:categoryRanks,categoryTotals:categoryTotals};
+  return profileRankCacheValue;
+}
 function delta(p){var d=Math.round(p.hist[p.hist.length-1]-p.hist[p.hist.length-2]);return d?'<span class="dl '+(d>0?'up':'down')+'">'+(d>0?'+':'−')+Math.abs(d)+'</span>':''}
 function groupPred(g){
   if(!g||g==="all")return function(){return true};
@@ -702,8 +715,8 @@ function fightRunnerMetrics(runnerId,st){
   races.forEach(function(c){var result=(c.results||[]).filter(function(x){return x.id===runnerId&&!x.pending;})[0];if(!result)return;
     var km=fightDistanceKm(c),sec=fightTimeSeconds(result.time);
     if(km>0&&sec>0)speeds.push(km/(sec/3600));
-    var rows=(c.results||[]).filter(function(x){return !x.pending&&x.id;}).slice().sort(function(a,b){return fightTimeSeconds(a.time)-fightTimeSeconds(b.time);});
-    var pos=Number(result.rk);if(!(pos>0))pos=rows.findIndex(function(x){return x.id===runnerId;})+1;
+    var rows=(c.results||[]).filter(function(x){return !x.pending&&x.id;}),pos=Number(result.rk);
+    if(!(pos>0)){var targetTime=fightTimeSeconds(result.time),ownIndex=rows.findIndex(function(x){return x.id===runnerId;}),ahead=0;rows.forEach(function(x,i){var t=fightTimeSeconds(x.time);if(t<targetTime||(t===targetTime&&i<ownIndex))ahead++;});pos=ahead+1;}
     if(rows.length>1&&pos>0)forces.push(100*(1-(pos-1)/(rows.length-1)));
   });
   var avg=function(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:null;};
@@ -724,17 +737,10 @@ function runnerProfile(id,isMine){
   isMine=!!(isMine||(linkedRunner&&linkedRunner===id)||(S.me&&S.me===id));
   var r=S.runners.filter(function(x){return x.id===id})[0];
   if(!r)return '<h2>Profil coureur</h2><p class="empty">Ce profil est introuvable.</p><button class="ghost" data-act="backrank">Retour au classement</button>';
-  var allState=compute(undefined,"all"),routeState=compute(undefined,"route"),trailState=compute(undefined,"trail");
+  var allState=compute(undefined,"all");
   var p=allState[id+"|X"];
-  // Le classement officiel est accessible dès la première course chronométrée.
-  function officialRank(st,runnerId){
-    var rows=S.runners.map(function(r){var q=st[r.id+"|X"];return q&&q.n>=MINR?{r:r,p:q}:null}).filter(Boolean);
-    rows.sort(function(a,b){return b.p.elo-a.p.elo});
-    return rows.findIndex(function(x){return x.r.id===runnerId});
-  }
-  var idx=officialRank(allState,id),allRankedCount=S.runners.filter(function(r){var q=allState[r.id+"|X"];return q&&q.n>=MINR}).length;
-  var route=routeState[id+"|X"],trail=trailState[id+"|X"];
-  var routeRank=officialRank(routeState,id),trailRank=officialRank(trailState,id);
+  // Un seul tri construit les rangs général, sexe et catégorie ; le résultat est réutilisé entre profils.
+  var rankIndex=profileRankIndex(allState),idx=(rankIndex.global[id]||0)-1,allRankedCount=rankIndex.total;
   var mine=S.races.filter(function(c){return c.results.some(function(a){return a.id===id})});
   var total=mine.length,liked=!!S.liked[id],eloMax=p&&p.n?Math.round(Math.max.apply(null,p.hist)):0,since=p&&p.n?Math.round(p.elo-1500):0;
   function place(c){var a=c.results.filter(function(x){return x.id===id})[0];if(a&&Number(a.rk)>0)return Number(a.rk);var sorted=c.results.slice().sort(function(x,y){return x.time-y.time});return sorted.findIndex(function(x){return x.id===id})+1}
@@ -746,7 +752,9 @@ function runnerProfile(id,isMine){
   var quick='<div class="pf-quick"><div class="pf-q"><b>'+total+'</b><span class="pf-q-label"><i class="pf-q-icon">🏁</i>Courses</span></div><div class="pf-q"><b>'+(medals.gold+medals.silver+medals.bronze)+'</b><span class="pf-q-label"><i class="pf-q-icon">🏅</i>Podiums</span></div><div class="pf-q"><b>'+(eloMax||'–')+'</b><span class="pf-q-label"><i class="pf-q-icon">📊</i>ELO maximum</span></div><div class="pf-q"><b class="'+(since>0?'up':since<0?'down':'')+'">'+(p&&p.n?(since>0?'+':since<0?'−':'')+Math.abs(since):'–')+'</b><span class="pf-q-label"><i class="pf-q-icon">📈</i>Progression</span></div></div>';
   var chronological=S.races.slice().sort(function(a,b){return String(a.date||'').localeCompare(String(b.date||''));}),formRows=[],histIndex=1;chronological.forEach(function(c){var validResults=c.results.filter(function(a){return !a.pending&&!!a.id;});if(validResults.length<2||!validResults.some(function(a){return a.id===id}))return;var before=p&&p.hist?Number(p.hist[histIndex-1]):1500,after=p&&p.hist?Number(p.hist[histIndex]):before;histIndex++;var diff=Math.round(after-before);formRows.push({diff:diff,dist:c.dist||'Course',name:c.name||''});});formRows=formRows.slice(-4).reverse();var recentForm='<div class="pf-form-recent"><div class="pf-form-title">📈 Forme récente</div>'+(formRows.length?'<div class="pf-form-list">'+formRows.map(function(x){var barHeight=Math.max(5,Math.min(52,Math.abs(x.diff)*1.25));return '<div class="pf-form-item"><strong class="'+(x.diff>=0?'up':'down')+'">'+(x.diff>0?'+':'')+x.diff+'</strong><i class="pf-form-bar '+(x.diff>=0?'up':'down')+'" style="height:'+barHeight+'px" aria-hidden="true"></i><span>'+esc(x.dist)+'</span></div>';}).join('')+'</div>':'<p class="pf-section-copy">La forme récente apparaîtra après les prochaines courses classées.</p>')+'</div>';
   var thisYear=String(new Date().getFullYear()),yearRaces=mine.filter(function(c){return String(c.date||'').slice(0,4)===thisYear;}),yearKm=0,yearPodiums=0;yearRaces.forEach(function(c){var d=norm(c.dist||''),m=d.match(/([0-9]+(?:[.,][0-9]+)?)\s*km/);if(m)yearKm+=Number(m[1].replace(',','.'));else if(d.indexOf('semi')>=0)yearKm+=21.0975;else if(d.indexOf('marathon')>=0)yearKm+=42.195;var pos=place(c);if(pos<=3)yearPodiums++;});var yearSummary='<div class="card" style="margin-top:10px"><strong>Bilan '+thisYear+'</strong><div class="pf-quick"><div class="pf-q"><b>'+yearRaces.length+'</b><span>Courses</span></div><div class="pf-q"><b>'+yearKm.toFixed(1).replace('.',',')+'</b><span>Km connus</span></div><div class="pf-q"><b>'+yearPodiums+'</b><span>Podiums</span></div></div><p class="meta">Les kilomètres sont calculés uniquement lorsque la distance est renseignée ou reconnue.</p></div>';
-  var catInfo=categoryRankInfo(allState,id),sexInfo=sexRankInfo(allState,id);
+  var profileSex=normalizeSex(r.sex),profileCategory=normalizeCategory(r.cat);
+  var sexInfo=profileSex?{sex:profileSex,rank:rankIndex.sexRanks[id]||0,total:rankIndex.sexTotals[profileSex]||0}:null;
+  var catInfo=profileSex&&profileCategory?{sex:profileSex,category:profileCategory,rank:rankIndex.categoryRanks[id]||0,total:rankIndex.categoryTotals[profileSex+"|"+profileCategory]||0}:null;
   var main='<div class="pf-overview"><div class="pf-overview-line"><span class="pf-overview-label">ELO</span><strong class="pf-overview-elo">'+(p&&p.n?Math.round(p.elo):'—')+'</strong>'+(p&&p.n?'<strong class="pf-overview-gain">'+(since>0?'+':since<0?'−':'')+Math.abs(since)+'</strong><span class="pf-overview-since">depuis ses débuts</span>':'')+'</div><div class="pf-rank-cards"><div class="pf-rank-card"><span>Général</span><strong>'+(idx>=0?(idx+1)+'e / '+allRankedCount:'Non classé')+'</strong></div><div class="pf-rank-card"><span>'+(sexInfo?(sexInfo.sex==='F'?'Femmes':'Hommes'):'Sexe')+'</span><strong>'+(sexInfo?(sexInfo.rank?sexInfo.rank+'e / '+sexInfo.total:'Non classé'):'—')+'</strong></div><div class="pf-rank-card"><span>'+(catInfo?esc(catInfo.category)+' · '+(catInfo.sex==='F'?'Femmes':'Hommes'):'Catégorie')+'</span><strong>'+(catInfo?(catInfo.rank?catInfo.rank+'e / '+catInfo.total:'Non classé'):'—')+'</strong></div></div></div>';
   hero=hero+main+'</div>';
   var medalHTML='<div class="pf-medals"><div class="pf-medal"><span class="pf-medal-icon gold">🥇</span><b>'+medals.gold+'</b><small>1re place</small></div><div class="pf-medal"><span class="pf-medal-icon silver">🥈</span><b>'+medals.silver+'</b><small>2e place</small></div><div class="pf-medal"><span class="pf-medal-icon bronze">🥉</span><b>'+medals.bronze+'</b><small>3e place</small></div></div>';
@@ -1227,7 +1235,7 @@ function render(){setTimeout(arrows,30);MINR=1;
   var st=needsStats?compute(undefined,S.dist||"all"):(ALL||{});if(needsStats)ALL=st;
   var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(st);var pop=document.getElementById("accountpopover");if(pop){pop.hidden=!accountPopoverOpen;pop.innerHTML=accountPopoverOpen?accountPanelHTML():"";}
   if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML(st);
-  if(S.view==="rank"){if(S.publicProfile&&(!eloCache.all||!eloCache.route||!eloCache.trail)){compute(undefined,"all");compute(undefined,"route");compute(undefined,"trail");$("#v-rank").innerHTML='<p class="empty">Préparation du profil et de son historique ELO…</p>';}else $("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));}
+  if(S.view==="rank"){if(S.publicProfile&&!eloCache.all){compute(undefined,"all");$("#v-rank").innerHTML='<p class="empty">Préparation du profil…</p>';}else $("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));}
   else if(S.view==="races")$("#v-races").innerHTML=racesHTML();
   else if(S.view==="me")$("#v-me").innerHTML=meHTML(st);
   else if(S.view==="help")$("#v-help").innerHTML=helpHTML();
