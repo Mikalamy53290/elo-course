@@ -810,7 +810,7 @@ function runnerProfile(id,isMine){
   var comparisonPanel='<section class="pf-tab-panel '+(tab==='comparison'?'active':'')+'" data-profile-panel="comparison"><h3 class="profile-section-title">Comparer avec un autre coureur</h3><div class="pf-compare-search"><input id="compareRunnerSearch" list="compareRunnerOptions" placeholder="Rechercher un coureur par son nom…" value="'+(duelOpponent?escapeAttr(duelOpponent.name):'')+'"><datalist id="compareRunnerOptions">'+compareOptions+'</datalist><button type="button" class="btn" data-act="compareRunner" data-v="'+escapeAttr(id)+'">Comparer</button></div>';
 
   if(comparisonOpponent){
-    var opponentId=comparisonOpponent.id,opponentState=allState[opponentId+'|X'],opponentRank=officialRank(allState,opponentId);
+    var opponentId=comparisonOpponent.id,opponentState=allState[opponentId+'|X'],opponentRank=(rankIndex.global[opponentId]||0)-1;
     var opponentRaces=S.races.filter(function(c){return (c.results||[]).some(function(a){return a.id===opponentId;});});
     var sharedRaces=mine.filter(function(c){return (c.results||[]).some(function(a){return a.id===opponentId;});});
     var duelWins=0,duelLosses=0,duelDraws=0;
@@ -849,7 +849,7 @@ function runnerProfile(id,isMine){
      var opponentId=duelOpponent.id,opponentState=allState[opponentId+'|X'];
      var opponentRaces=S.races.filter(function(c){return (c.results||[]).some(function(a){return a.id===opponentId;});});
      var myElo=p&&p.n?Math.round(p.elo):null,oppElo=opponentState&&opponentState.n?Math.round(opponentState.elo):null;
-     var myRank=idx>=0?idx+1:null,oppRank=officialRank(allState,opponentId)>=0?officialRank(allState,opponentId)+1:null;
+     var myRank=idx>=0?idx+1:null,oppRank=rankIndex.global[opponentId]||null;
      var myMax=p&&p.hist&&p.hist.length?Math.round(Math.max.apply(null,p.hist)):null,oppMax=opponentState&&opponentState.hist&&opponentState.hist.length?Math.round(Math.max.apply(null,opponentState.hist)):null;
      var myProgress=p&&p.n?Math.round(p.elo-1500):null,oppProgress=opponentState&&opponentState.n?Math.round(opponentState.elo-1500):null;
      function duelCell(value,other,lowerWins){var a=lowerWins?fightTimeSeconds(value):Number(value),b=lowerWins?fightTimeSeconds(other):Number(other),valid=value!==null&&other!==null&&Number.isFinite(a)&&Number.isFinite(b),win=valid&&(lowerWins?a<b:a>b),loss=valid&&!win&&a!==b;return '<strong class="duel-cell '+(win?'is-best':loss?'is-worst':'')+'">'+(value===null?'—':String(value))+'</strong>';}
