@@ -118,14 +118,19 @@ security definer
 set search_path = public
 as $$
 begin
-  if tg_op = 'INSERT' then
-    insert into public.runner_notifications (recipient_runner_id, actor_runner_id, kind, created_at)
-    values (new.opponent_runner_id, new.challenger_runner_id, 'duel_invitation', now());
-  elsif tg_op = 'UPDATE' and old.status = 'pending' and new.status in ('accepted','refused') then
-    insert into public.runner_notifications (recipient_runner_id, actor_runner_id, kind, created_at)
-    values (new.challenger_runner_id, new.opponent_runner_id,
-      case when new.status = 'accepted' then 'duel_accepted' else 'duel_refused' end, now());
-  end if;
+  begin
+    if tg_op = 'INSERT' then
+      insert into public.runner_notifications (recipient_runner_id, actor_runner_id, kind, created_at)
+      values (new.opponent_runner_id, new.challenger_runner_id, 'duel_invitation', now());
+    elsif tg_op = 'UPDATE' and old.status = 'pending' and new.status in ('accepted','refused') then
+      insert into public.runner_notifications (recipient_runner_id, actor_runner_id, kind, created_at)
+      values (new.challenger_runner_id, new.opponent_runner_id,
+        case when new.status = 'accepted' then 'duel_accepted' else 'duel_refused' end, now());
+    end if;
+  exception when others then
+    -- Une table de notifications non migrée ne doit pas bloquer l'invitation.
+    null;
+  end;
   return new;
 end;
 $$;
