@@ -1,0 +1,27 @@
+name: Pack ELO COURSE
+on:
+  push:
+    branches:
+      - gestion-courses-corrections-2026-11-16
+    paths:
+      - '.github/workflows/package-elo.yml'
+  workflow_dispatch:
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gestion-courses-corrections-2026-11-16
+      - name: Prepare ZIP
+        run: |
+          mkdir -p dist
+          cp index.html dist/index.html
+          cd dist
+          zip -9 ELO-COURSE-gestion-courses-corrections-2026-11-16.zip index.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ELO-COURSE-gestion-courses-corrections-2026-11-16
+          path: dist/ELO-COURSE-gestion-courses-corrections-2026-11-16.zip
+          if-no-files-found: error
+          retention-days: 7
