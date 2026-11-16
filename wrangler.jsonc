@@ -2,7 +2,7 @@
   "name": "elo-course-sarthe-mayenne-maineetloire",
   "compatibility_date": "2026-11-14",
   "assets": {
-    "directory": "./",
-    "binding": "ASSETS"
-  }
+    "directory": "./"
+  },
+  "previews": {}
 }
