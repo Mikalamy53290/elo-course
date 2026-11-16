@@ -110,6 +110,54 @@ revoke all on function public.elo_cancel_duel_challenge(uuid) from public;
 grant execute on function public.elo_respond_duel_challenge(uuid,text) to authenticated;
 grant execute on function public.elo_cancel_duel_challenge(uuid) to authenticated;
 
+-- Centre de notifications : la table n'existe pas encore dans cette base.
+create table if not exists public.runner_notifications (
+  id uuid primary key default gen_random_uuid(),
+  recipient_runner_id text not null,
+  actor_runner_id text,
+  kind text not null,
+  created_at timestamptz not null default now(),
+  read_at timestamptz
+);
+
+create index if not exists runner_notifications_recipient_created
+  on public.runner_notifications (recipient_runner_id, created_at desc);
+
+alter table public.runner_notifications enable row level security;
+
+drop policy if exists "Runners can read their own notifications" on public.runner_notifications;
+create policy "Runners can read their own notifications"
+on public.runner_notifications for select to authenticated
+using (
+  exists (
+    select 1 from public.runner_accounts a
+    where a.user_id = auth.uid() and a.status = 'approved'
+      and a.runner_id = recipient_runner_id
+  )
+);
+
+drop policy if exists "Runners can mark their own notifications read" on public.runner_notifications;
+create policy "Runners can mark their own notifications read"
+on public.runner_notifications for update to authenticated
+using (
+  exists (
+    select 1 from public.runner_accounts a
+    where a.user_id = auth.uid() and a.status = 'approved'
+      and a.runner_id = recipient_runner_id
+  )
+)
+with check (
+  exists (
+    select 1 from public.runner_accounts a
+    where a.user_id = auth.uid() and a.status = 'approved'
+      and a.runner_id = recipient_runner_id
+  )
+);
+
+revoke all on public.runner_notifications from anon, authenticated;
+grant select on public.runner_notifications to authenticated;
+grant update (read_at) on public.runner_notifications to authenticated;
+
 -- Notifications dans le centre de notifications existant.
 create or replace function public.elo_notify_duel_challenge()
 returns trigger
