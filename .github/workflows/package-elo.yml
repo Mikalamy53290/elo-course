@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - gestion-courses-corrections-2026-11-16
-    paths:
-      - '.github/workflows/package-elo.yml'
   workflow_dispatch:
 jobs:
   package:
