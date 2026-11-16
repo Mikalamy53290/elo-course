@@ -1896,15 +1896,18 @@ document.addEventListener("click",function(e){
   else if(a==='uploadavatar'){
     (async function(){
       var am=document.getElementById('avatarmessage');
+      var photoStep='vérification du formulaire';
       try{
         if(!authUser||!linkedRunner)throw new Error('Ton compte doit être connecté et rattaché à une fiche coureur validée.');
         var input=document.getElementById('avatarfile'),f=input&&input.files&&input.files[0];
         if(!f||!/^image\/(jpeg|png|webp)$/.test(f.type)||f.size>2097152)throw new Error('Choisis une image JPG, PNG ou WebP de 2 Mo maximum.');
         if(am)am.textContent='Envoi de la photo…';
         var path=authUser.id+'/'+Date.now()+'-'+f.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-        var up=await sb.storage.from('photos-coureurs').upload(path,f,{upsert:true,contentType:f.type});
+        photoStep='envoi dans le bucket photos-coureurs';
+        var up=await sb.storage.from('photos-coureurs').upload(path,f,{upsert:false,contentType:f.type});
         if(up.error)throw up.error;
         var pub=sb.storage.from('photos-coureurs').getPublicUrl(path).data.publicUrl;
+        photoStep='enregistrement dans la table runner_avatars';
         var saved=await sb.from('runner_avatars').upsert({user_id:authUser.id,runner_id:linkedRunner,avatar_url:pub,updated_at:new Date().toISOString()},{onConflict:'user_id'});
         if(saved.error)throw saved.error;
         avatarMap[linkedRunner]=pub;
@@ -1913,7 +1916,7 @@ document.addEventListener("click",function(e){
         if(am)am.textContent='Photo de profil enregistrée.';
         if(input)input.value='';
       }catch(err){
-        var message='Photo non enregistrée : '+(err&&err.message?err.message:'Erreur inconnue');
+        var message='Photo non enregistrée ('+photoStep+') : '+(err&&err.message?err.message:'Erreur inconnue');
         if(am)am.textContent=message;else alert(message);
       }
     })();
