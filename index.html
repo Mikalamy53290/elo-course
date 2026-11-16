@@ -769,6 +769,10 @@ function runnerProfile(id,isMine){
   var r=S.runners.filter(function(x){return x.id===id})[0];
   if(!r)return '<h2>Profil coureur</h2><p class="empty">Ce profil est introuvable.</p><button class="ghost" data-act="backrank">Retour au classement</button>';
   var allState=compute(undefined,"all");
+  // Adversaire mémorisé pour le duel comparatif du profil ; aucune sélection ne doit bloquer le rendu.
+  var duelOpponentId=S.profileDuelOpponentByRunner&&S.profileDuelOpponentByRunner[id];
+  var duelOpponent=duelOpponentId?S.runners.filter(function(x){return x.id===duelOpponentId;})[0]||null:null;
+  var compareOptions=S.runners.filter(function(x){return x.id!==id;}).slice().sort(function(a,b){return String(a.name||"").localeCompare(String(b.name||""),"fr");}).map(function(x){return '<option value="'+escapeAttr(x.name||"")+'"></option>';}).join("");
   var p=allState[id+"|X"];
   // Un seul tri construit les rangs général, sexe et catégorie ; le résultat est réutilisé entre profils.
   var rankIndex=profileRankIndex(allState),idx=(rankIndex.global[id]||0)-1,allRankedCount=rankIndex.total;
