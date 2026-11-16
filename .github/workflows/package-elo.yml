@@ -15,8 +15,10 @@ jobs:
         run: |
           mkdir -p dist
           cp index.html dist/index.html
+          mkdir -p dist/supabase
+          cp supabase/runner_duel_challenges.sql dist/supabase/runner_duel_challenges.sql
           cd dist
-          zip -9 ELO-COURSE-gestion-courses-corrections-2026-11-16.zip index.html
+          zip -9 -r ELO-COURSE-gestion-courses-corrections-2026-11-16.zip index.html supabase/runner_duel_challenges.sql
       - uses: actions/upload-artifact@v4
         with:
           name: ELO-COURSE-gestion-courses-corrections-2026-11-16
