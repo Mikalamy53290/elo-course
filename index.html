@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Elo Course – Sarthe, Mayenne et Maine-et-Loire</title>
+<title>ELO COURSE – Classements et résultats de course à pied</title>
+<meta name="description" content="Consultez les classements et résultats de courses à pied en Sarthe, Mayenne et Maine-et-Loire avec ELO COURSE.">
+<link id="seo-canonical" rel="canonical" href="https://elo-course.eu/">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0B1724;--surface:#172B3D;--ink:#F3F6FA;--muted:#AAB8C7;--line:#294155;--accent:#278A50;--accent-bg:#203F3A;--accent-ink:#071B14;--gold:#FFD166;--up:#278A50;--down:#F06B72;--route:#278A50;--trail:#F06B72;--general:#B8A2FF;
@@ -556,6 +558,41 @@ S.chronos=S.chronos||[];
 var adminLoginRequested=false;try{adminLoginRequested=new URLSearchParams(window.location.search).get("admin")==="1";}catch(ignoreAdminParam){}
 try{var s=localStorage.getItem(KEY);if(s)S=Object.assign(S,JSON.parse(s))}catch(e){}
 if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":"accueil";S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
+// Rubriques publiques accessibles par URL dédiée (navigation SEO).
+var SEO_VIEWS={
+  '/':'accueil',
+  '/classement':'rank',
+  '/courses':'races',
+  '/reglement':'help',
+  '/organisateurs':'organizer',
+  '/chronometreurs':'chrono',
+  '/courses-a-venir':'upcoming'
+};
+var SEO_META={
+  accueil:{title:'ELO COURSE – Classements et résultats de course à pied',description:'Consultez les classements et résultats de courses à pied en Sarthe, Mayenne et Maine-et-Loire avec ELO COURSE.'},
+  rank:{title:'Classement ELO des coureurs – ELO COURSE',description:'Consultez le classement ELO des coureurs et les performances en Sarthe, Mayenne et Maine-et-Loire.'},
+  races:{title:'Résultats des courses à pied – ELO COURSE',description:'Retrouvez les résultats et classements des courses à pied en Sarthe, Mayenne et Maine-et-Loire.'},
+  help:{title:'Règlement et fonctionnement – ELO COURSE',description:'Découvrez le règlement et le fonctionnement du classement ELO COURSE.'},
+  organizer:{title:'Espace organisateurs – ELO COURSE',description:'Informations et accès à l’espace organisateurs d’ELO COURSE pour les courses en Sarthe, Mayenne et Maine-et-Loire.'},
+  chrono:{title:'Chronométreurs partenaires – ELO COURSE',description:'Informations pour les chronométreurs et les résultats officiels référencés par ELO COURSE.'},
+  upcoming:{title:'Courses à venir – ELO COURSE',description:'Consultez le calendrier des courses à venir en Sarthe, Mayenne et Maine-et-Loire.'}
+};
+function applySeoView(view,updateAddress){
+  var slug=Object.keys(SEO_VIEWS).find(function(path){return SEO_VIEWS[path]===view;});
+  if(!slug)return;
+  var meta=SEO_META[view];
+  document.title=meta.title;
+  var desc=document.querySelector('meta[name="description"]');if(desc)desc.setAttribute('content',meta.description);
+  var canonical=document.getElementById('seo-canonical');if(canonical)canonical.href='https://elo-course.eu'+slug;
+  if(updateAddress&&window.location.pathname!==slug){
+    // En ouverture locale (file://), le navigateur peut refuser pushState vers /slug.
+    // La navigation visuelle doit tout de même fonctionner pour tester le fichier.
+    try{window.history.pushState({seoView:view},'',slug);}
+    catch(historyError){console.warn('URL SEO non modifiable dans cet aperçu local :',historyError);}
+  }
+}
+try{var requestedPath=decodeURI(window.location.pathname).replace(/\/$/,'')||'/';if(SEO_VIEWS[requestedPath]&&!sharedCourseParam&&!sharedProfileParam){S.view=SEO_VIEWS[requestedPath];}}catch(ignoreSeoPath){}
+
 if(!S.gsex&&!S.gcat&&S.group&&S.group!=="all"){var oldGroup=S.group.split("|");if(oldGroup.length===1)S.gsex=oldGroup[0];else{S.gsex=oldGroup[0]==="*"?"all":oldGroup[0];S.gcat=oldGroup[1];}}
 try{var savedUi=JSON.parse(localStorage.getItem(UI_KEY)||"null");if(savedUi){if(typeof savedUi.rankClass==="string")S.rankClass=savedUi.rankClass;if(typeof savedUi.rankMode==="string")S.rankMode=savedUi.rankMode;if(typeof savedUi.group==="string")S.group=savedUi.group;if(typeof savedUi.dist==="string")S.dist=savedUi.dist;if(typeof savedUi.catSel==="string")S.catSel=savedUi.catSel;if(typeof savedUi.gsex==="string")S.gsex=savedUi.gsex;if(typeof savedUi.gcat==="string")S.gcat=savedUi.gcat;}}catch(ignoreUiPrefs){}
 function savePrefs(){try{localStorage.setItem(UI_KEY,JSON.stringify({rankClass:S.rankClass||"all",rankMode:S.rankMode||"all",group:S.group||"all",dist:S.dist||"all",catSel:S.catSel||"",gsex:S.gsex||"all",gcat:S.gcat||"all"}));}catch(ignoreUiSave){}}
@@ -1807,6 +1844,7 @@ document.addEventListener("click",function(e){
   // Basculer immédiatement la vue : le menu ne doit jamais laisser
   // l'utilisateur prisonnier du classement si un rendu secondaire échoue.
   S.view=destination;
+  applySeoView(destination,true);
   document.querySelectorAll("main .view").forEach(function(section){
     section.classList.toggle("on",section.id==="v-"+destination);
   });
@@ -2120,6 +2158,13 @@ document.addEventListener("click",function(e){
     if(b.dataset.arm){S={runners:[],races:[],me:null,view:"rank",dist:S.dist};save(true);render()}
     else{b.dataset.arm=1;b.textContent="Confirmer : tout effacer ?"}
   }
+});
+// Synchroniser titre, description et URL avec la rubrique ouverte.
+applySeoView(S.view,false);
+window.addEventListener('popstate',function(){
+  var path=decodeURI(window.location.pathname).replace(/\/$/,'')||'/';
+  var view=SEO_VIEWS[path];if(!view)return;
+  S.testPreview=null;S.publicProfile=null;S.view=view;applySeoView(view,false);render();window.scrollTo(0,0);
 });
 sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRunnerAuth();render();},0);});
 // Lecture des données publiques et synchronisation des modifications réservée au compte administrateur.
