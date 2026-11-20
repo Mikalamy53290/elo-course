@@ -193,7 +193,7 @@ button.ghost{color:#D5E1EC;border-color:#456176;background:#1B3348}
 .catelo{font-size:17px;flex:none}.catitle{margin:6px 0 10px;font-size:22px}
 
 
-/* ===== Améliorations Page Profil & Accueil — version 0.9.17 ===== */
+/* ===== ELO COURSE — version 0.9.18 : pagination résultats course ===== */
 .home-hero{background:linear-gradient(135deg,#0f3d28 0%,#102236 70%);color:#f4f7fa;border:1px solid #2a445d;border-radius:16px;padding:clamp(20px,4vw,34px);margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.22)}
 .home-hero:after{content:"";position:absolute;width:210px;height:210px;border:24px solid rgba(53,216,120,.09);border-radius:50%;right:-65px;top:-80px;pointer-events:none}
 .home-hero h2{color:#fff;font-size:clamp(30px,5vw,44px);line-height:1.02;margin:0 0 10px;max-width:650px}
@@ -525,7 +525,7 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
   <section class="view" id="v-organizer" aria-label="Espace organisateur"></section>
   <section class="view" id="v-upcoming" aria-label="Courses à venir"></section>
   <section class="view" id="v-ghost" aria-label="Mode Ghost"><iframe id="ghost-frame" title="Mode Ghost ELO COURSE" src="about:blank" loading="lazy" style="display:block;width:100%;height:1px;min-height:1px;border:0;border-radius:12px;background:#0B1724;overflow:hidden" allow="fullscreen"></iframe></section>
-<p class="sitefoot">Les résultats viennent des classements officiels publiés par les chronométreurs. Pour demander le retrait de ton nom, <a id="rmlink" href="#">écris-nous</a>. · <a href="cgu.html" target="_blank" rel="noopener">Conditions générales d’utilisation (CGU)</a> · <a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité</a> · <a href="mentions-legales.html" target="_blank" rel="noopener">Mentions légales</a></p><p class="sitefoot" style="text-align:center;margin-top:-8px"><button class="ghost" style="display:inline;padding:0 3px;text-decoration:underline" data-act="history">ELO COURSE version 0.9.17</button></p></main>
+<p class="sitefoot">Les résultats viennent des classements officiels publiés par les chronométreurs. Pour demander le retrait de ton nom, <a id="rmlink" href="#">écris-nous</a>. · <a href="cgu.html" target="_blank" rel="noopener">Conditions générales d’utilisation (CGU)</a> · <a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité</a> · <a href="mentions-legales.html" target="_blank" rel="noopener">Mentions légales</a></p><p class="sitefoot" style="text-align:center;margin-top:-8px"><button class="ghost" style="display:inline;padding:0 3px;text-decoration:underline" data-act="history">ELO COURSE version 0.9.18</button></p></main>
 <nav class="nav" aria-label="Navigation">
   <button data-act="view" data-v="accueil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span class="full">Accueil</span><span class="short">Accueil</span></button>
   <button data-act="view" data-v="rank"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM5 5H3v2a3 3 0 0 0 3 3M19 5h2v2a3 3 0 0 1-3 3"/></svg>Classement</button>
@@ -558,7 +558,7 @@ try{var sharedCourseParam=new URLSearchParams(window.location.search).get("cours
 S.chronos=S.chronos||[];
 var adminLoginRequested=false;try{adminLoginRequested=new URLSearchParams(window.location.search).get("admin")==="1";}catch(ignoreAdminParam){}
 try{var s=localStorage.getItem(KEY);if(s)S=Object.assign(S,JSON.parse(s))}catch(e){}
-if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":"accueil";S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
+if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":"accueil";S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.raceResultsPage=1;S.raceResultsQuery="";S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
 if(!S.gsex&&!S.gcat&&S.group&&S.group!=="all"){var oldGroup=S.group.split("|");if(oldGroup.length===1)S.gsex=oldGroup[0];else{S.gsex=oldGroup[0]==="*"?"all":oldGroup[0];S.gcat=oldGroup[1];}}
 try{var savedUi=JSON.parse(localStorage.getItem(UI_KEY)||"null");if(savedUi){if(typeof savedUi.rankClass==="string")S.rankClass=savedUi.rankClass;if(typeof savedUi.rankMode==="string")S.rankMode=savedUi.rankMode;if(typeof savedUi.group==="string")S.group=savedUi.group;if(typeof savedUi.dist==="string")S.dist=savedUi.dist;if(typeof savedUi.catSel==="string")S.catSel=savedUi.catSel;if(typeof savedUi.gsex==="string")S.gsex=savedUi.gsex;if(typeof savedUi.gcat==="string")S.gcat=savedUi.gcat;}}catch(ignoreUiPrefs){}
 function savePrefs(){try{localStorage.setItem(UI_KEY,JSON.stringify({rankClass:S.rankClass||"all",rankMode:S.rankMode||"all",group:S.group||"all",dist:S.dist||"all",catSel:S.catSel||"",gsex:S.gsex||"all",gcat:S.gcat||"all"}));}catch(ignoreUiSave){}}
@@ -1263,7 +1263,20 @@ function raceDetail(c){
   var have={},mx=0;c.results.forEach(function(x){if(x.rk){have[x.rk]=1;if(x.rk>mx)mx=x.rk}});var gap=[];for(var k=1;k<=mx;k++)if(!have[k])gap.push(k);
   var note=mx?'<p class="meta" style="margin-top:8px">'+(gap.length?'Rangs Klikego manquants : '+gap.join(", ")+'.':'Aucun rang manquant, de 1 à '+mx+'.')+'</p>':'';
   var edit=S.admin?'<div class="card" style="margin:8px 0;background:var(--panel)"><strong>Modifier cette course</strong><label for="edit-dist-'+c.id+'">Distance exacte</label><input id="edit-dist-'+c.id+'" type="text" maxlength="40" value="'+esc(c.dist||"")+'" placeholder="Ex. 5 km, 11 km ou 22 km"><label for="edit-provider-'+c.id+'">Chronométreur</label><select id="edit-provider-'+c.id+'"><option value=""'+(!c.provider?' selected':'')+'>Non renseigné</option>'+['Klikego','Breizh Chrono','IPITOS','RaceScore','Autre'].map(function(x){return '<option'+(c.provider===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select><label for="edit-dept-'+c.id+'">Département</label><select id="edit-dept-'+c.id+'"><option value=""'+(raceDepartment(c)==="Non renseigné"?' selected':'')+'>À préciser</option>'+['Sarthe','Mayenne','Maine-et-Loire'].map(function(x){return '<option value="'+x+'"'+(raceDepartment(c)===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select><label for="edit-type-'+c.id+'">Type de course</label><select id="edit-type-'+c.id+'"><option value="route"'+(raceDiscipline(c)==="route"?' selected':'')+'>Courses sur route</option><option value="nature"'+(raceDiscipline(c)==="nature"?' selected':'')+'>Courses nature</option></select><label for="edit-url-'+c.id+'">Lien vers les résultats</label><input id="edit-url-'+c.id+'" type="url" value="'+esc(c.results_url||'')+'" placeholder="https://…"><label for="edit-event-'+c.id+'">Événement commun (facultatif)</label><input id="edit-event-'+c.id+'" type="text" maxlength="60" value="'+esc(c.event||"")+'" placeholder="Ex. Foulées de Solesmes"><p class="meta">Donne le même nom d’événement aux différentes épreuves pour les regrouper dans la liste.</p><button class="ghost" data-act="savecourse" data-v="'+c.id+'">Enregistrer</button></div>':'';
-  return edit+'<div style="display:flex;justify-content:flex-end;margin:8px 0"><button class="btn" data-act="shareRace" data-v="'+esc(c.id)+'">↗ Partager cette course</button></div>'+note+'<label for="race-runner-search">Rechercher un coureur dans cette course</label><input id="race-runner-search" type="search" autocomplete="off" placeholder="Nom, prénom ou rang…"><p class="meta" id="race-runner-search-count">'+c.results.length+' résultat(s)</p><div id="race-result-list" style="max-height:320px;overflow-y:auto;margin-top:8px">'+c.results.map(function(x,i){var r=by[x.id]||{name:x.pendingName||"?"},searchText=norm((r.name||"")+" "+(x.rk||i+1)+" "+f(x.time));return '<div class="row" data-race-runner-row data-search="'+esc(searchText)+'"><span class="num rk">'+(x.rk||i+1)+'</span><div style="flex:1;min-width:0"><div class="nm">'+esc(r.name)+'</div><div class="meta">'+(x.pending?'À identifier · '+(x.reason==='doublon'?'plusieurs fiches possibles':(x.reason==='ville_a_verifier'?'ville à vérifier':'profil absent')):(r.cat||"")+(r.sex?" "+r.sex:""))+'</div></div><span class="num" style="font-size:20px">'+f(x.time)+'</span>'+(S.admin&&x.pending?'<button class="ghost" style="padding:5px 8px;margin-left:8px" data-act="resolvepending" data-course="'+esc(c.id)+'" data-result="'+esc(x.pendingKey)+'">Associer</button>':'')+(S.admin&&!x.pending?'<button class="ghost" style="padding:5px 8px;margin-left:8px" data-act="reassignresult" data-course="'+esc(c.id)+'" data-result="'+esc(x.id)+'">Réattribuer</button>':'')+(S.admin?'<button class="ghost" style="padding:5px 8px;margin-left:8px" data-act="delresult" data-course="'+esc(c.id)+'" data-result="'+esc(x.id||x.pendingKey)+'" data-result-index="'+i+'" aria-label="Supprimer uniquement cette ligne de résultat">Supprimer</button>':'')+'</div>'}).join("")+'</div>';
+  return edit+'<div style="display:flex;justify-content:flex-end;margin:8px 0"><button class="btn" data-act="shareRace" data-v="'+esc(c.id)+'">↗ Partager cette course</button></div>'+note+'<label for="race-runner-search">Rechercher un coureur dans cette course</label><input id="race-runner-search" type="search" autocomplete="off" value="'+esc(S.raceResultsQuery||'')+'" placeholder="Nom, prénom ou rang…"><div id="race-result-list" style="margin-top:8px">'+raceResultsBody(c,by,f)+'</div>';
+}
+function raceResultsBody(c,by,formatRaceTime){
+  var all=(c.results||[]).map(function(x,i){return {x:x,index:i,rank:Number(x.rk)||i+1,runner:by[x.id]||{name:x.pendingName||"?"}};});
+  all.sort(function(a,b){return a.rank-b.rank||a.index-b.index;});
+  var query=norm(S.raceResultsQuery||"").trim();
+  if(query)all=all.filter(function(item){return norm((item.runner.name||"")+" "+item.rank+" "+formatRaceTime(item.x.time)).indexOf(query)>=0;});
+  var pageSize=100,pages=Math.max(1,Math.ceil(all.length/pageSize));
+  S.raceResultsPage=Math.min(Math.max(1,Number(S.raceResultsPage)||1),pages);
+  var first=(S.raceResultsPage-1)*pageSize,shown=all.slice(first,first+pageSize);
+  var html='<p class="meta" id="race-runner-search-count">'+(all.length?((first+1)+' à '+Math.min(first+pageSize,all.length)+' sur '):'')+all.length+' résultat(s)'+(query?' trouvé(s)':' au total')+' · '+(c.results||[]).length+' inscrits</p>';
+  html+=shown.map(function(item){var x=item.x,r=item.runner,i=item.index;return '<div class="row" data-race-runner-row><span class="num rk">'+item.rank+'</span><div style="flex:1;min-width:0"><div class="nm">'+esc(r.name)+'</div><div class="meta">'+(x.pending?'À identifier · '+(x.reason==='doublon'?'plusieurs fiches possibles':(x.reason==='ville_a_verifier'?'ville à vérifier':'profil absent')):(r.cat||"")+(r.sex?" "+r.sex:""))+'</div></div><span class="num" style="font-size:20px">'+formatRaceTime(x.time)+'</span>'+(S.admin&&x.pending?'<button class="ghost" style="padding:5px 8px;margin-left:8px" data-act="resolvepending" data-course="'+esc(c.id)+'" data-result="'+esc(x.pendingKey)+'">Associer</button>':'')+(S.admin&&!x.pending?'<button class="ghost" style="padding:5px 8px;margin-left:8px" data-act="reassignresult" data-course="'+esc(c.id)+'" data-result="'+esc(x.id)+'">Réattribuer</button>':'')+(S.admin?'<button class="ghost" style="padding:5px 8px;margin-left:8px" data-act="delresult" data-course="'+esc(c.id)+'" data-result="'+esc(x.id||x.pendingKey)+'" data-result-index="'+i+'" aria-label="Supprimer uniquement cette ligne de résultat">Supprimer</button>':'')+'</div>';}).join('');
+  if(all.length>pageSize){html+='<nav class="seg" aria-label="Pages des résultats" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:12px"><button class="ghost" data-act="racepage" data-v="1" '+(S.raceResultsPage===1?'disabled':'')+'>« Début</button><button class="ghost" data-act="racepage" data-v="'+Math.max(1,S.raceResultsPage-1)+'" '+(S.raceResultsPage===1?'disabled':'')+'>‹ Précédent</button><span class="meta">Page '+S.raceResultsPage+' / '+pages+'</span><label class="meta" for="race-page-jump">Aller à</label><input id="race-page-jump" type="number" min="1" max="'+pages+'" value="'+S.raceResultsPage+'" style="width:72px"><button class="ghost" data-act="racepage" data-v="'+Math.min(pages,S.raceResultsPage+1)+'" '+(S.raceResultsPage===pages?'disabled':'')+'>Suivant ›</button><button class="ghost" data-act="racepage" data-v="'+pages+'" '+(S.raceResultsPage===pages?'disabled':'')+'>Fin »</button></nav>';} 
+  return html;
 }
 function adminGate(){
   return '<h2 style="margin-top:20px">Administration</h2><p class="meta">Connecte-toi avec ton compte administrateur ELO COURSE.</p><label for="admemail">Adresse e-mail</label><input id="admemail" type="email" autocomplete="username" value="mickaellamy@yahoo.fr"><label for="adm">Mot de passe Supabase</label><input id="adm" type="password" autocomplete="current-password"><p class="msg" role="alert" style="color:var(--down)">'+esc(msg.adm||"")+'</p><button class="btn" data-act="login">Se connecter</button>';
@@ -1459,7 +1472,7 @@ function parseMamertines(txt){
   // Classements en texte brut de type "Rang Doss Nom Prénom Sexe Catégorie Club Temps".
   // Le club est facultatif et peut contenir plusieurs mots ; le temps est toujours en fin de ligne.
   var out=[],seen={},lines=String(txt||"").replace(/\r/g,"\n").split("\n");
-  var category=/^(?:SEM|SEF|ESM|ESF|JUM|JUF|CAM|CAF|MIM|MIF|BEM|BEF|POM|POF|M[0-9]{1,2}[MF]|[A-Z]{2,3})$/i;
+  var category=/^(?:SEM|SEF|ESM|ESF|JUM|JUF|CAM|CAF|MIM|MIF|BEM|BEF|POM|POF|M[0-9]{1,2}[MF]?|[A-Z]{2,3})$/i;
   lines.forEach(function(line){
     line=String(line||"").replace(/\s+/g," ").trim();
     if(!line||/^(?:rang|les foul[eé]es|classement|\d+\s*)$/i.test(line))return;
@@ -1750,22 +1763,14 @@ function arrows(){var t=document.getElementById("topbtn"),d=document.getElementB
 window.addEventListener("scroll",arrows);window.addEventListener("resize",arrows);setTimeout(arrows,50);
 document.addEventListener("input",function(e){
   if(e.target.id==="race-runner-search"){
-    var query=norm(e.target.value).trim(),list=document.getElementById("race-result-list"),count=document.getElementById("race-runner-search-count");
+    S.raceResultsQuery=e.target.value||"";S.raceResultsPage=1;
+    var list=document.getElementById("race-result-list");
     if(!list)return;
-    var rows=list.querySelectorAll("[data-race-runner-row]"),visible=0;
-    rows.forEach(function(row){var match=!query||String(row.dataset.search||"").indexOf(query)>=0;row.hidden=!match;if(match)visible++;});
-    if(count)count.textContent=visible+" résultat(s) affiché(s) sur "+rows.length;
-    /* Amener le résultat filtré dans la zone visible, y compris sur mobile. */
-    if(visible===1){
-      var matchRow=list.querySelector("[data-race-runner-row]:not([hidden])");
-      if(matchRow){
-        list.scrollTop=Math.max(0,matchRow.offsetTop-list.offsetTop-8);
-        requestAnimationFrame(function(){
-          var rect=list.getBoundingClientRect();
-          if(rect.top<70||rect.top>window.innerHeight-100)window.scrollTo({top:window.scrollY+rect.top-90,behavior:"smooth"});
-        });
-      }
-    }
+    var course=S.races.filter(function(c){return String(c.id)===String(S.open);})[0];
+    if(!course)return;
+    var by={};S.runners.forEach(function(r){by[r.id]=r;});
+    function fmt(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=Math.round(t%60);if(sec===60){sec=0;m++;}return h+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");}
+    list.innerHTML=raceResultsBody(course,by,fmt);
     return;
   }
   if(e.target.id==="race-search"){
@@ -1846,6 +1851,14 @@ function sendGhostRealRaces(){
 document.addEventListener("change",function(e){if(e.target.matches("[data-race-select]")){raceListScrollY=window.scrollY||0;S.open=e.target.value;render();requestAnimationFrame(function(){window.scrollTo(0,raceListScrollY);});}else if(e.target.id==="cdist"){if(e.target.value!=="Autre"){var customDistance=document.getElementById("cdistother");if(customDistance)customDistance.value="";}}else if(e.target.id==="cdistother"){if(e.target.value.trim()){var distanceSelect=document.getElementById("cdist");if(distanceSelect)distanceSelect.value="Autre";}}else if(e.target.id==="srch"){S.q=e.target.value;S.rankPage=1;render()}else if(e.target.id==="grp"){S.group=e.target.value;S.rankPage=1;savePrefs();render()}});
 // Navigation latérale traitée en phase capture : garantit que le menu reste actif
 // même lorsqu’un composant de la vue courante intercepte les clics en phase normale.
+document.addEventListener("change",function(e){
+  if(e.target.id!=="race-page-jump")return;
+  var course=S.races.filter(function(c){return String(c.id)===String(S.open);})[0],list=document.getElementById("race-result-list");
+  if(!course||!list)return;
+  var total=(course.results||[]).length,pages=Math.max(1,Math.ceil(total/100));S.raceResultsPage=Math.min(pages,Math.max(1,Number(e.target.value)||1));
+  var by={};S.runners.forEach(function(r){by[r.id]=r;});function fmt(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=Math.round(t%60);if(sec===60){sec=0;m++;}return h+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");}list.innerHTML=raceResultsBody(course,by,fmt);
+});
+
 document.addEventListener("click",function(e){
   var target=e.target;
   var navButton=target&&target.closest?target.closest(".nav button[data-act=\"view\"]"):null;
@@ -1878,6 +1891,12 @@ document.addEventListener("click",function(e){
 
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act,v=b.dataset.v;
+  if(a==="racepage"){
+    S.raceResultsPage=Math.max(1,Number(v)||1);
+    var list=document.getElementById("race-result-list"),course=S.races.filter(function(c){return String(c.id)===String(S.open);})[0];
+    if(list&&course){var by={};S.runners.forEach(function(r){by[r.id]=r;});function fmt(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=Math.round(t%60);if(sec===60){sec=0;m++;}return h+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");}list.innerHTML=raceResultsBody(course,by,fmt);}
+    return;
+  }
   if(a==='adminentry'){
     if(!(authUser&&authUser.id===ADMIN_AUTH_USER_ID&&linkedRunner)){return;}
     if(S.admin){adminLoginRequested=false;S.view='races';render();window.scrollTo(0,0);}
@@ -1937,7 +1956,7 @@ document.addEventListener("click",function(e){
     (async function(){var q=await sb.from('elo_upcoming_courses').delete().eq('id',v).eq('user_id',authUser.id);if(q.error){msg.organizer='Suppression impossible : '+q.error.message;}else{upcomingCourses=upcomingCourses.filter(function(x){return x.id!==v});msg.organizer='Course retirée de la publication.';}render();})();return;
   }
   if(a==='deleteupcomingAdmin'){if(!S.admin||!confirm('Retirer définitivement cette annonce de la page publique ?'))return;(async function(){var q=await sb.from('elo_upcoming_courses').delete().eq('id',v);if(q.error){alert('Suppression impossible : '+q.error.message);}else{upcomingCourses=upcomingCourses.filter(function(x){return x.id!==v});render();}})();return;}
-  if(a==='history'){alert('Historique ELO COURSE\n\nVersion 0.9.16 — 20 novembre 2026\n• Progression ELO recalculée dans l’ordre chronologique des courses ; chaque point du graphique affiche sa date et sa valeur au survol.\n• Partage individuel ajouté à chaque résultat de l’historique du profil.\n• Compteurs séparés entre profils uniques et coureurs réellement classés, pour rendre visible l’écart à analyser.\n\n• Accueil réorganisé avec accès directs, dernières courses et compteurs de coureurs uniques, courses et résultats.\n• Connexion administrateur réservée au compte coureur autorisé ; le retour en mode coureur conserve la session pour permettre une reconnexion.\n• Suppression d’un résultat ciblée sur sa ligne exacte, sans supprimer les autres résultats du même coureur.\n• Classement officiel accessible dès la première course, avec un ELO qui se précise au fil des participations.\n\nÉvolutions précédentes : courses à venir publiées directement par les organisateurs, profils coureurs et inscription sécurisée, classement officiel dès la première course.');return;}
+  if(a==='history'){alert('Historique ELO COURSE\n\nVersion 0.9.18 — 20 novembre 2026\n• Résultats de chaque course affichés par pages de 100, avec accès début/précédent/suivant/fin et saut direct vers une page.\n• Recherche d’un coureur par nom, prénom ou rang dans les résultats d’une course.\n• Résultats affichés dans l’ordre numérique des rangs, sans modifier les données importées ni recalculer les ELO.\n• Reconnaissance élargie des catégories M1 à M10 lorsque le sexe est indiqué séparément.\n\nVersion 0.9.16 — 20 novembre 2026\n• Progression ELO recalculée dans l’ordre chronologique des courses ; chaque point du graphique affiche sa date et sa valeur au survol.\n• Partage individuel ajouté à chaque résultat de l’historique du profil.\n• Compteurs séparés entre profils uniques et coureurs réellement classés, pour rendre visible l’écart à analyser.\n\n• Accueil réorganisé avec accès directs, dernières courses et compteurs de coureurs uniques, courses et résultats.\n• Connexion administrateur réservée au compte coureur autorisé ; le retour en mode coureur conserve la session pour permettre une reconnexion.\n• Suppression d’un résultat ciblée sur sa ligne exacte, sans supprimer les autres résultats du même coureur.\n• Classement officiel accessible dès la première course, avec un ELO qui se précise au fil des participations.\n\nÉvolutions précédentes : courses à venir publiées directement par les organisateurs, profils coureurs et inscription sécurisée, classement officiel dès la première course.');return;}
   if(a==='testPreview'){S.testPreview=v==='organizer'?'organizer':'runner';accountPopoverOpen=false;S.view='rank';render();window.scrollTo(0,0);return;}
   if(a==='closeTestPreview'){S.testPreview=null;render();return;}
   if(a==='testOrganizerPublish'){var m=document.getElementById('testorgmsg');if(m)m.textContent='Simulation réussie : la course apparaîtrait dans Courses à venir. Rien n’a été publié.';return;}
@@ -2184,7 +2203,7 @@ document.addEventListener("click",function(e){
       S.admin=(result.data.user.id===ADMIN_AUTH_USER_ID);msg.adm=S.admin?"":"Ce compte n'est pas autorisé à administrer le site.";render();
     }catch(err){msg.adm="Connexion Supabase impossible.";render();}})();
   }
-  else if(a==="openrace"){raceListScrollY=window.scrollY||0;raceListScrollOpen=v;S.open=(S.open===v?null:v);render();requestAnimationFrame(function(){window.scrollTo(0,raceListScrollY);});}
+  else if(a==="openrace"){raceListScrollY=window.scrollY||0;raceListScrollOpen=v;if(S.open!==v){S.raceResultsPage=1;S.raceResultsQuery="";}S.open=(S.open===v?null:v);render();requestAnimationFrame(function(){window.scrollTo(0,raceListScrollY);});}
   else if(a==="cleandemo"){S.runners=S.runners.filter(function(r){return !r.demo});S.races=S.races.filter(function(c){return !c.demo});if(S.me&&!S.runners.some(function(r){return r.id===S.me}))S.me=null;save(true);render()}
   else if(a==="adminoff"){S.admin=false;adminLoginRequested=false;msg.adm="";render()}
   else if(a==="export"){var t=$("#bk");t.value=JSON.stringify({runners:S.runners,races:S.races,chronos:S.chronos||[],trash:S.trash||[]});t.focus();t.select();$("#bkmsg").textContent=S.runners.length+" coureurs et "+S.races.length+" courses. Copie tout le texte ci-dessus."}
