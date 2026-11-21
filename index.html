@@ -1112,12 +1112,6 @@ function accountPanelHTML(){
   var html='<div class="card"><button class="ghost account-close" data-act="closeAccountPanel" aria-label="Fermer">✕</button><h3>Compte coureur</h3>';
   if(!authUser){
   
-  if(authUser&&linkedRunner){
-    html+='<div><h3>Mon portefeuille ELOCOINS</h3><p><strong>'+Number(eloCoinsBalance||0).toLocaleString("fr-FR")+' ELOCOINS</strong></p>';
-    if(eloCoinsReferralCode){var referralUrl=window.location.origin+'/?parrain='+encodeURIComponent(eloCoinsReferralCode);html+='<p>Code parrain : '+esc(eloCoinsReferralCode)+'</p><p>Lien : <a href="'+esc(referralUrl)+'">'+esc(referralUrl)+'</a></p>';}
-    if(eloCoinsTransactions.length){html+='<h4>Derniers mouvements</h4><ul>'+eloCoinsTransactions.map(function(t){return '<li>'+(t.amount>0?'+':'')+Number(t.amount)+' ELOCOINS — '+esc(t.description||'Mouvement')+'</li>';}).join('')+'</ul>';}
-    html+='</div>';
-  }
   html+='<p class="meta">Crée un compte ou connecte-toi pour rattacher ta fiche, ajouter ta photo et participer aux échanges.</p><div class="account-tabs"><button class="'+(accountMode==='signup'?'btn active':'ghost')+'" data-act="accountMode" data-v="signup">INSCRIPTION</button><button class="'+(accountMode==='login'?'btn active':'ghost')+'" data-act="accountMode" data-v="login">CONNEXION</button></div><label for="runneremail">E-mail</label><input id="runneremail" type="email" autocomplete="email" placeholder="Ton adresse e-mail"><label for="runnerpassword">Mot de passe (8 caractères minimum)</label><input id="runnerpassword" type="password" autocomplete="'+(accountMode==='login'?'current-password':'new-password')+'" placeholder="Ton mot de passe">';
     if(accountMode==='signup'){
       var chosen=getRunnerByName();
@@ -1126,6 +1120,12 @@ function accountPanelHTML(){
     }else html+='<button class="btn account-choice" data-act="runner_login">Me connecter</button>';
   }else if(!linkedRunner&&pendingRunner){html+='<p>Connecté : '+esc(authUser.email||'compte coureur')+'</p><p class="meta">Ta demande de rattachement est en attente de vérification par l’administration.</p><button class="ghost" data-act="runner_logout">Déconnexion</button>'}else if(!linkedRunner){html+='<p>Connecté : '+esc(authUser.email||'compte coureur')+'</p><p class="meta">Choisis ta fiche existante. Le rattachement sera vérifié avant activation.</p><label for="runnersearch">Fiche coureur</label><input id="runnersearch" type="search" placeholder="Tape ton nom et prénom"><div id="runnersearchresults"></div><button class="btn" data-act="runner_request_link">Demander le rattachement</button> <button class="ghost" data-act="runner_logout">Déconnexion</button>';
   }else html+='<p>Compte lié à ton profil coureur.</p><div class="card" style="margin:10px 0;background:var(--surface)"><strong>Espaces de test isolés</strong><p class="meta">Prévisualise les deux espaces sans créer de vrai compte, publier de course ni modifier le classement.</p><button class="ghost" data-act="testPreview" data-v="runner">🏃 Tester l’espace coureur</button> <button class="ghost" data-act="testPreview" data-v="organizer">🏁 Tester l’espace organisateur</button></div><button class="ghost" data-act="runner_logout">Déconnexion</button>';
+  if(authUser&&linkedRunner){
+    html+='<div><h3>Mon portefeuille ELOCOINS</h3><p><strong>'+Number(eloCoinsBalance||0).toLocaleString("fr-FR")+' ELOCOINS</strong></p>';
+    if(eloCoinsReferralCode){var referralUrl=window.location.origin+'/?parrain='+encodeURIComponent(eloCoinsReferralCode);html+='<p>Code parrain : '+esc(eloCoinsReferralCode)+'</p><p>Lien : <a href="'+esc(referralUrl)+'">'+esc(referralUrl)+'</a></p>';}
+    if(eloCoinsTransactions.length){html+='<h4>Derniers mouvements</h4><ul>'+eloCoinsTransactions.map(function(t){return '<li>'+(t.amount>0?'+':'')+Number(t.amount)+' ELOCOINS — '+esc(t.description||'Mouvement')+'</li>';}).join('')+'</ul>';}
+    html+='</div>';
+  }
   html+='<p class="msg" id="runneraccountmsg" role="status">'+esc(msg.runnerAccount||'')+'</p></div>';return html;
 }
 function getRunnerByName(){return S.runners.filter(function(r){return r.id===window.selectedRunnerLink})[0]||null;}
