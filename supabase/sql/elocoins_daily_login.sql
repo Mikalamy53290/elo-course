@@ -26,6 +26,12 @@ begin
     raise exception 'Authentification requise pour réclamer les ELO Coins.';
   end if;
 
+  -- Le compte administrateur historique reste volontairement à zéro.
+  if v_user_id = '26789cc4-2ac3-4129-95c8-2234b1dc748d'::uuid then
+    return query select false, 0::bigint, (now() at time zone 'Europe/Paris')::date;
+    return;
+  end if;
+
   select ra.status into v_status
     from public.runner_accounts as ra
    where ra.user_id = v_user_id;
