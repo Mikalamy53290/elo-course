@@ -128,7 +128,7 @@ async function routeSEO(request, env) {
     const id=parseId(path,"/coureur/");
     const runner=publicRunners(data).find(r=>String(r.id)===id);
     const consentedIds=await getConsentIds();
-    if (!runner) return new Response("Fiche coureur introuvable",{status:404,headers:{"content-type":"text/plain; charset=utf-8","x-robots-tag":"noindex"}});
+    if (!runner || !consentedIds.has(String(runner.id))) return new Response("Cette fiche coureur n’est pas publiée.",{status:404,headers:{"content-type":"text/plain; charset=utf-8","x-robots-tag":"noindex","cache-control":"no-store"}});
     const results=[];
     for (const race of data.races || []) for (const item of race.results || []) if (!item.pending && String(item.id)===id) results.push({race,item});
     results.sort((a,b)=>String(b.race.date||"").localeCompare(String(a.race.date||"")));
@@ -136,8 +136,7 @@ async function routeSEO(request, env) {
     const title=runner.name+" – Profil coureur ELO COURSE";
     const description="Retrouvez les résultats de "+runner.name+" en course à pied en Sarthe, Mayenne et Maine-et-Loire sur ELO COURSE.";
     const body=`<h1>${esc(runner.name)}</h1><p class="muted">Profil coureur · ELO COURSE</p><div class="stats"><div class="stat"><strong>${results.length}</strong>course(s) classée(s)</div></div><section class="panel"><h2>Résultats de course</h2>${latest.length?'<ol class="list">'+latest.map(({race,item})=>'<li><strong>'+esc(race.name||"Course")+'</strong> · '+esc(dateFR(race.date))+' · '+esc(race.dist||"Distance non précisée")+(item.rk?' · '+esc(item.rk)+'e':'')+(fmtTime(item.time)?' · '+esc(fmtTime(item.time)):'')+'</li>').join("")+'</ol>':'<p>Aucun résultat détaillé disponible.</p>'}${results.length>30?'<p class="muted">Les 30 résultats les plus récents sont affichés sur cette page.</p>':''}</section><a class="cta" href="/#profil=${encodeURIComponent(String(runner.id))}">Ouvrir le profil dans ELO COURSE</a><a href="/">Retour au site</a>`;
-    const canIndex = consentedIds.has(String(runner.id));
-    return new Response(layout({title,description,canonical:SITE+profilePath(runner),body,robots:canIndex?"index,follow":"noindex,follow"}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
+    return new Response(layout({title,description,canonical:SITE+profilePath(runner),body,robots:"index,follow"}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   const id=parseId(path,"/course/");
   const race=(data.races||[]).find(r=>String(r.id)===id);
