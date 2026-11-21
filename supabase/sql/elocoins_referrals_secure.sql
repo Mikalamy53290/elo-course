@@ -5,6 +5,9 @@
 
 create schema if not exists elo_private;
 revoke all on schema elo_private from public, anon, authenticated;
+-- Les wrappers SECURITY INVOKER des RPC quotidiennes/jalons doivent
+-- pouvoir appeler leurs helpers; le schéma reste non exposé à PostgREST.
+grant usage on schema elo_private to authenticated;
 
 -- Les triggers existants conservent leur liaison aux fonctions lors du
 -- déplacement de celles-ci hors du schéma public exposé par l'API.
