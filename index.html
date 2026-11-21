@@ -554,7 +554,7 @@ var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
 var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,elocoinsBalance=null,avatarMap={},runnerDetails={},socialBusy=false;
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false,elocoinsHistoryUser=null,elocoinsHistoryHtml='',elocoinsHistoryLoading=false;
-function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function localDayKey(){var p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Paris",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};p.forEach(function(x){o[x.type]=x.value});return o.year+"-"+o.month+"-"+o.day}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
 var KEY="elo-site-v2",UI_KEY="elo-course-ui-v1",MINR=1,ADMIN_AUTH_USER_ID="26789cc4-2ac3-4129-95c8-2234b1dc748d",ALL={},CONTACT="mimi.6q@live.fr";
 var CATS=["CA","JU","ES","SE","M0","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10"];
