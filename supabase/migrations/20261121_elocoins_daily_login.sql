@@ -4,7 +4,7 @@
 
 create or replace function public.elocoins_claim_daily_login()
 returns table (
-  current_balance bigint,
+  balance bigint,
   awarded boolean,
   reward_day date
 )
