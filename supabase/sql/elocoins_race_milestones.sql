@@ -36,6 +36,12 @@ begin
   v_user_id := auth.uid();
   if v_user_id is null then raise exception 'Authentification requise.'; end if;
 
+  -- Le compte administrateur historique ne reçoit pas de récompenses ELO Coins.
+  if v_user_id = '26789cc4-2ac3-4129-95c8-2234b1dc748d'::uuid then
+    return query select 0, false, false, false, 0::bigint;
+    return;
+  end if;
+
   select ra.runner_id into v_runner_id
     from public.runner_accounts as ra
    where ra.user_id = v_user_id and ra.status = 'approved';
