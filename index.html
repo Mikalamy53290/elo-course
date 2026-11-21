@@ -2162,7 +2162,7 @@ document.addEventListener("click",function(e){
         else if(age>=23)cat='SE';else if(age>=20)cat='ES';else if(age>=18)cat='JU';else if(age>=16)cat='CA';
         if(button){button.disabled=true;button.textContent='Enregistrement en cours…';}
         msg.profilePrivate='Enregistrement en cours…';if(live)live.textContent=msg.profilePrivate;
-        var rpc=await sb.rpc('elo_update_my_runner_private_details',{p_sex:sex,p_date_of_birth:dob,p_runner_id:linkedRunner,p_category:cat,p_terms_accepted:terms,p_publication_consent:consent});if(rpc.error)throw rpc.error;
+        var rpc=await sb.rpc('elo_update_my_runner_private_details',{p_sex:sex,p_date_of_birth:dob,p_runner_id:linkedRunner,p_category:cat,p_terms_accepted:terms,p_publication_consent:consent});if(rpc.error)throw rpc.error;var seoConsent=await sb.rpc('elo_set_publication_consent',{p_publication_consent:consent});if(seoConsent.error)throw seoConsent.error;
         privateRunnerDetails[linkedRunner]={sex:sex,date_of_birth:dob};var rr=S.runners.find(function(r){return r.id===linkedRunner;});if(rr){rr.sex=sex;if(cat)rr.cat=cat;}
         msg.profilePrivate='Informations privées enregistrées avec succès. Le classement sera recalculé avec le bon sexe et la catégorie.';render();
       }catch(err){
