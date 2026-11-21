@@ -95,7 +95,7 @@ async function routeSEO(request, env) {
   const id=parseId(path,"/course/");
   const race=(data.races||[]).find(r=>String(r.id)===id);
   if (!race || !(race.results||[]).some(x=>!x.pending)) return new Response("Course introuvable",{status:404,headers:{"content-type":"text/plain; charset=utf-8","x-robots-tag":"noindex"}});
-  const byId=new Map((data.runners||[]).map(r=>[String(r.id),r]));
+  const byId=new Map(publicRunners(data).map(r=>[String(r.id),r]));
   const results=(race.results||[]).filter(x=>!x.pending).slice().sort((a,b)=>(Number(a.rk)||999999)-(Number(b.rk)||999999));
   const title=(race.name||"Course")+" – Résultats ELO COURSE";
   const description="Résultats de "+(race.name||"cette course")+" · "+(race.dist||"course à pied")+" · "+dateFR(race.date)+". Consultez le classement sur ELO COURSE.";
@@ -107,7 +107,7 @@ export default {
     const url=new URL(request.url);
     if (request.method!=="GET" && request.method!=="HEAD") return env.ASSETS.fetch(request);
     const response=await routeSEO(request,env);
-    if (response) return request.method==="HEAD" ? new Response(null,response) : response;
+    if (response) return request.method==="HEAD" ? new Response(null,{status:response.status,statusText:response.statusText,headers:response.headers}) : response;
     return env.ASSETS.fetch(request);
   }
 };
