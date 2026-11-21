@@ -89,7 +89,8 @@ async function routeSEO(request, env) {
   };
   if (sections[path]) {
     const [title,description,copy]=sections[path];
-    return new Response(layout({title,description,canonical:SITE+path,body:`<h1>${esc(title)}</h1><p>${esc(copy)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p><a class="cta" href="/">Accéder à ELO COURSE</a>`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
+    const appLinks={"/rubrique/classement":"/?view=rank","/rubrique/courses":"/?view=races","/rubrique/mode-ghost":"/?view=ghost","/rubrique/reglement":"/?view=help"};
+    return new Response(layout({title,description,canonical:SITE+path,body:`<h1>${esc(title)}</h1><p>${esc(copy)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p><a class="cta" href="${appLinks[path]}">Ouvrir cette rubrique dans ELO COURSE</a>`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   if (!path.startsWith("/coureur/") && !path.startsWith("/course/")) return null;
   let data;
