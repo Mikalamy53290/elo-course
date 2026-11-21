@@ -44,7 +44,7 @@ begin
 
   insert into public.elocoins_wallets (user_id, balance, referral_code)
   values (v_user_id, 0,
-    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12)))
+    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 24)))
   on conflict (user_id) do nothing;
 
   insert into public.elocoins_transactions
