@@ -65,11 +65,36 @@ function consentedRunners(data, consentedIds) {
   // L’indexation nominative est conditionnée à un compte approuvé et à un accord explicite.
   return publicRunners(data).filter(r => consentedIds.has(String(r.id)));
 }
-async function sitemap(data, consentedIds) {
+async function getSections(env) {
+  try {
+    const asset = await env.ASSETS.fetch(new Request(SITE + "/"));
+    if (!asset.ok) return [];
+    const html = await asset.text();
+    const found = [], seen = new Set();
+    const buttons = html.matchAll(/<button\\b([^>]*)>([\\s\\S]*?)<\\/button>/gi);
+    const privateViews = new Set(["me","organizer","upcoming"]);
+    for (const match of buttons) {
+      const attrs = match[1], inner = match[2];
+      if (!/data-act=["']view["']/.test(attrs)) continue;
+      const viewMatch = attrs.match(/data-v=["']([^"']+)["']/);
+      if (!viewMatch) continue;
+      const view = viewMatch[1];
+      if (privateViews.has(view) || seen.has(view)) continue;
+      seen.add(view);
+      const fullLabel = inner.match(/<span[^>]*class=["'][^"']*full[^"']*["'][^>]*>([\\s\\S]*?)<\\/span>/i);
+      const label = String((fullLabel ? fullLabel[1] : inner).replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/\\s+/g," ").trim() || view);
+      if (view === "accueil") continue;
+      found.push({view,label,path:"/rubrique/"+slug(label)});
+    }
+    return found;
+  } catch (_) { return []; }
+}
+async function sitemap(data, consentedIds, sections) {
   const runners = consentedRunners(data, consentedIds);
   const races = (data.races || []).filter(r => r && r.id != null && (r.results || []).some(x => !x.pending));
-  const fixed = ["/","/rubrique/classement","/rubrique/courses","/rubrique/mode-ghost","/rubrique/chronometreurs","/rubrique/reglement"];
+  const fixed = ["/"];
   const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
+  for (const section of sections) urls.push(`<url><loc>${SITE+section.path}</loc></url>`);
   for (const r of runners) urls.push(`<url><loc>${esc(SITE+profilePath(r))}</loc></url>`);
   for (const r of races) urls.push(`<url><loc>${esc(SITE+racePath(r))}</loc></url>`);
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}</urlset>`;
@@ -78,20 +103,23 @@ async function routeSEO(request, env) {
   const url = new URL(request.url), path = decodeURI(url.pathname);
   if (path === "/robots.txt") return new Response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /compte\nSitemap: "+SITE+"/sitemap.xml\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
   if (path === "/sitemap.xml") {
-    try { const data=await getData(env); const consentedIds=await getConsentIds(); return new Response(await sitemap(data,consentedIds),{headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}}); }
+    try { const data=await getData(env); const consentedIds=await getConsentIds(); const sections=await getSections(env); return new Response(await sitemap(data,consentedIds,sections),{headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}}); }
     catch(e) { return new Response("Sitemap temporairement indisponible",{status:503,headers:{"content-type":"text/plain; charset=utf-8","cache-control":"no-store"}}); }
   }
-  const sections = {
-    "/rubrique/classement": ["Classement ELO des coureurs","Consultez le classement ELO des coureurs ayant participé aux courses en Sarthe, Mayenne et Maine-et-Loire.","Le classement ELO ELO COURSE compare les performances des coureurs à partir des résultats de courses publiés. Retrouvez les classements généraux et par catégorie."],
-    "/rubrique/courses": ["Résultats des courses","Retrouvez les résultats des courses en Sarthe, Mayenne et Maine-et-Loire.","ELO COURSE rassemble les résultats des courses à pied et trails, avec les classements et les chronos publiés par les organisateurs et chronométreurs."],
-    "/rubrique/mode-ghost": ["Mode Ghost – simulation ELO","Découvrez le Mode Ghost et son laboratoire de simulation ELO sur ELO COURSE.","Le Mode Ghost permet d’explorer et de simuler l’évolution du classement ELO à partir des performances de course."],
-    "/rubrique/chronometreurs": ["Chronométreurs et résultats de course","Les chronométreurs et sources de résultats utilisés par ELO COURSE.","ELO COURSE référence les résultats publiés par les chronométreurs et organisateurs de courses, notamment pour les épreuves en Sarthe, Mayenne et Maine-et-Loire."],
-    "/rubrique/reglement": ["Règlement ELO COURSE","Consultez le fonctionnement et les règles d’utilisation d’ELO COURSE.","Présentation du fonctionnement du classement ELO COURSE, des profils coureurs et des résultats publiés."]
-  };
-  if (sections[path]) {
-    const [title,description,copy]=sections[path];
-    const appLinks={"/rubrique/classement":"/?view=rank","/rubrique/courses":"/?view=races","/rubrique/mode-ghost":"/?view=ghost","/rubrique/chronometreurs":"/?view=chrono","/rubrique/reglement":"/?view=help"};
-    return new Response(layout({title,description,canonical:SITE+path,body:`<h1>${esc(title)}</h1><p>${esc(copy)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p><a class="cta" href="${appLinks[path]}">Ouvrir cette rubrique dans ELO COURSE</a>`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
+  const sections = await getSections(env);
+  const section = sections.find(item => item.path === path);
+  if (section) {
+    const copyByView = {
+      rank:["Classement ELO des coureurs","Le classement ELO ELO COURSE compare les performances des coureurs à partir des résultats de courses publiés. Retrouvez les classements généraux et par catégorie."],
+      races:["Résultats des courses","ELO COURSE rassemble les résultats des courses à pied et trails, avec les classements et les chronos publiés par les organisateurs et chronométreurs."],
+      ghost:["Mode Ghost – simulation ELO","Le Mode Ghost permet d’explorer et de simuler l’évolution du classement ELO à partir des performances de course."],
+      chrono:["Chronométreurs et résultats de course","ELO COURSE référence les résultats publiés par les chronométreurs et organisateurs de courses, notamment pour les épreuves en Sarthe, Mayenne et Maine-et-Loire."],
+      help:["Règlement ELO COURSE","Présentation du fonctionnement du classement ELO COURSE, des profils coureurs et des résultats publiés."]
+    };
+    const known = copyByView[section.view] || ["Rubrique "+section.label,"Retrouvez cette rubrique publique du site ELO COURSE, consacré aux classements et aux résultats de course à pied en Sarthe, Mayenne et Maine-et-Loire."];
+    const title = known[0].replace("ELO COURSE", "ELO COURSE");
+    const description = known[1];
+    return new Response(layout({title,description,canonical:SITE+section.path,body:`<h1>${esc(title)}</h1><p>${esc(description)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p><a class="cta" href="/?view=${encodeURIComponent(section.view)}">Ouvrir cette rubrique dans ELO COURSE</a>`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   if (!path.startsWith("/coureur/") && !path.startsWith("/course/")) return null;
   let data;
