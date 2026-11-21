@@ -71,7 +71,7 @@ async function getSections(env) {
     if (!asset.ok) return [];
     const html = await asset.text();
     const found = [], seen = new Set();
-    const buttons = html.matchAll(/<button\\b([^>]*)>([\\s\\S]*?)<\\/button>/gi);
+    const buttons = html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi);
     const privateViews = new Set(["me","organizer","upcoming"]);
     for (const match of buttons) {
       const attrs = match[1], inner = match[2];
@@ -81,8 +81,8 @@ async function getSections(env) {
       const view = viewMatch[1];
       if (privateViews.has(view) || seen.has(view)) continue;
       seen.add(view);
-      const fullLabel = inner.match(/<span[^>]*class=["'][^"']*full[^"']*["'][^>]*>([\\s\\S]*?)<\\/span>/i);
-      const label = String((fullLabel ? fullLabel[1] : inner).replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/\\s+/g," ").trim() || view);
+      const fullLabel = inner.match(/<span[^>]*class=["'][^"']*full[^"']*["'][^>]*>([\s\S]*?)<\/span>/i);
+      const label = String((fullLabel ? fullLabel[1] : inner).replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/\s+/g," ").trim() || view);
       if (view === "accueil") continue;
       found.push({view,label,path:"/rubrique/"+slug(label)});
     }
