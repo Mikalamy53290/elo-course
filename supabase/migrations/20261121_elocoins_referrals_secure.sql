@@ -11,10 +11,23 @@ grant usage on schema elo_private to authenticated;
 
 -- Les triggers existants conservent leur liaison aux fonctions lors du
 -- déplacement de celles-ci hors du schéma public exposé par l'API.
-alter function public.elocoins_capture_referral_on_account_insert()
-  set schema elo_private;
-alter function public.elocoins_reward_referrer_on_approval()
-  set schema elo_private;
+do $migration$
+begin
+  -- Rendre le déplacement relançable : une fonction déjà privée n'est pas
+  -- déplacée une seconde fois. Les OID restent inchangés pour les triggers.
+  if to_regprocedure('public.elocoins_capture_referral_on_account_insert()') is not null
+     and to_regprocedure('elo_private.elocoins_capture_referral_on_account_insert()') is null then
+    alter function public.elocoins_capture_referral_on_account_insert()
+      set schema elo_private;
+  end if;
+
+  if to_regprocedure('public.elocoins_reward_referrer_on_approval()') is not null
+     and to_regprocedure('elo_private.elocoins_reward_referrer_on_approval()') is null then
+    alter function public.elocoins_reward_referrer_on_approval()
+      set schema elo_private;
+  end if;
+end;
+$migration$;
 
 -- Le bonus de bienvenue général de 50 coins ne correspond pas à la règle
 -- validée : il est retiré. Les comptes sans parrain ne reçoivent rien.
