@@ -2241,7 +2241,7 @@ window.addEventListener("popstate",function(){
   S.publicProfile=null;
   if(path.indexOf("/coureur/")===0){var rest=path.slice(9),cut=rest.lastIndexOf("--");S.publicProfile=decodeURIComponent(cut>=0?rest.slice(cut+2):rest);S.view="rank";S.open=null;}
   else if(path.indexOf("/course/")===0){var restRace=path.slice(8),cutRace=restRace.lastIndexOf("--");S.open=decodeURIComponent(cutRace>=0?restRace.slice(cutRace+2):restRace);S.view="races";}
-  else{S.open=params.get("course")||null;var v=params.get("view");S.view=S.open?"races":(v&&privateViews.indexOf(v)<0&&document.getElementById("v-"+v)?v:"accueil");}
+  else{S.open=params.get("course")||null;var v=params.get("view");S.view=S.open?"races":(v&&["me","organizer","upcoming"].indexOf(v)<0&&document.getElementById("v-"+v)?v:"accueil");}
   render();
 });
 // Lecture des données publiques et synchronisation des modifications réservée au compte administrateur.
