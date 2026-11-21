@@ -1284,12 +1284,12 @@ function loadEloCoinHistory(force){
     return o.year+'-'+o.month+'-'+o.day;
   }
   function parisMidnightUtc(key){
-    var a=key.split('-').map(Number),guess=Date.UTC(a[0],a[1]-1,a[2]);
+    var a=key.split('-').map(Number),target=Date.UTC(a[0],a[1]-1,a[2]),guess=target;
     for(var n=0;n<3;n++){
       var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(guess)),o={};
       p.forEach(function(x){o[x.type]=x.value;});
       var shown=Date.UTC(Number(o.year),Number(o.month)-1,Number(o.day),Number(o.hour),Number(o.minute),Number(o.second));
-      guess-=shown-guess;
+      guess-=shown-target;
     }
     return new Date(guess).toISOString();
   }
