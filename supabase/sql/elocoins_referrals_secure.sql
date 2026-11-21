@@ -170,3 +170,47 @@ revoke all on function elo_private.elocoins_reward_referrer_on_approval()
 -- Les triggers en place pointent sur les mêmes OID après ALTER FUNCTION SET SCHEMA.
 -- Ils continuent donc à capturer le code à la création de la demande puis à
 -- distribuer les deux récompenses uniquement lors du passage pending -> approved.
+
+-- Tous les comptes coureurs approuvés disposent d'un code personnel,
+-- mais aucun solde n'est crédité en l'absence d'un parrainage validé.
+create or replace function elo_private.elocoins_ensure_wallet_on_approval()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $function$
+begin
+  if new.user_id = '26789cc4-2ac3-4129-95c8-2234b1dc748d'::uuid
+     or new.status <> 'approved' then
+    return new;
+  end if;
+
+  if tg_op = 'UPDATE' and old.status = 'approved' then
+    return new;
+  end if;
+
+  insert into public.elocoins_wallets (user_id, balance, referral_code)
+  values (
+    new.user_id,
+    0,
+    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12))
+  )
+  on conflict (user_id) do nothing;
+
+  return new;
+end;
+$function$;
+
+revoke all on function elo_private.elocoins_ensure_wallet_on_approval()
+  from public, anon, authenticated;
+
+drop trigger if exists elocoins_wallet_after_insert on public.runner_accounts;
+drop trigger if exists elocoins_wallet_after_approval on public.runner_accounts;
+
+create trigger elocoins_wallet_after_insert
+after insert on public.runner_accounts
+for each row execute function elo_private.elocoins_ensure_wallet_on_approval();
+
+create trigger elocoins_wallet_after_approval
+after update of status on public.runner_accounts
+for each row execute function elo_private.elocoins_ensure_wallet_on_approval();
