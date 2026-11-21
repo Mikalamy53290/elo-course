@@ -1299,7 +1299,7 @@ function loadEloCoinHistory(force){
   var nextDate=new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7))-1,Number(today.slice(8,10))+1));
   var tomorrow=nextDate.getUTCFullYear()+'-'+String(nextDate.getUTCMonth()+1).padStart(2,'0')+'-'+String(nextDate.getUTCDate()).padStart(2,'0');
   if(elocoinsHistoryTimer)clearTimeout(elocoinsHistoryTimer);
-  elocoinsHistoryTimer=setTimeout(function(){elocoinsHistoryUser=null;elocoinsHistoryHtml='';loadEloCoinHistory(true);},Math.max(1000,new Date(parisMidnightUtc(tomorrow)).getTime()-Date.now()+1200));
+  elocoinsHistoryTimer=setTimeout(function(){elocoinsHistoryUser=null;elocoinsHistoryHtml='';refreshRunnerAuth().then(function(){if(S.view==='me')render();}).catch(function(err){console.warn('Actualisation quotidienne ELO Coins impossible :',err.message);if(S.view==='me')loadEloCoinHistory(true);});},Math.max(1000,new Date(parisMidnightUtc(tomorrow)).getTime()-Date.now()+1200));
   elocoinsHistoryLoading=true;box.innerHTML='<strong>Récompenses du jour</strong><p class="meta">Chargement des gains de la journée…</p>';
   (async function(){
     try{
