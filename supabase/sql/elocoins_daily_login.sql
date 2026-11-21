@@ -62,11 +62,11 @@ begin
   returning id into v_transaction_id;
 
   if v_transaction_id is not null then
-    update public.elocoins_wallets
-       set balance = balance + 10,
+    update public.elocoins_wallets as w
+       set balance = w.balance + 10,
            updated_at = now()
-     where user_id = v_user_id
-     returning elocoins_wallets.balance into v_balance;
+     where w.user_id = v_user_id
+     returning w.balance into v_balance;
     v_credited := true;
   else
     select w.balance
