@@ -1,10 +1,13 @@
 -- ELO COURSE — Récompenses des jalons de courses réelles
--- À appliquer uniquement après validation explicite sur la base cible.
--- Les courses sont comptées depuis site_data.data->'races', source réellement utilisée par le site.
--- Récompenses cumulatives : 1 course +10, 5 courses +20, 10 courses +30.
--- Chaque jalon est crédité une seule fois par compte.
+-- Courses lues exclusivement dans site_data.data->'races', source du site.
+-- Jalons cumulatifs : 1 course +10, 5 courses +20, 10 courses +30.
+-- Helper privilégié non exposé à l'API REST; wrapper public SECURITY INVOKER.
 
-create or replace function public.elocoins_claim_race_milestones()
+create schema if not exists elo_private;
+revoke all on schema elo_private from public, anon, authenticated;
+grant usage on schema elo_private to authenticated;
+
+create or replace function elo_private.elocoins_claim_race_milestones_impl()
 returns table (
   races_count integer,
   first_race_credited boolean,
@@ -31,22 +34,16 @@ declare
   v_ten boolean := false;
 begin
   v_user_id := auth.uid();
-  if v_user_id is null then
-    raise exception 'Authentification requise.';
-  end if;
+  if v_user_id is null then raise exception 'Authentification requise.'; end if;
 
-  select ra.runner_id
-    into v_runner_id
+  select ra.runner_id into v_runner_id
     from public.runner_accounts as ra
-   where ra.user_id = v_user_id
-     and ra.status = 'approved';
+   where ra.user_id = v_user_id and ra.status = 'approved';
 
   if v_runner_id is null then
     raise exception 'Un compte coureur validé est nécessaire.';
   end if;
 
-  -- Compter uniquement les courses distinctes avec un classement valide
-  -- et un temps renseigné pour la fiche coureur liée au compte.
   select count(distinct race_item.race->>'id')::integer
     into v_races_count
     from public.site_data as sd
@@ -58,14 +55,10 @@ begin
      and nullif(btrim(result_item.result->>'time'), '') is not null;
 
   insert into public.elocoins_wallets (user_id, balance, referral_code)
-  values (
-    v_user_id,
-    0,
-    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12))
-  )
+  values (v_user_id, 0,
+    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12)))
   on conflict (user_id) do nothing;
 
-  -- Les jalons sont cumulables, mais chaque clé d'événement est unique.
   for v_code, v_reward, v_label, v_event_key in
     select m.code, m.reward, m.label, m.event_key
       from (values
@@ -79,15 +72,13 @@ begin
     v_transaction_id := null;
     insert into public.elocoins_transactions
       (user_id, amount, transaction_type, description, event_key)
-    values
-      (v_user_id, v_reward, v_code, v_label, v_event_key)
+    values (v_user_id, v_reward, v_code, v_label, v_event_key)
     on conflict (user_id, event_key) do nothing
     returning id into v_transaction_id;
 
     if v_transaction_id is not null then
       update public.elocoins_wallets as w
-         set balance = w.balance + v_reward,
-             updated_at = now()
+         set balance = w.balance + v_reward, updated_at = now()
        where w.user_id = v_user_id;
 
       if v_code = 'first_race' then v_first := true;
@@ -98,11 +89,28 @@ begin
   end loop;
 
   select w.balance into v_balance
-    from public.elocoins_wallets as w
-   where w.user_id = v_user_id;
+    from public.elocoins_wallets as w where w.user_id = v_user_id;
 
   return query select v_races_count, v_first, v_five, v_ten, coalesce(v_balance, 0);
 end;
+$function$;
+
+revoke all on function elo_private.elocoins_claim_race_milestones_impl() from public, anon, authenticated;
+grant execute on function elo_private.elocoins_claim_race_milestones_impl() to authenticated;
+
+create or replace function public.elocoins_claim_race_milestones()
+returns table (
+  races_count integer,
+  first_race_credited boolean,
+  five_races_credited boolean,
+  ten_races_credited boolean,
+  balance bigint
+)
+language sql
+security invoker
+set search_path = ''
+as $function$
+  select * from elo_private.elocoins_claim_race_milestones_impl();
 $function$;
 
 revoke all on function public.elocoins_claim_race_milestones() from public, anon, authenticated;
