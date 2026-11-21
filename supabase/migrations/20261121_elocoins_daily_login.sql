@@ -1,13 +1,14 @@
 -- ELO COURSE — Récompense quotidienne de connexion ELO Coins
+-- Helper privilégié placé dans un schéma non exposé à l'API REST.
+-- Le wrapper public est SECURITY INVOKER et n'expose aucune donnée d'un autre compte.
 -- À appliquer uniquement après validation explicite, sur la base cible.
--- Crédit : +10 coins, une seule fois par date civile en Europe/Paris et par compte validé.
 
-create or replace function public.elocoins_claim_daily_login()
-returns table (
-  credited boolean,
-  balance bigint,
-  reward_date date
-)
+create schema if not exists elo_private;
+revoke all on schema elo_private from public, anon, authenticated;
+grant usage on schema elo_private to authenticated;
+
+create or replace function elo_private.elocoins_claim_daily_login_impl()
+returns table (credited boolean, balance bigint, reward_date date)
 language plpgsql
 security definer
 set search_path = ''
@@ -21,13 +22,11 @@ declare
   v_credited boolean := false;
 begin
   v_user_id := auth.uid();
-
   if v_user_id is null then
     raise exception 'Authentification requise pour réclamer les ELO Coins.';
   end if;
 
-  select ra.status
-    into v_status
+  select ra.status into v_status
     from public.runner_accounts as ra
    where ra.user_id = v_user_id;
 
@@ -35,42 +34,29 @@ begin
     raise exception 'Seuls les comptes coureurs validés peuvent recevoir cette récompense.';
   end if;
 
-  -- La date est calculée côté serveur, selon le calendrier français.
   v_reward_date := (now() at time zone 'Europe/Paris')::date;
 
   insert into public.elocoins_wallets (user_id, balance, referral_code)
-  values (
-    v_user_id,
-    0,
-    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12))
-  )
+  values (v_user_id, 0,
+    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12)))
   on conflict (user_id) do nothing;
 
-  -- L'index unique (user_id, event_key) bloque les doubles crédits,
-  -- y compris en cas de plusieurs appels simultanés depuis plusieurs onglets.
   insert into public.elocoins_transactions
     (user_id, amount, transaction_type, description, event_key)
-  values
-    (
-      v_user_id,
-      10,
-      'daily_login',
-      'Bonus de connexion quotidienne ELO COURSE',
-      'daily_login:' || to_char(v_reward_date, 'YYYY-MM-DD')
-    )
+  values (v_user_id, 10, 'daily_login',
+    'Bonus de connexion quotidienne ELO COURSE',
+    'daily_login:' || to_char(v_reward_date, 'YYYY-MM-DD'))
   on conflict (user_id, event_key) do nothing
   returning id into v_transaction_id;
 
   if v_transaction_id is not null then
     update public.elocoins_wallets as w
-       set balance = w.balance + 10,
-           updated_at = now()
+       set balance = w.balance + 10, updated_at = now()
      where w.user_id = v_user_id
      returning w.balance into v_balance;
     v_credited := true;
   else
-    select w.balance
-      into v_balance
+    select w.balance into v_balance
       from public.elocoins_wallets as w
      where w.user_id = v_user_id;
   end if;
@@ -79,7 +65,17 @@ begin
 end;
 $function$;
 
--- Fonction volontairement appelable par un utilisateur connecté : elle ne
--- crédite que son propre compte et vérifie son statut côté serveur.
+revoke all on function elo_private.elocoins_claim_daily_login_impl() from public, anon, authenticated;
+grant execute on function elo_private.elocoins_claim_daily_login_impl() to authenticated;
+
+create or replace function public.elocoins_claim_daily_login()
+returns table (credited boolean, balance bigint, reward_date date)
+language sql
+security invoker
+set search_path = ''
+as $function$
+  select * from elo_private.elocoins_claim_daily_login_impl();
+$function$;
+
 revoke all on function public.elocoins_claim_daily_login() from public, anon, authenticated;
 grant execute on function public.elocoins_claim_daily_login() to authenticated;
