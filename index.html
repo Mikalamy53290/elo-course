@@ -2275,7 +2275,7 @@ PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImZyIj4KPGhlYWQ+CiAgPG1ldGEgY2hhcnNldD0iVVRG
     var bytes = new Uint8Array(binary.length);
     for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     frame.srcdoc = new TextDecoder('utf-8').decode(bytes);
-    frame.addEventListener('load',function(){try{var st=eloCache.all||ALL||{};if(Object.keys(st).length)sendGhostRealRaces();else compute(undefined,"all");}catch(e){}},{once:true});
+    frame.addEventListener('load',function(){try{var st=eloCache.all||ALL||{};if(!Object.keys(st).length)st=compute(undefined,"all");if(st&&Object.keys(st).length){ALL=st;sendGhostRealRaces();}}catch(e){console.error('Transmission des courses réelles au Mode Ghost impossible :',e);}},{once:true});
   } catch (error) {
     console.error('Chargement du Mode Ghost embarqué impossible :', error);
     frame.srcdoc = '<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font-family:sans-serif;padding:20px">Impossible de charger le Mode Ghost. Recharge la page.</body></html>';
