@@ -38,6 +38,18 @@ async function getData(env) {
   if (!data || !Array.isArray(data.runners) || !Array.isArray(data.races)) throw new Error("Données publiques indisponibles");
   return data;
 }
+async function getConsentIds() {
+  try {
+    const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/elo_seo_public_runner_ids", {
+      method:"POST",
+      headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"content-type":"application/json"},
+      body:"{}"
+    });
+    if (!response.ok) return new Set();
+    const rows = await response.json();
+    return new Set((Array.isArray(rows)?rows:[]).map(row=>String(row?.runner_id ?? row)).filter(Boolean));
+  } catch (_) { return new Set(); }
+}
 function parseId(path, prefix) {
   const rest = path.slice(prefix.length).replace(/\/$/,"");
   const cut = rest.lastIndexOf("--");
@@ -49,12 +61,12 @@ function publicRunners(data) {
   for (const race of data.races) for (const result of (race.results || [])) if (!result.pending && result.id != null) used.add(String(result.id));
   return (data.runners || []).filter(r => r && r.id != null && used.has(String(r.id)) && validName(r.name));
 }
-function consentedRunners(data) {
-  // L'indexation nominative est conditionnée à un accord explicite, distinct de la simple présence dans un résultat public.
-  return publicRunners(data).filter(r => r.publication_consent === true || r.publicProfileConsent === true);
+function consentedRunners(data, consentedIds) {
+  // L’indexation nominative est conditionnée à un compte approuvé et à un accord explicite.
+  return publicRunners(data).filter(r => consentedIds.has(String(r.id)));
 }
-async function sitemap(data) {
-  const runners = consentedRunners(data);
+async function sitemap(data, consentedIds) {
+  const runners = consentedRunners(data, consentedIds);
   const races = (data.races || []).filter(r => r && r.id != null && (r.results || []).some(x => !x.pending));
   const fixed = ["/","/rubrique/classement","/rubrique/courses","/rubrique/mode-ghost","/rubrique/reglement"];
   const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
@@ -66,7 +78,7 @@ async function routeSEO(request, env) {
   const url = new URL(request.url), path = decodeURI(url.pathname);
   if (path === "/robots.txt") return new Response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /compte\nSitemap: "+SITE+"/sitemap.xml\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
   if (path === "/sitemap.xml") {
-    try { const data=await getData(env); return new Response(await sitemap(data),{headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}}); }
+    try { const data=await getData(env); const consentedIds=await getConsentIds(); return new Response(await sitemap(data,consentedIds),{headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}}); }
     catch(e) { return new Response("Sitemap temporairement indisponible",{status:503,headers:{"content-type":"text/plain; charset=utf-8","cache-control":"no-store"}}); }
   }
   const sections = {
@@ -85,6 +97,7 @@ async function routeSEO(request, env) {
   if (path.startsWith("/coureur/")) {
     const id=parseId(path,"/coureur/");
     const runner=publicRunners(data).find(r=>String(r.id)===id);
+    const consentedIds=await getConsentIds();
     if (!runner) return new Response("Fiche coureur introuvable",{status:404,headers:{"content-type":"text/plain; charset=utf-8","x-robots-tag":"noindex"}});
     const results=[];
     for (const race of data.races || []) for (const item of race.results || []) if (!item.pending && String(item.id)===id) results.push({race,item});
@@ -93,7 +106,7 @@ async function routeSEO(request, env) {
     const title=runner.name+" – Profil coureur ELO COURSE";
     const description="Retrouvez les résultats de "+runner.name+" en course à pied en Sarthe, Mayenne et Maine-et-Loire sur ELO COURSE.";
     const body=`<h1>${esc(runner.name)}</h1><p class="muted">Profil coureur · ELO COURSE</p><div class="stats"><div class="stat"><strong>${results.length}</strong>course(s) classée(s)</div></div><section class="panel"><h2>Résultats de course</h2>${latest.length?'<ol class="list">'+latest.map(({race,item})=>'<li><strong>'+esc(race.name||"Course")+'</strong> · '+esc(dateFR(race.date))+' · '+esc(race.dist||"Distance non précisée")+(item.rk?' · '+esc(item.rk)+'e':'')+(fmtTime(item.time)?' · '+esc(fmtTime(item.time)):'')+'</li>').join("")+'</ol>':'<p>Aucun résultat détaillé disponible.</p>'}${results.length>30?'<p class="muted">Les 30 résultats les plus récents sont affichés sur cette page.</p>':''}</section><a class="cta" href="/#profil=${encodeURIComponent(String(runner.id))}">Ouvrir le profil dans ELO COURSE</a><a href="/">Retour au site</a>`;
-    const canIndex = runner.publication_consent === true || runner.publicProfileConsent === true;
+    const canIndex = consentedIds.has(String(runner.id));
     return new Response(layout({title,description,canonical:SITE+profilePath(runner),body,robots:canIndex?"index,follow":"noindex,follow"}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   const id=parseId(path,"/course/");
