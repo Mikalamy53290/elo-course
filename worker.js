@@ -113,7 +113,8 @@ async function routeSEO(request, env) {
   const id=parseId(path,"/course/");
   const race=(data.races||[]).find(r=>String(r.id)===id);
   if (!race || !(race.results||[]).some(x=>!x.pending)) return new Response("Course introuvable",{status:404,headers:{"content-type":"text/plain; charset=utf-8","x-robots-tag":"noindex"}});
-  const byId=new Map(publicRunners(data).map(r=>[String(r.id),r]));
+  const consentedIds=await getConsentIds();
+  const byId=new Map(consentedRunners(data,consentedIds).map(r=>[String(r.id),r]));
   const results=(race.results||[]).filter(x=>!x.pending).slice().sort((a,b)=>(Number(a.rk)||999999)-(Number(b.rk)||999999));
   const title=(race.name||"Course")+" – Résultats ELO COURSE";
   const description="Résultats de "+(race.name||"cette course")+" · "+(race.dist||"course à pied")+" · "+dateFR(race.date)+". Consultez le classement sur ELO COURSE.";
