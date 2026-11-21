@@ -558,11 +558,11 @@ var KEY="elo-site-v2",UI_KEY="elo-course-ui-v1",MINR=1,ADMIN_AUTH_USER_ID="26789
 var CATS=["CA","JU","ES","SE","M0","M1","M2","M3","M4","M5","M6","M7","M8","M9","M10"];
 var DISTS=["5 km","10 km","Semi-marathon","Marathon"],TRAIL=["Trail court","Trail moyen","Trail long"];
 var S={runners:[],races:[],chronos:[],me:null,view:"rank",dist:"Semi-marathon",group:"all",rankPage:1,rankMode:"all",catSel:""},msg={};
-try{var sharedCourseParam=new URLSearchParams(window.location.search).get("course");if(sharedCourseParam){S.open=sharedCourseParam;S.view="races";}}catch(ignoreSharedCourse){}
+try{var initialParams=new URLSearchParams(window.location.search),sharedCourseParam=initialParams.get("course"),sharedViewParam=initialParams.get("view");if(sharedCourseParam){S.open=sharedCourseParam;S.view="races";}}catch(ignoreSharedCourse){}
 S.chronos=S.chronos||[];
 var adminLoginRequested=false;try{adminLoginRequested=new URLSearchParams(window.location.search).get("admin")==="1";}catch(ignoreAdminParam){}
 try{var s=localStorage.getItem(KEY);if(s)S=Object.assign(S,JSON.parse(s))}catch(e){}
-if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":"accueil";S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.raceResultsPage=1;S.raceResultsQuery="";S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
+if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":(["accueil","rank","races","help","chrono","ghost"].indexOf(sharedViewParam)>=0?sharedViewParam:"accueil");S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.raceResultsPage=1;S.raceResultsQuery="";S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
 if(!S.gsex&&!S.gcat&&S.group&&S.group!=="all"){var oldGroup=S.group.split("|");if(oldGroup.length===1)S.gsex=oldGroup[0];else{S.gsex=oldGroup[0]==="*"?"all":oldGroup[0];S.gcat=oldGroup[1];}}
 try{var savedUi=JSON.parse(localStorage.getItem(UI_KEY)||"null");if(savedUi){if(typeof savedUi.rankClass==="string")S.rankClass=savedUi.rankClass;if(typeof savedUi.rankMode==="string")S.rankMode=savedUi.rankMode;if(typeof savedUi.group==="string")S.group=savedUi.group;if(typeof savedUi.dist==="string")S.dist=savedUi.dist;if(typeof savedUi.catSel==="string")S.catSel=savedUi.catSel;if(typeof savedUi.gsex==="string")S.gsex=savedUi.gsex;if(typeof savedUi.gcat==="string")S.gcat=savedUi.gcat;}}catch(ignoreUiPrefs){}
 function savePrefs(){try{localStorage.setItem(UI_KEY,JSON.stringify({rankClass:S.rankClass||"all",rankMode:S.rankMode||"all",group:S.group||"all",dist:S.dist||"all",catSel:S.catSel||"",gsex:S.gsex||"all",gcat:S.gcat||"all"}));}catch(ignoreUiSave){}}
@@ -1886,6 +1886,8 @@ document.addEventListener("click",function(e){
   // Basculer immédiatement la vue : le menu ne doit jamais laisser
   // l'utilisateur prisonnier du classement si un rendu secondaire échoue.
   S.view=destination;
+  var publicViewUrls={accueil:"/",rank:"/?view=rank",races:"/?view=races",help:"/?view=help",chrono:"/?view=chrono",ghost:"/?view=ghost"};
+  if(publicViewUrls[destination]&&window.history&&window.history.replaceState){window.history.replaceState(null,"",publicViewUrls[destination]);}
   document.querySelectorAll("main .view").forEach(function(section){
     section.classList.toggle("on",section.id==="v-"+destination);
   });
