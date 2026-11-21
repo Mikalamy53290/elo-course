@@ -106,18 +106,18 @@ async function routeSEO(request, env) {
     try { const data=await getData(env); const consentedIds=await getConsentIds(); const sections=await getSections(env); return new Response(await sitemap(data,consentedIds,sections),{headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}}); }
     catch(e) { return new Response("Sitemap temporairement indisponible",{status:503,headers:{"content-type":"text/plain; charset=utf-8","cache-control":"no-store"}}); }
   }
-  const sections = await getSections(env);
+  const sections = path.startsWith("/rubrique/") ? await getSections(env) : [];
   const section = sections.find(item => item.path === path);
   if (section) {
     const copyByView = {
-      rank:["Classement ELO des coureurs","Le classement ELO ELO COURSE compare les performances des coureurs à partir des résultats de courses publiés. Retrouvez les classements généraux et par catégorie."],
+      rank:["Classement ELO des coureurs","Le classement ELO d’ELO COURSE compare les performances des coureurs à partir des résultats de courses publiés. Retrouvez les classements généraux et par catégorie."],
       races:["Résultats des courses","ELO COURSE rassemble les résultats des courses à pied et trails, avec les classements et les chronos publiés par les organisateurs et chronométreurs."],
       ghost:["Mode Ghost – simulation ELO","Le Mode Ghost permet d’explorer et de simuler l’évolution du classement ELO à partir des performances de course."],
       chrono:["Chronométreurs et résultats de course","ELO COURSE référence les résultats publiés par les chronométreurs et organisateurs de courses, notamment pour les épreuves en Sarthe, Mayenne et Maine-et-Loire."],
       help:["Règlement ELO COURSE","Présentation du fonctionnement du classement ELO COURSE, des profils coureurs et des résultats publiés."]
     };
     const known = copyByView[section.view] || ["Rubrique "+section.label,"Retrouvez cette rubrique publique du site ELO COURSE, consacré aux classements et aux résultats de course à pied en Sarthe, Mayenne et Maine-et-Loire."];
-    const title = known[0].replace("ELO COURSE", "ELO COURSE");
+    const title = known[0];
     const description = known[1];
     return new Response(layout({title,description,canonical:SITE+section.path,body:`<h1>${esc(title)}</h1><p>${esc(description)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p><a class="cta" href="/?view=${encodeURIComponent(section.view)}">Ouvrir cette rubrique dans ELO COURSE</a>`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
