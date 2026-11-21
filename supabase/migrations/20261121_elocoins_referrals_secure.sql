@@ -220,6 +220,18 @@ $function$;
 revoke all on function elo_private.elocoins_ensure_wallet_on_approval()
   from public, anon, authenticated;
 
+-- Donner aussi un code de parrainage aux comptes déjà approuvés.
+-- Aucun bonus n'est crédité par cette initialisation.
+insert into public.elocoins_wallets (user_id, balance, referral_code)
+select
+  ra.user_id,
+  0,
+  'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 24))
+from public.runner_accounts ra
+where ra.status = 'approved'
+  and ra.user_id <> '26789cc4-2ac3-4129-95c8-2234b1dc748d'::uuid
+on conflict (user_id) do nothing;
+
 drop trigger if exists elocoins_wallet_after_insert on public.runner_accounts;
 drop trigger if exists elocoins_wallet_after_approval on public.runner_accounts;
 
