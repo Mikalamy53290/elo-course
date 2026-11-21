@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://elo-course.eu/sitemap.xml
