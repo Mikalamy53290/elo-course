@@ -1,43 +1,53 @@
--- ELO COURSE — récompense quotidienne de connexion
--- À appliquer à Supabase uniquement après validation explicite.
--- Une attribution maximum par compte et par jour civil en France.
+-- ELO COURSE — Récompense quotidienne de connexion ELO Coins
+-- À appliquer uniquement après validation explicite, sur la base cible.
+-- Crédit : +10 coins, une seule fois par date civile en Europe/Paris et par compte validé.
 
 create or replace function public.elocoins_claim_daily_login()
 returns table (
+  credited boolean,
   balance bigint,
-  awarded boolean,
-  reward_day date
+  reward_date date
 )
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $function$
 declare
-  v_user_id uuid := auth.uid();
-  v_today date := (now() at time zone 'Europe/Paris')::date;
+  v_user_id uuid;
+  v_status text;
+  v_reward_date date;
   v_transaction_id bigint;
+  v_balance bigint;
+  v_credited boolean := false;
 begin
+  v_user_id := auth.uid();
+
   if v_user_id is null then
-    raise exception 'Authentification requise';
+    raise exception 'Authentification requise pour réclamer les ELO Coins.';
   end if;
 
-  if not exists (
-    select 1
-      from public.runner_accounts ra
-     where ra.user_id = v_user_id
-       and ra.status = 'approved'
-  ) then
-    raise exception 'Compte coureur validé requis';
+  select ra.status
+    into v_status
+    from public.runner_accounts as ra
+   where ra.user_id = v_user_id;
+
+  if v_status is distinct from 'approved' then
+    raise exception 'Seuls les comptes coureurs validés peuvent recevoir cette récompense.';
   end if;
 
-  if not exists (
-    select 1
-      from public.elocoins_wallets w
-     where w.user_id = v_user_id
-  ) then
-    raise exception 'Portefeuille ELO Coins introuvable';
-  end if;
+  -- La date est calculée côté serveur, selon le calendrier français.
+  v_reward_date := (now() at time zone 'Europe/Paris')::date;
 
+  insert into public.elocoins_wallets (user_id, balance, referral_code)
+  values (
+    v_user_id,
+    0,
+    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12))
+  )
+  on conflict (user_id) do nothing;
+
+  -- L'index unique (user_id, event_key) bloque les doubles crédits,
+  -- y compris en cas de plusieurs appels simultanés depuis plusieurs onglets.
   insert into public.elocoins_transactions
     (user_id, amount, transaction_type, description, event_key)
   values
@@ -45,26 +55,31 @@ begin
       v_user_id,
       10,
       'daily_login',
-      'Bonus quotidien de connexion',
-      'daily_login:' || v_today::text
+      'Bonus de connexion quotidienne ELO COURSE',
+      'daily_login:' || to_char(v_reward_date, 'YYYY-MM-DD')
     )
   on conflict (user_id, event_key) do nothing
   returning id into v_transaction_id;
 
   if v_transaction_id is not null then
-    update public.elocoins_wallets
-       set balance = balance + 10,
+    update public.elocoins_wallets as w
+       set balance = w.balance + 10,
            updated_at = now()
-     where user_id = v_user_id;
+     where w.user_id = v_user_id
+     returning w.balance into v_balance;
+    v_credited := true;
+  else
+    select w.balance
+      into v_balance
+      from public.elocoins_wallets as w
+     where w.user_id = v_user_id;
   end if;
 
-  return query
-    select w.balance, (v_transaction_id is not null), v_today
-      from public.elocoins_wallets w
-     where w.user_id = v_user_id;
+  return query select v_credited, coalesce(v_balance, 0), v_reward_date;
 end;
 $function$;
 
-revoke all on function public.elocoins_claim_daily_login() from public;
-revoke all on function public.elocoins_claim_daily_login() from anon;
+-- Fonction volontairement appelable par un utilisateur connecté : elle ne
+-- crédite que son propre compte et vérifie son statut côté serveur.
+revoke all on function public.elocoins_claim_daily_login() from public, anon, authenticated;
 grant execute on function public.elocoins_claim_daily_login() to authenticated;
