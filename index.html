@@ -1879,34 +1879,48 @@ document.addEventListener("change",function(e){
 
 document.addEventListener("click",function(e){
   var target=e.target;
-  var navButton=target&&target.closest?target.closest(".nav button[data-act=\"view\"]"):null;
+  if(target&&target.nodeType!==1)target=target.parentElement;
+  var navButton=target&&target.closest?target.closest(".nav button[data-act="view"]"):null;
   if(!navButton)return;
-  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+  e.preventDefault();
+  e.stopPropagation();
   var destination=navButton.dataset.v;
   if(["accueil","rank","races","me","help","chrono","organizer","upcoming","ghost"].indexOf(destination)<0)return;
-  S.testPreview=null;S.publicProfile=null;
-  // Basculer immédiatement la vue : le menu ne doit jamais laisser
-  // l'utilisateur prisonnier du classement si un rendu secondaire échoue.
+
+  // Changer immédiatement la rubrique, sans attendre le calcul ou le rendu.
+  S.testPreview=null;
+  S.publicProfile=null;
   S.view=destination;
   var privateViews=["me","organizer","upcoming"];
-  if(window.history&&window.history.replaceState){var navUrl=privateViews.indexOf(destination)>=0?"/":(destination==="accueil"?"/":"/?view="+encodeURIComponent(destination));window.history.replaceState(null,"",navUrl);}
-  document.querySelectorAll("main .view").forEach(function(section){
-    section.classList.toggle("on",section.id==="v-"+destination);
-  });
-  document.querySelectorAll(".nav button").forEach(function(button){
-    button.setAttribute("aria-current",button.dataset.v===destination?"true":"false");
-  });
   try{
-    render2(destination);
-  }catch(error){
-    console.error("Erreur d'affichage de la rubrique "+destination,error);
-    var active=document.getElementById("v-"+destination);
-    if(active){
-      active.classList.add("on");
-      active.innerHTML='<h2>'+(destination==="races"?"Courses":"Rubrique")+'</h2><p class="msg" role="alert">La rubrique n’a pas pu se charger complètement. Recharge la page ; si le problème persiste, transmets ce message : '+String(error&&error.message||error).replace(/[&<>"']/g,function(c){return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]})+'</p>';
+    if(window.history&&window.history.replaceState){
+      var navUrl=privateViews.indexOf(destination)>=0||destination==="accueil"?"/":"/?view="+encodeURIComponent(destination);
+      window.history.replaceState(null,"",navUrl);
     }
+    document.querySelectorAll("main .view").forEach(function(section){
+      section.classList.toggle("on",section.id==="v-"+destination);
+    });
+    document.querySelectorAll(".nav button").forEach(function(button){
+      button.setAttribute("aria-current",button.dataset.v===destination?"true":"false");
+    });
+  }catch(navError){
+    console.error("Erreur de navigation ELO COURSE",navError);
   }
-  if(destination==="upcoming")loadUpcomingCourses();
+
+  // Laisser le navigateur afficher le changement avant de reconstruire la rubrique.
+  window.requestAnimationFrame(function(){
+    try{
+      render2(destination);
+      if(destination==="upcoming")loadUpcomingCourses();
+    }catch(error){
+      console.error("Erreur d'affichage de la rubrique "+destination,error);
+      var active=document.getElementById("v-"+destination);
+      if(active){
+        active.classList.add("on");
+        active.innerHTML='<h2>Rubrique</h2><p class="msg" role="alert">La rubrique n’a pas pu se charger complètement. Recharge la page ; si le problème persiste, transmets ce message : '+String(error&&error.message||error).replace(/[&<>"']/g,function(c){return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]})+'</p>';
+      }
+    }
+  });
 },true);
 
 document.addEventListener("click",function(e){
