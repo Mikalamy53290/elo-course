@@ -1278,28 +1278,47 @@ function loadEloCoinHistory(force){
   if(!authUser||!linkedRunner)return;
   var box=document.getElementById('elocoins-history');if(!box)return;
   var userId=authUser.id;
+  function parisDayKey(date){
+    var p=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date),o={};
+    p.forEach(function(x){o[x.type]=x.value;});
+    return o.year+'-'+o.month+'-'+o.day;
+  }
+  function parisMidnightUtc(key){
+    var a=key.split('-').map(Number),guess=Date.UTC(a[0],a[1]-1,a[2]);
+    for(var n=0;n<3;n++){
+      var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(guess)),o={};
+      p.forEach(function(x){o[x.type]=x.value;});
+      var shown=Date.UTC(Number(o.year),Number(o.month)-1,Number(o.day),Number(o.hour),Number(o.minute),Number(o.second));
+      guess-=shown-guess;
+    }
+    return new Date(guess).toISOString();
+  }
+  var today=parisDayKey(new Date()),cacheKey=userId+':'+today;
   if(elocoinsHistoryLoading)return;
-  if(!force&&elocoinsHistoryUser===userId&&elocoinsHistoryHtml){box.innerHTML=elocoinsHistoryHtml;return;}
-  elocoinsHistoryLoading=true;box.innerHTML='<strong>Historique ELO Coins</strong><p class="meta">Chargement de tes dernières opérations…</p>';
+  if(!force&&elocoinsHistoryUser===cacheKey&&elocoinsHistoryHtml){box.innerHTML=elocoinsHistoryHtml;return;}
+  var nextDate=new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7))-1,Number(today.slice(8,10))+1));
+  var tomorrow=nextDate.getUTCFullYear()+'-'+String(nextDate.getUTCMonth()+1).padStart(2,'0')+'-'+String(nextDate.getUTCDate()).padStart(2,'0');
+  elocoinsHistoryLoading=true;box.innerHTML='<strong>Récompenses du jour</strong><p class="meta">Chargement des gains de la journée…</p>';
   (async function(){
     try{
-      var q=await sb.from('elocoins_transactions').select('amount,transaction_type,description,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(30);
+      var q=await sb.from('elocoins_transactions').select('amount,transaction_type,description,created_at').eq('user_id',userId).gte('created_at',parisMidnightUtc(today)).lt('created_at',parisMidnightUtc(tomorrow)).order('created_at',{ascending:false});
       if(q.error)throw q.error;
       var labels={welcome:'Bonus de bienvenue',referral:'Récompense de parrainage',daily_login:'Connexion quotidienne',profile:'Profil complété',photo:'Photo de profil',first_race:'Première course',race:'Participation à une course',monthly_runner:'Coureur du mois',purchase:'Récompense utilisée'};
       var icons={welcome:'🎁',referral:'🤝',daily_login:'📅',profile:'👤',photo:'📸',first_race:'🏁',race:'🏃',monthly_runner:'🏆',purchase:'🎉'};
       var rows=q.data||[],earned=0,spent=0;
       rows.forEach(function(t){var a=Number(t.amount)||0;if(a>0)earned+=a;else spent+=Math.abs(a);});
-      var html='<strong style="font-size:1.05em">Comment gagner tes ELO Coins ?</strong><p class="meta" style="margin:5px 0 10px">Retrouve ici chaque récompense reçue et chaque dépense : la raison, la date et le nombre de coins.</p>';
-      if(rows.length)html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px"><span class="pill">+'+earned.toLocaleString('fr-FR')+' gagnés</span><span class="pill">−'+spent.toLocaleString('fr-FR')+' dépensés</span></div>';
-      if(!rows.length)html+='<p class="meta">Tu n’as pas encore reçu de récompense. Tes prochains bonus apparaîtront ici, par exemple pour ta connexion quotidienne ou ta première course, dès que ces récompenses seront activées.</p>';
-      else html+='<div style="margin-top:8px">'+rows.map(function(t){
-        var amount=Number(t.amount)||0,type=t.transaction_type||'',label=labels[type]||'Récompense ELO Coins',detail=t.description||label,date=t.created_at?new Date(t.created_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):'';
+      var html='<strong style="font-size:1.05em">Comment gagner tes ELO Coins ?</strong><p class="meta" style="margin:5px 0 10px">Tes récompenses obtenues aujourd’hui apparaissent ci-dessous. Le solde de ton portefeuille conserve tous tes coins.</p><div class="card" style="padding:10px;margin:8px 0;background:var(--panel)"><div style="display:flex;justify-content:space-between;gap:8px"><span>📅 Connexion quotidienne</span><strong>+10 coins</strong></div><div class="meta">Une fois par jour, pour un compte coureur validé.</div></div>';
+      if(rows.length)html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px"><span class="pill">+'+earned.toLocaleString('fr-FR')+' gagnés aujourd’hui</span>'+(spent?'<span class="pill">−'+spent.toLocaleString('fr-FR')+' utilisés aujourd’hui</span>':'')+'</div>';
+      if(!rows.length)html+='<p class="meta">Aucune récompense enregistrée aujourd’hui pour le moment. Le bonus de connexion sera ajouté automatiquement lors de ta première connexion de la journée.</p>';
+      else html+='<strong style="display:block;margin-top:10px">Tes opérations du jour</strong><div style="margin-top:6px">'+rows.map(function(t){
+        var amount=Number(t.amount)||0,type=t.transaction_type||'',label=labels[type]||'Récompense ELO Coins',detail=t.description||label,date=t.created_at?new Date(t.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}):'';
         return '<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid var(--line);padding:11px 0"><div style="display:flex;gap:9px;align-items:flex-start;min-width:0"><span aria-hidden="true" style="font-size:1.2em">'+(icons[type]||'🪙')+'</span><div style="min-width:0"><strong>'+esc(detail)+'</strong><div class="meta">'+esc(label)+' · '+esc(date)+'</div></div></div><strong style="white-space:nowrap;color:'+(amount>0?'var(--up)':'var(--down)')+'">'+(amount>0?'+':'')+amount.toLocaleString('fr-FR')+' coins</strong></div>';
-      }).join('')+'</div><p class="meta">30 dernières opérations maximum. Les récompenses affichées dépendent des dispositifs effectivement activés sur ELO COURSE.</p>';
-      elocoinsHistoryUser=userId;elocoinsHistoryHtml=html;
+      }).join('')+'</div>';
+      html+='<p class="meta">Ce journal se renouvelle chaque jour à minuit, heure française. Tes coins restent acquis dans ton portefeuille.</p>';
+      elocoinsHistoryUser=cacheKey;elocoinsHistoryHtml=html;
       var current=document.getElementById('elocoins-history');if(current&&authUser&&authUser.id===userId)current.innerHTML=html;
     }catch(err){
-      var current=document.getElementById('elocoins-history');if(current)current.innerHTML='<strong>Historique ELO Coins</strong><p class="meta">Impossible de charger l’historique pour le moment.</p>';
+      var current=document.getElementById('elocoins-history');if(current)current.innerHTML='<strong>Récompenses du jour</strong><p class="meta">Impossible de charger les récompenses pour le moment.</p>';
       console.warn('Historique ELO Coins indisponible :',err.message);
     }finally{elocoinsHistoryLoading=false;}
   })();
