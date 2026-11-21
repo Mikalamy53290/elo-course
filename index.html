@@ -1270,7 +1270,7 @@ function spark(h){
   return '<svg viewBox="0 0 '+w+' '+ht+'" width="100%" height="50" role="img" aria-label="Évolution de l’Elo"><polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>';
 }
 function meHTML(st){
-  var me=S.runners.filter(function(r){return r.id===S.me})[0],h='<h2>Profil</h2><div class="card"><strong>Rechercher une fiche coureur</strong><p class="meta">Retrouve le profil d’un coureur par son nom ou son prénom.</p><input id="profilelookup" type="search" placeholder="Ex. Martin, Durand…" autocomplete="off"><div id="profilelookupresults"></div></div>'+accountPanelHTML()+(authUser&&linkedRunner?'<div class="card" id="elocoins-history"><strong>Historique ELO Coins</strong><p class="meta">Chargement de tes dernières opérations…</p></div>':'');
+  var me=S.runners.filter(function(r){return r.id===S.me})[0],h='<h2>Profil</h2><div class="card"><strong>Rechercher une fiche coureur</strong><p class="meta">Retrouve le profil d’un coureur par son nom ou son prénom.</p><input id="profilelookup" type="search" placeholder="Ex. Martin, Durand…" autocomplete="off"><div id="profilelookupresults"></div></div>'+accountPanelHTML()+(authUser&&linkedRunner?'<div class="card" id="elocoins-history"><strong>Récompenses du jour</strong><p class="meta">Chargement des gains de la journée…</p></div>':'');
   if(!me)return h+'<p class="empty">Ton profil ELO apparaîtra ici une fois ton compte coureur rattaché à une fiche existante. Tu peux aussi consulter les profils depuis le classement.</p>';
   return h+runnerProfile(me.id,true)+'<p style="margin-top:14px"><button class="ghost" data-act="logout">Fermer mon profil</button> '+(S.admin?'<button class="ghost" data-act="reset" id="rst">Tout effacer</button>':'')+'</p>';
 }
