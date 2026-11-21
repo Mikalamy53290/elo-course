@@ -68,7 +68,7 @@ function consentedRunners(data, consentedIds) {
 async function sitemap(data, consentedIds) {
   const runners = consentedRunners(data, consentedIds);
   const races = (data.races || []).filter(r => r && r.id != null && (r.results || []).some(x => !x.pending));
-  const fixed = ["/","/rubrique/classement","/rubrique/courses","/rubrique/mode-ghost","/rubrique/reglement"];
+  const fixed = ["/","/rubrique/classement","/rubrique/courses","/rubrique/mode-ghost","/rubrique/chronometreurs","/rubrique/reglement"];
   const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
   for (const r of runners) urls.push(`<url><loc>${esc(SITE+profilePath(r))}</loc></url>`);
   for (const r of races) urls.push(`<url><loc>${esc(SITE+racePath(r))}</loc></url>`);
@@ -85,11 +85,12 @@ async function routeSEO(request, env) {
     "/rubrique/classement": ["Classement ELO des coureurs","Consultez le classement ELO des coureurs ayant participé aux courses en Sarthe, Mayenne et Maine-et-Loire.","Le classement ELO ELO COURSE compare les performances des coureurs à partir des résultats de courses publiés. Retrouvez les classements généraux et par catégorie."],
     "/rubrique/courses": ["Résultats des courses","Retrouvez les résultats des courses en Sarthe, Mayenne et Maine-et-Loire.","ELO COURSE rassemble les résultats des courses à pied et trails, avec les classements et les chronos publiés par les organisateurs et chronométreurs."],
     "/rubrique/mode-ghost": ["Mode Ghost – simulation ELO","Découvrez le Mode Ghost et son laboratoire de simulation ELO sur ELO COURSE.","Le Mode Ghost permet d’explorer et de simuler l’évolution du classement ELO à partir des performances de course."],
+    "/rubrique/chronometreurs": ["Chronométreurs et résultats de course","Les chronométreurs et sources de résultats utilisés par ELO COURSE.","ELO COURSE référence les résultats publiés par les chronométreurs et organisateurs de courses, notamment pour les épreuves en Sarthe, Mayenne et Maine-et-Loire."],
     "/rubrique/reglement": ["Règlement ELO COURSE","Consultez le fonctionnement et les règles d’utilisation d’ELO COURSE.","Présentation du fonctionnement du classement ELO COURSE, des profils coureurs et des résultats publiés."]
   };
   if (sections[path]) {
     const [title,description,copy]=sections[path];
-    const appLinks={"/rubrique/classement":"/?view=rank","/rubrique/courses":"/?view=races","/rubrique/mode-ghost":"/?view=ghost","/rubrique/reglement":"/?view=help"};
+    const appLinks={"/rubrique/classement":"/?view=rank","/rubrique/courses":"/?view=races","/rubrique/mode-ghost":"/?view=ghost","/rubrique/chronometreurs":"/?view=chrono","/rubrique/reglement":"/?view=help"};
     return new Response(layout({title,description,canonical:SITE+path,body:`<h1>${esc(title)}</h1><p>${esc(copy)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p><a class="cta" href="${appLinks[path]}">Ouvrir cette rubrique dans ELO COURSE</a>`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   if (!path.startsWith("/coureur/") && !path.startsWith("/course/")) return null;
