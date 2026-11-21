@@ -1844,17 +1844,31 @@ document.addEventListener("input",function(e){
 (function(){
   var ghostFrame=document.getElementById("ghost-frame");
   window.addEventListener("message",function(event){
-    if(!ghostFrame||event.source!==ghostFrame.contentWindow||!event.data||event.data.type!=="elo-ghost-height")return;
+    if(!ghostFrame||event.source!==ghostFrame.contentWindow||!event.data)return;
+    if(event.data.type==="elo-ghost-ready"){
+      sendGhostRealRaces();
+      return;
+    }
+    if(event.data.type!=="elo-ghost-height")return;
     var height=Number(event.data.height);
     if(Number.isFinite(height))ghostFrame.style.height=Math.max(1,Math.min(12000,height+4))+"px";
   });
 })();
+function ghostRaceDistanceKm(c){
+  var raw=String(c&&(c.dist||c.distance)||"").trim().replace(",",".");
+  var numeric=parseFloat(raw);
+  if(Number.isFinite(numeric)&&numeric>0)return numeric;
+  var normalized=raw.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+  if(/semi/.test(normalized))return 21.1;
+  if(/marathon/.test(normalized))return 42.195;
+  return 0;
+}
 function sendGhostRealRaces(){
   var frame=document.getElementById("ghost-frame");if(!frame||!frame.contentWindow||!Array.isArray(S.races)||!Array.isArray(S.runners))return;
   var st=eloCache.all||ALL||{};if(!Object.keys(st).length)return;
   var runnersById={};S.runners.forEach(function(r){runnersById[String(r.id)]=r;});
   var races=S.races.map(function(c){
-    var dist=parseFloat(String(c.dist||c.distance||"").replace(",","."));if(!(dist>0))return null;
+    var dist=ghostRaceDistanceKm(c);if(!(dist>0))return null;
     function toSeconds(v){if(typeof v==="number"&&isFinite(v))return v;var raw=String(v||"").trim();if(/^\d+(?:\.\d+)?$/.test(raw))return Number(raw);if(raw.indexOf(":")>=0){var parts=raw.split(":").map(Number);if(parts.every(Number.isFinite)){var total=0;parts.forEach(function(x){total=total*60+x});return total;}}return 0;}
     var results=(Array.isArray(c.results)?c.results:[]).filter(function(a){return a&&!a.pending&&a.id&&toSeconds(a.time)>0&&runnersById[String(a.id)]&&st[String(a.id)+"|X"]&&st[String(a.id)+"|X"].n>0;}).map(function(a){
       var r=runnersById[String(a.id)],p=st[String(a.id)+"|X"];return {name:r.name||"Coureur",club:r.club||"",elo:Math.round(p.elo),time:toSeconds(a.time),rank:Number(a.rk)||null};
