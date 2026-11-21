@@ -49,8 +49,12 @@ function publicRunners(data) {
   for (const race of data.races) for (const result of (race.results || [])) if (!result.pending && result.id != null) used.add(String(result.id));
   return (data.runners || []).filter(r => r && r.id != null && used.has(String(r.id)) && validName(r.name));
 }
+function consentedRunners(data) {
+  // L'indexation nominative est conditionnée à un accord explicite, distinct de la simple présence dans un résultat public.
+  return publicRunners(data).filter(r => r.publication_consent === true || r.publicProfileConsent === true);
+}
 async function sitemap(data) {
-  const runners = publicRunners(data);
+  const runners = consentedRunners(data);
   const races = (data.races || []).filter(r => r && r.id != null && (r.results || []).some(x => !x.pending));
   const fixed = ["/","/rubrique/classement","/rubrique/courses","/rubrique/mode-ghost","/rubrique/reglement"];
   const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
@@ -89,7 +93,8 @@ async function routeSEO(request, env) {
     const title=runner.name+" – Profil coureur ELO COURSE";
     const description="Retrouvez les résultats de "+runner.name+" en course à pied en Sarthe, Mayenne et Maine-et-Loire sur ELO COURSE.";
     const body=`<h1>${esc(runner.name)}</h1><p class="muted">Profil coureur · ELO COURSE</p><div class="stats"><div class="stat"><strong>${results.length}</strong>course(s) classée(s)</div></div><section class="panel"><h2>Résultats de course</h2>${latest.length?'<ol class="list">'+latest.map(({race,item})=>'<li><strong>'+esc(race.name||"Course")+'</strong> · '+esc(dateFR(race.date))+' · '+esc(race.dist||"Distance non précisée")+(item.rk?' · '+esc(item.rk)+'e':'')+(fmtTime(item.time)?' · '+esc(fmtTime(item.time)):'')+'</li>').join("")+'</ol>':'<p>Aucun résultat détaillé disponible.</p>'}${results.length>30?'<p class="muted">Les 30 résultats les plus récents sont affichés sur cette page.</p>':''}</section><a class="cta" href="/#profil=${encodeURIComponent(String(runner.id))}">Ouvrir le profil dans ELO COURSE</a><a href="/">Retour au site</a>`;
-    return new Response(layout({title,description,canonical:SITE+profilePath(runner),body}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
+    const canIndex = runner.publication_consent === true || runner.publicProfileConsent === true;
+    return new Response(layout({title,description,canonical:SITE+profilePath(runner),body,robots:canIndex?"index,follow":"noindex,follow"}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   const id=parseId(path,"/course/");
   const race=(data.races||[]).find(r=>String(r.id)===id);
