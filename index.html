@@ -552,7 +552,7 @@ var TEST_BUILD=false; // Synchronisation Supabase activee.
 var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_publishable_jiboviI5BaRii9_Lz9JK_A_qwXsVC-O";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
-var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,elocoinsBalance=null,elocoinsRaceCount=null,avatarMap={},runnerDetails={},socialBusy=false;
+var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,elocoinsBalance=null,elocoinsRaceCount=null,elocoinsReferralCode=null,avatarMap={},runnerDetails={},socialBusy=false;
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false,elocoinsHistoryUser=null,elocoinsHistoryHtml='',elocoinsHistoryLoading=false,elocoinsHistoryTimer=null;
 function localDayKey(){var p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Paris",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};p.forEach(function(x){o[x.type]=x.value});return o.year+"-"+o.month+"-"+o.day}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
@@ -1121,7 +1121,38 @@ function accountPanelHTML(){
   html+='<p class="msg" id="runneraccountmsg" role="status">'+esc(msg.runnerAccount||'')+'</p></div>';return html;
 }
 function getRunnerByName(){return S.runners.filter(function(r){return r.id===window.selectedRunnerLink})[0]||null;}
-async function refreshRunnerAuth(){var s=await sb.auth.getSession();var session=s.data.session;authUser=session?session.user:null;linkedRunner=null;pendingRunner=null;elocoinsBalance=null;elocoinsRaceCount=null;elocoinsHistoryUser=null;elocoinsHistoryHtml='';if(authUser){var a=await sb.from('runner_accounts').select('runner_id,status').eq('user_id',authUser.id).maybeSingle();if(a.data&&a.data.status==='approved'){linkedRunner=a.data.runner_id;S.me=linkedRunner;}else if(a.data&&a.data.status==='pending'){pendingRunner=a.data.runner_id;}if(linkedRunner){try{var milestones=await sb.rpc('elocoins_claim_race_milestones');if(milestones.error)throw milestones.error;var milestoneRow=Array.isArray(milestones.data)?milestones.data[0]:milestones.data;elocoinsRaceCount=milestoneRow&&milestoneRow.races_count!==undefined?Number(milestoneRow.races_count)||0:null;}catch(milestoneError){elocoinsRaceCount=null;console.warn('Récompenses de courses ELO Coins indisponibles :',milestoneError.message);}try{var daily=await sb.rpc('elocoins_claim_daily_login');if(daily.error)throw daily.error;var dailyRow=Array.isArray(daily.data)?daily.data[0]:daily.data;if(!dailyRow||dailyRow.balance===undefined)throw new Error('Réponse de récompense quotidienne invalide');elocoinsBalance=Number(dailyRow.balance)||0;}catch(dailyError){console.warn('Récompense quotidienne ELO Coins indisponible :',dailyError.message);try{var wallet=await sb.from('elocoins_wallets').select('balance').eq('user_id',authUser.id).maybeSingle();if(wallet.error)throw wallet.error;elocoinsBalance=wallet.data?Number(wallet.data.balance)||0:0;}catch(walletError){console.warn('Portefeuille ELO Coins indisponible :',walletError.message);elocoinsBalance=null;}}}} }
+async function refreshRunnerAuth(){
+  var s=await sb.auth.getSession(),session=s.data.session;
+  authUser=session?session.user:null;linkedRunner=null;pendingRunner=null;
+  elocoinsBalance=null;elocoinsRaceCount=null;elocoinsReferralCode=null;
+  elocoinsHistoryUser=null;elocoinsHistoryHtml='';
+  if(!authUser)return;
+  var a=await sb.from('runner_accounts').select('runner_id,status').eq('user_id',authUser.id).maybeSingle();
+  if(a.data&&a.data.status==='approved'){linkedRunner=a.data.runner_id;S.me=linkedRunner;}
+  else if(a.data&&a.data.status==='pending'){pendingRunner=a.data.runner_id;}
+  if(!linkedRunner)return;
+  try{
+    var milestones=await sb.rpc('elocoins_claim_race_milestones');
+    if(milestones.error)throw milestones.error;
+    var milestoneRow=Array.isArray(milestones.data)?milestones.data[0]:milestones.data;
+    elocoinsRaceCount=milestoneRow&&milestoneRow.races_count!==undefined?Number(milestoneRow.races_count)||0:null;
+  }catch(milestoneError){elocoinsRaceCount=null;console.warn('Récompenses de courses ELO Coins indisponibles :',milestoneError.message);}
+  try{
+    var daily=await sb.rpc('elocoins_claim_daily_login');
+    if(daily.error)throw daily.error;
+    var dailyRow=Array.isArray(daily.data)?daily.data[0]:daily.data;
+    if(!dailyRow||dailyRow.balance===undefined)throw new Error('Réponse de récompense quotidienne invalide');
+    elocoinsBalance=Number(dailyRow.balance)||0;
+  }catch(dailyError){console.warn('Récompense quotidienne ELO Coins indisponible :',dailyError.message);}
+  try{
+    var walletInfo=await sb.from('elocoins_wallets').select('balance,referral_code').eq('user_id',authUser.id).maybeSingle();
+    if(walletInfo.error)throw walletInfo.error;
+    if(walletInfo.data){
+      elocoinsReferralCode=walletInfo.data.referral_code||null;
+      if(elocoinsBalance===null)elocoinsBalance=Number(walletInfo.data.balance)||0;
+    }
+  }catch(walletError){console.warn('Portefeuille ELO Coins indisponible :',walletError.message);}
+}
 function publicProfileHTML(id){return runnerProfile(id,false)}
 function formatTime(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=Math.round(t%60);if(s===60){s=0;m++}return (h? h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
 function rankPager(total,page,pages){
@@ -1310,6 +1341,10 @@ function loadEloCoinHistory(force){
       var rows=q.data||[],earned=0,spent=0;
       rows.forEach(function(t){var a=Number(t.amount)||0;if(a>0)earned+=a;else spent+=Math.abs(a);});
       var html='<strong style="font-size:1.05em">Comment gagner tes ELO Coins ?</strong><p class="meta" style="margin:5px 0 10px">Tes récompenses obtenues aujourd’hui apparaissent ci-dessous. Le solde de ton portefeuille conserve tous tes coins.</p>'+(authUser&&authUser.id===ADMIN_AUTH_USER_ID?'<div class="card" style="padding:10px;margin:8px 0;background:var(--panel)"><div class="meta">Compte administrateur historique : aucune récompense ELO Coins n’est attribuée à ce compte.</div></div>':'<div class="card" style="padding:10px;margin:8px 0;background:var(--panel)"><div style="display:flex;justify-content:space-between;gap:8px"><span>📅 Connexion quotidienne</span><strong>+10 coins</strong></div><div class="meta">Une fois par jour, pour un compte coureur validé.</div></div>')+''+(authUser&&authUser.id===ADMIN_AUTH_USER_ID?'<div class="card" style="padding:10px;margin:8px 0;background:var(--panel)"><strong>🏃 Défis de courses</strong><div class="meta">Le compte administrateur historique est exclu du programme ELO Coins.</div></div>':'<div class="card" style="padding:10px;margin:8px 0;background:var(--panel)"><strong>🏃 Défis de courses</strong><div class="meta" style="margin:4px 0 8px">Courses classées et terminées reconnues : '+(elocoinsRaceCount===null?'progression indisponible':elocoinsRaceCount)+'</div><div class="meta">Les récompenses liées aux courses sont en préparation. Les montants seront affichés lorsqu’ils seront définitivement validés.</div></div>');
+      if(elocoinsReferralCode&&authUser&&authUser.id!==ADMIN_AUTH_USER_ID){
+        var referralLink=window.location.origin+window.location.pathname+'?parrain='+encodeURIComponent(elocoinsReferralCode);
+        html+='<div class="card" style="padding:12px;margin:10px 0;background:var(--panel)"><strong>🤝 Parraine un coureur</strong><p class="meta" style="margin:5px 0 8px">Partage ton code ou ton lien. Après validation du compte de ton filleul, il reçoit <strong>50 ELO Coins</strong> et tu reçois <strong>20 ELO Coins</strong>. Tu peux parrainer autant de coureurs que tu veux.</p><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong style="font-size:1.1em;letter-spacing:.08em">'+esc(elocoinsReferralCode)+'</strong><button class="ghost" data-act="copyreferral" data-v="'+escapeAttr(referralLink)+'">Copier mon lien de parrainage</button></div></div>';
+      }
       if(rows.length)html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px"><span class="pill">+'+earned.toLocaleString('fr-FR')+' gagnés aujourd’hui</span>'+(spent?'<span class="pill">−'+spent.toLocaleString('fr-FR')+' utilisés aujourd’hui</span>':'')+'</div>';
       if(!rows.length)html+='<p class="meta">'+(authUser&&authUser.id===ADMIN_AUTH_USER_ID?'Aucune récompense enregistrée : le compte administrateur historique est exclu du programme ELO Coins.':'Aucune récompense enregistrée aujourd’hui pour le moment. Le bonus de connexion sera ajouté automatiquement lors de ta première connexion de la journée.')+'</p>';
       else html+='<strong style="display:block;margin-top:10px">Tes opérations du jour</strong><div style="margin-top:6px">'+rows.map(function(t){
@@ -1962,6 +1997,13 @@ document.addEventListener("click",function(e){
 
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act,v=b.dataset.v;
+  if(a==="copyreferral"){
+    var referralUrl=v;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(referralUrl).then(function(){alert("Lien de parrainage copié. Tu peux le partager !");}).catch(function(){prompt("Copie ton lien de parrainage :",referralUrl);});
+    }else{prompt("Copie ton lien de parrainage :",referralUrl);}
+    return;
+  }
   if(a==="racepage"){
     S.raceResultsPage=Math.max(1,Number(v)||1);
     var list=document.getElementById("race-result-list"),course=S.races.filter(function(c){return String(c.id)===String(S.open);})[0];
