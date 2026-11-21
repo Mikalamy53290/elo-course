@@ -1,6 +1,6 @@
 -- ELO COURSE — Récompenses des jalons de courses réelles
 -- Courses lues exclusivement dans site_data.data->'races', source du site.
--- Jalons cumulatifs : 1 course +10, 5 courses +20, 10 courses +30.
+-- Jalons de récompense désactivés : les montants restent à valider.
 -- Helper privilégié non exposé à l'API REST; wrapper public SECURITY INVOKER.
 
 create schema if not exists elo_private;
@@ -23,15 +23,7 @@ declare
   v_user_id uuid;
   v_runner_id text;
   v_races_count integer := 0;
-  v_transaction_id bigint;
   v_balance bigint := 0;
-  v_code text;
-  v_reward integer;
-  v_label text;
-  v_event_key text;
-  v_first boolean := false;
-  v_five boolean := false;
-  v_ten boolean := false;
 begin
   v_user_id := auth.uid();
   if v_user_id is null then raise exception 'Authentification requise.'; end if;
@@ -65,39 +57,14 @@ begin
     'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12)))
   on conflict (user_id) do nothing;
 
-  for v_code, v_reward, v_label, v_event_key in
-    select m.code, m.reward, m.label, m.event_key
-      from (values
-        (1, 'first_race', 10, 'Première course terminée', 'race_milestone:first_race'),
-        (5, 'five_races', 20, '5 courses terminées', 'race_milestone:five_races'),
-        (10, 'ten_races', 30, '10 courses terminées', 'race_milestone:ten_races')
-      ) as m(threshold, code, reward, label, event_key)
-     where v_races_count >= m.threshold
-     order by m.threshold
-  loop
-    v_transaction_id := null;
-    insert into public.elocoins_transactions
-      (user_id, amount, transaction_type, description, event_key)
-    values (v_user_id, v_reward, v_code, v_label, v_event_key)
-    on conflict (user_id, event_key) do nothing
-    returning id into v_transaction_id;
-
-    if v_transaction_id is not null then
-      update public.elocoins_wallets as w
-         set balance = w.balance + v_reward, updated_at = now()
-       where w.user_id = v_user_id;
-
-      if v_code = 'first_race' then v_first := true;
-      elsif v_code = 'five_races' then v_five := true;
-      elsif v_code = 'ten_races' then v_ten := true;
-      end if;
-    end if;
-  end loop;
+  -- Les montants des jalons de courses ne sont pas encore validés.
+  -- Cette RPC calcule uniquement le nombre de courses terminées et ne crédite
+  -- aucun ELO Coin tant que Mickaël n'a pas confirmé les récompenses.
 
   select w.balance into v_balance
     from public.elocoins_wallets as w where w.user_id = v_user_id;
 
-  return query select v_races_count, v_first, v_five, v_ten, coalesce(v_balance, 0);
+  return query select v_races_count, false, false, false, coalesce(v_balance, 0);
 end;
 $function$;
 
