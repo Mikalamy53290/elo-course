@@ -1001,7 +1001,8 @@ var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.dow
 async function shareRace(c){
   if(!c)return;
   var base=window.location.href.split('#')[0].split('?')[0];
-  var raceSlug=String(c.name||'course').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||'course';\n  var url=window.location.origin+'/course/'+raceSlug+'--'+encodeURIComponent(c.id);
+  var raceSlug=String(c.name||'course').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||'course';
+  var url=window.location.origin+'/course/'+raceSlug+'--'+encodeURIComponent(c.id);
   var title=String(c.name||'Course ELO COURSE')+(c.dist?' · '+c.dist:'');
   var date=c.date?new Date(c.date+'T12:00:00').toLocaleDateString('fr-FR'):'Date à confirmer';
   var sorted=(c.results||[]).filter(function(x){return !x.pending;}).slice().sort(function(a,b){return Number(a.rk||999999)-Number(b.rk||999999)||Number(a.time||0)-Number(b.time||0);});
