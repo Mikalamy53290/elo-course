@@ -52,16 +52,11 @@ begin
      and coalesce(result_item.result->>'rk', '') ~ '^[1-9][0-9]*$'
      and nullif(btrim(result_item.result->>'time'), '') is not null;
 
-  insert into public.elocoins_wallets (user_id, balance, referral_code)
-  values (v_user_id, 0,
-    'ELO' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 12)))
-  on conflict (user_id) do nothing;
-
   -- Les montants des jalons de courses ne sont pas encore validés.
   -- Cette RPC calcule uniquement le nombre de courses terminées et ne crédite
   -- aucun ELO Coin tant que Mickaël n'a pas confirmé les récompenses.
 
-  select w.balance into v_balance
+  select coalesce(w.balance, 0) into v_balance
     from public.elocoins_wallets as w where w.user_id = v_user_id;
 
   return query select v_races_count, false, false, false, coalesce(v_balance, 0);
