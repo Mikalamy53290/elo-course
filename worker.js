@@ -52,7 +52,7 @@ function publicRunners(data) {
 async function sitemap(data) {
   const runners = publicRunners(data);
   const races = (data.races || []).filter(r => r && r.id != null && (r.results || []).some(x => !x.pending));
-  const fixed = ["/","/rubrique/classement","/rubrique/courses","/rubrique/mode-ghost","/rubrique/reglement","/cgu.html","/confidentialite.html","/mentions-legales.html"];
+  const fixed = ["/","/rubrique/classement","/rubrique/courses","/rubrique/mode-ghost","/rubrique/reglement"];
   const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
   for (const r of runners) urls.push(`<url><loc>${esc(SITE+profilePath(r))}</loc></url>`);
   for (const r of races) urls.push(`<url><loc>${esc(SITE+racePath(r))}</loc></url>`);
