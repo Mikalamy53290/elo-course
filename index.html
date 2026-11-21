@@ -553,7 +553,7 @@ var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_pub
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
 var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,elocoinsBalance=null,elocoinsRaceCount=null,avatarMap={},runnerDetails={},socialBusy=false;
-var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false,elocoinsHistoryUser=null,elocoinsHistoryHtml='',elocoinsHistoryLoading=false;
+var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false,elocoinsHistoryUser=null,elocoinsHistoryHtml='',elocoinsHistoryLoading=false,elocoinsHistoryTimer=null;
 function localDayKey(){var p=new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Paris",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};p.forEach(function(x){o[x.type]=x.value});return o.year+"-"+o.month+"-"+o.day}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
 var KEY="elo-site-v2",UI_KEY="elo-course-ui-v1",MINR=1,ADMIN_AUTH_USER_ID="26789cc4-2ac3-4129-95c8-2234b1dc748d",ALL={},CONTACT="mimi.6q@live.fr";
@@ -1298,6 +1298,8 @@ function loadEloCoinHistory(force){
   if(!force&&elocoinsHistoryUser===cacheKey&&elocoinsHistoryHtml){box.innerHTML=elocoinsHistoryHtml;return;}
   var nextDate=new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7))-1,Number(today.slice(8,10))+1));
   var tomorrow=nextDate.getUTCFullYear()+'-'+String(nextDate.getUTCMonth()+1).padStart(2,'0')+'-'+String(nextDate.getUTCDate()).padStart(2,'0');
+  if(elocoinsHistoryTimer)clearTimeout(elocoinsHistoryTimer);
+  elocoinsHistoryTimer=setTimeout(function(){elocoinsHistoryUser=null;elocoinsHistoryHtml='';loadEloCoinHistory(true);},Math.max(1000,new Date(parisMidnightUtc(tomorrow)).getTime()-Date.now()+1200));
   elocoinsHistoryLoading=true;box.innerHTML='<strong>Récompenses du jour</strong><p class="meta">Chargement des gains de la journée…</p>';
   (async function(){
     try{
