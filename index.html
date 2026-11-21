@@ -1880,7 +1880,7 @@ document.addEventListener("change",function(e){
 document.addEventListener("click",function(e){
   var target=e.target;
   if(target&&target.nodeType!==1)target=target.parentElement;
-  var navButton=target&&target.closest?target.closest(".nav button[data-act="view"]"):null;
+  var navButton=target&&target.closest?target.closest('.nav button[data-act="view"]'):null;
   if(!navButton)return;
   e.preventDefault();
   e.stopPropagation();
