@@ -564,7 +564,7 @@ try{var initialParams=new URLSearchParams(window.location.search),sharedCoursePa
 S.chronos=S.chronos||[];
 var adminLoginRequested=false;try{adminLoginRequested=new URLSearchParams(window.location.search).get("admin")==="1";}catch(ignoreAdminParam){}
 try{var s=localStorage.getItem(KEY);if(s)S=Object.assign(S,JSON.parse(s))}catch(e){}
-if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":(["accueil","rank","races","help","chrono","ghost"].indexOf(sharedViewParam)>=0?sharedViewParam:"accueil");S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.raceResultsPage=1;S.raceResultsQuery="";S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
+if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":(sharedViewParam&&document.getElementById("v-"+sharedViewParam)?sharedViewParam:"accueil");S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.raceResultsPage=1;S.raceResultsQuery="";S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
 if(!S.gsex&&!S.gcat&&S.group&&S.group!=="all"){var oldGroup=S.group.split("|");if(oldGroup.length===1)S.gsex=oldGroup[0];else{S.gsex=oldGroup[0]==="*"?"all":oldGroup[0];S.gcat=oldGroup[1];}}
 try{var savedUi=JSON.parse(localStorage.getItem(UI_KEY)||"null");if(savedUi){if(typeof savedUi.rankClass==="string")S.rankClass=savedUi.rankClass;if(typeof savedUi.rankMode==="string")S.rankMode=savedUi.rankMode;if(typeof savedUi.group==="string")S.group=savedUi.group;if(typeof savedUi.dist==="string")S.dist=savedUi.dist;if(typeof savedUi.catSel==="string")S.catSel=savedUi.catSel;if(typeof savedUi.gsex==="string")S.gsex=savedUi.gsex;if(typeof savedUi.gcat==="string")S.gcat=savedUi.gcat;}}catch(ignoreUiPrefs){}
 function savePrefs(){try{localStorage.setItem(UI_KEY,JSON.stringify({rankClass:S.rankClass||"all",rankMode:S.rankMode||"all",group:S.group||"all",dist:S.dist||"all",catSel:S.catSel||"",gsex:S.gsex||"all",gcat:S.gcat||"all"}));}catch(ignoreUiSave){}}
@@ -1888,8 +1888,8 @@ document.addEventListener("click",function(e){
   // Basculer immédiatement la vue : le menu ne doit jamais laisser
   // l'utilisateur prisonnier du classement si un rendu secondaire échoue.
   S.view=destination;
-  var publicViewUrls={accueil:"/",rank:"/?view=rank",races:"/?view=races",help:"/?view=help",chrono:"/?view=chrono",ghost:"/?view=ghost"};
-  if(publicViewUrls[destination]&&window.history&&window.history.replaceState){window.history.replaceState(null,"",publicViewUrls[destination]);}
+  var privateViews=["me","organizer","upcoming"];
+  if(window.history&&window.history.replaceState){var navUrl=privateViews.indexOf(destination)>=0?"/":(destination==="accueil"?"/":"/?view="+encodeURIComponent(destination));window.history.replaceState(null,"",navUrl);}
   document.querySelectorAll("main .view").forEach(function(section){
     section.classList.toggle("on",section.id==="v-"+destination);
   });
@@ -2241,7 +2241,7 @@ window.addEventListener("popstate",function(){
   S.publicProfile=null;
   if(path.indexOf("/coureur/")===0){var rest=path.slice(9),cut=rest.lastIndexOf("--");S.publicProfile=decodeURIComponent(cut>=0?rest.slice(cut+2):rest);S.view="rank";S.open=null;}
   else if(path.indexOf("/course/")===0){var restRace=path.slice(8),cutRace=restRace.lastIndexOf("--");S.open=decodeURIComponent(cutRace>=0?restRace.slice(cutRace+2):restRace);S.view="races";}
-  else{S.open=params.get("course")||null;var v=params.get("view");S.view=S.open?"races":(["accueil","rank","races","help","chrono","ghost"].indexOf(v)>=0?v:"accueil");}
+  else{S.open=params.get("course")||null;var v=params.get("view");S.view=S.open?"races":(v&&privateViews.indexOf(v)<0&&document.getElementById("v-"+v)?v:"accueil");}
   render();
 });
 // Lecture des données publiques et synchronisation des modifications réservée au compte administrateur.
