@@ -9,6 +9,12 @@ revoke all on schema elo_private from public, anon, authenticated;
 -- pouvoir appeler leurs helpers; le schéma reste non exposé à PostgREST.
 grant usage on schema elo_private to authenticated;
 
+-- Les politiques RLS limitent chaque lecture au compte concerné.
+-- Le GRANT SQL est nécessaire en plus de RLS pour les requêtes PostgREST du site.
+grant select on table public.elocoins_wallets to authenticated;
+grant select on table public.elocoins_transactions to authenticated;
+grant select on table public.elocoins_referrals to authenticated;
+
 -- Les triggers existants conservent leur liaison aux fonctions lors du
 -- déplacement de celles-ci hors du schéma public exposé par l'API.
 do $migration$
