@@ -553,7 +553,7 @@ var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_pub
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
 var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,elocoinsBalance=null,avatarMap={},runnerDetails={},socialBusy=false;
-var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false;
+var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false,elocoinsHistoryUser=null,elocoinsHistoryHtml='',elocoinsHistoryLoading=false;
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
 var KEY="elo-site-v2",UI_KEY="elo-course-ui-v1",MINR=1,ADMIN_AUTH_USER_ID="26789cc4-2ac3-4129-95c8-2234b1dc748d",ALL={},CONTACT="mimi.6q@live.fr";
@@ -1121,7 +1121,7 @@ function accountPanelHTML(){
   html+='<p class="msg" id="runneraccountmsg" role="status">'+esc(msg.runnerAccount||'')+'</p></div>';return html;
 }
 function getRunnerByName(){return S.runners.filter(function(r){return r.id===window.selectedRunnerLink})[0]||null;}
-async function refreshRunnerAuth(){var s=await sb.auth.getSession();var session=s.data.session;if(session){var day='';try{day=localStorage.getItem('elo-course-auth-day')||''}catch(e){}if(day&&day!==localDayKey()){await sb.auth.signOut();session=null;}else if(!day){rememberDailyLogin();}}authUser=session?session.user:null;linkedRunner=null;pendingRunner=null;elocoinsBalance=null;if(authUser){var a=await sb.from('runner_accounts').select('runner_id,status').eq('user_id',authUser.id).maybeSingle();if(a.data&&a.data.status==='approved'){linkedRunner=a.data.runner_id;S.me=linkedRunner;}else if(a.data&&a.data.status==='pending'){pendingRunner=a.data.runner_id;}if(linkedRunner){try{var wallet=await sb.from('elocoins_wallets').select('balance').eq('user_id',authUser.id).maybeSingle();if(wallet.error)throw wallet.error;elocoinsBalance=wallet.data?Number(wallet.data.balance)||0:0;}catch(walletError){console.warn('Portefeuille ELO Coins indisponible :',walletError.message);elocoinsBalance=null;}}} }
+async function refreshRunnerAuth(){var s=await sb.auth.getSession();var session=s.data.session;if(session){var day='';try{day=localStorage.getItem('elo-course-auth-day')||''}catch(e){}if(day&&day!==localDayKey()){await sb.auth.signOut();session=null;}else if(!day){rememberDailyLogin();}}authUser=session?session.user:null;linkedRunner=null;pendingRunner=null;elocoinsBalance=null;if(authUser){var a=await sb.from('runner_accounts').select('runner_id,status').eq('user_id',authUser.id).maybeSingle();if(a.data&&a.data.status==='approved'){linkedRunner=a.data.runner_id;S.me=linkedRunner;}else if(a.data&&a.data.status==='pending'){pendingRunner=a.data.runner_id;}if(linkedRunner){try{var daily=await sb.rpc('elocoins_claim_daily_login');if(daily.error)throw daily.error;var dailyRow=Array.isArray(daily.data)?daily.data[0]:daily.data;if(!dailyRow||dailyRow.balance===undefined)throw new Error('Réponse de récompense quotidienne invalide');elocoinsBalance=Number(dailyRow.balance)||0;}catch(dailyError){console.warn('Récompense quotidienne ELO Coins indisponible :',dailyError.message);try{var wallet=await sb.from('elocoins_wallets').select('balance').eq('user_id',authUser.id).maybeSingle();if(wallet.error)throw wallet.error;elocoinsBalance=wallet.data?Number(wallet.data.balance)||0:0;}catch(walletError){console.warn('Portefeuille ELO Coins indisponible :',walletError.message);elocoinsBalance=null;}}}} }
 function publicProfileHTML(id){return runnerProfile(id,false)}
 function formatTime(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=Math.round(t%60);if(s===60){s=0;m++}return (h? h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
 function rankPager(total,page,pages){
@@ -1270,9 +1270,37 @@ function spark(h){
   return '<svg viewBox="0 0 '+w+' '+ht+'" width="100%" height="50" role="img" aria-label="Évolution de l’Elo"><polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>';
 }
 function meHTML(st){
-  var me=S.runners.filter(function(r){return r.id===S.me})[0],h='<h2>Profil</h2><div class="card"><strong>Rechercher une fiche coureur</strong><p class="meta">Retrouve le profil d’un coureur par son nom ou son prénom.</p><input id="profilelookup" type="search" placeholder="Ex. Martin, Durand…" autocomplete="off"><div id="profilelookupresults"></div></div>'+accountPanelHTML();
+  var me=S.runners.filter(function(r){return r.id===S.me})[0],h='<h2>Profil</h2><div class="card"><strong>Rechercher une fiche coureur</strong><p class="meta">Retrouve le profil d’un coureur par son nom ou son prénom.</p><input id="profilelookup" type="search" placeholder="Ex. Martin, Durand…" autocomplete="off"><div id="profilelookupresults"></div></div>'+accountPanelHTML()+(authUser&&linkedRunner?'<div class="card" id="elocoins-history"><strong>Historique ELO Coins</strong><p class="meta">Chargement de tes dernières opérations…</p></div>':'');
   if(!me)return h+'<p class="empty">Ton profil ELO apparaîtra ici une fois ton compte coureur rattaché à une fiche existante. Tu peux aussi consulter les profils depuis le classement.</p>';
   return h+runnerProfile(me.id,true)+'<p style="margin-top:14px"><button class="ghost" data-act="logout">Fermer mon profil</button> '+(S.admin?'<button class="ghost" data-act="reset" id="rst">Tout effacer</button>':'')+'</p>';
+}
+function loadEloCoinHistory(force){
+  if(!authUser||!linkedRunner)return;
+  var box=document.getElementById('elocoins-history');if(!box)return;
+  var userId=authUser.id;
+  if(elocoinsHistoryLoading)return;
+  if(!force&&elocoinsHistoryUser===userId&&elocoinsHistoryHtml){box.innerHTML=elocoinsHistoryHtml;return;}
+  elocoinsHistoryLoading=true;box.innerHTML='<strong>Historique ELO Coins</strong><p class="meta">Chargement de tes dernières opérations…</p>';
+  (async function(){
+    try{
+      var q=await sb.from('elocoins_transactions').select('amount,transaction_type,description,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(30);
+      if(q.error)throw q.error;
+      var labels={welcome:'Bonus de bienvenue',referral:'Parrainage',daily_login:'Connexion quotidienne',profile:'Profil complété',photo:'Photo de profil',race:'Participation à une course',monthly_runner:'Coureur du mois',purchase:'Récompense'};
+      var rows=q.data||[];
+      var html='<strong>Historique ELO Coins</strong>';
+      if(!rows.length)html+='<p class="meta">Aucune opération pour le moment. Tes gains et tes dépenses apparaîtront ici.</p>';
+      else html+='<div style="margin-top:8px">'+rows.map(function(t){
+        var amount=Number(t.amount)||0,label=labels[t.transaction_type]||t.transaction_type||'Opération ELO Coins';
+        var detail=t.description||label,date=t.created_at?new Date(t.created_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):'';
+        return '<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid var(--line);padding:9px 0"><div style="min-width:0"><strong>'+esc(detail)+'</strong><div class="meta">'+esc(date)+'</div></div><strong style="white-space:nowrap;color:'+(amount>0?'var(--up)':'var(--down)')+'">'+(amount>0?'+':'')+amount.toLocaleString('fr-FR')+' coins</strong></div>';
+      }).join('')+'</div><p class="meta">30 dernières opérations maximum.</p>';
+      elocoinsHistoryUser=userId;elocoinsHistoryHtml=html;
+      var current=document.getElementById('elocoins-history');if(current&&authUser&&authUser.id===userId)current.innerHTML=html;
+    }catch(err){
+      var current=document.getElementById('elocoins-history');if(current)current.innerHTML='<strong>Historique ELO Coins</strong><p class="meta">Impossible de charger l’historique pour le moment.</p>';
+      console.warn('Historique ELO Coins indisponible :',err.message);
+    }finally{elocoinsHistoryLoading=false;}
+  })();
 }
 function raceDetail(c){
   var by={};S.runners.forEach(function(r){by[r.id]=r});
@@ -1405,7 +1433,7 @@ function render(){setTimeout(arrows,30);MINR=1;
   if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML(st);
   if(S.view==="rank"){if(S.publicProfile&&!eloCache.all){compute(undefined,"all");$("#v-rank").innerHTML='<p class="empty">Préparation du profil…</p>';}else $("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));}
   else if(S.view==="races")$("#v-races").innerHTML=racesHTML();
-  else if(S.view==="me")$("#v-me").innerHTML=meHTML(st);
+  else if(S.view==="me"){$("#v-me").innerHTML=meHTML(st);if(authUser&&linkedRunner)loadEloCoinHistory();}
   else if(S.view==="help")$("#v-help").innerHTML=helpHTML();
   else if(S.view==="chrono")$("#v-chrono").innerHTML=chronoHTML();
   else if(S.view==="organizer")$("#v-organizer").innerHTML=organizerHTML();
