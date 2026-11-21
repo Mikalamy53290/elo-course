@@ -1111,7 +1111,13 @@ async function loadSocial(id){
 function accountPanelHTML(){
   var html='<div class="card"><button class="ghost account-close" data-act="closeAccountPanel" aria-label="Fermer">✕</button><h3>Compte coureur</h3>';
   if(!authUser){
-    html+='<p class="meta">Crée un compte ou connecte-toi pour rattacher ta fiche, ajouter ta photo et participer aux échanges.</p><div class="account-tabs"><button class="'+(accountMode==='signup'?'btn active':'ghost')+'" data-act="accountMode" data-v="signup">INSCRIPTION</button><button class="'+(accountMode==='login'?'btn active':'ghost')+'" data-act="accountMode" data-v="login">CONNEXION</button></div><label for="runneremail">E-mail</label><input id="runneremail" type="email" autocomplete="email" placeholder="Ton adresse e-mail"><label for="runnerpassword">Mot de passe (8 caractères minimum)</label><input id="runnerpassword" type="password" autocomplete="'+(accountMode==='login'?'current-password':'new-password')+'" placeholder="Ton mot de passe">';
+    if(authUser&&linkedRunner){
+    html+='<div><h3>Mon portefeuille ELOCOINS</h3><p><strong>'+Number(eloCoinsBalance||0).toLocaleString("fr-FR")+' ELOCOINS</strong></p>';
+    if(eloCoinsReferralCode){var referralUrl=window.location.origin+'/?parrain='+encodeURIComponent(eloCoinsReferralCode);html+='<p>Code parrain : '+esc(eloCoinsReferralCode)+'</p><p>Lien : <a href="'+esc(referralUrl)+'">'+esc(referralUrl)+'</a></p>';}
+    if(eloCoinsTransactions.length){html+='<h4>Derniers mouvements</h4><ul>'+eloCoinsTransactions.map(function(t){return '<li>'+(t.amount>0?'+':'')+Number(t.amount)+' ELOCOINS — '+esc(t.description||'Mouvement')+'</li>';}).join('')+'</ul>';}
+    html+='</div>';
+  }
+  html+='<p class="meta">Crée un compte ou connecte-toi pour rattacher ta fiche, ajouter ta photo et participer aux échanges.</p><div class="account-tabs"><button class="'+(accountMode==='signup'?'btn active':'ghost')+'" data-act="accountMode" data-v="signup">INSCRIPTION</button><button class="'+(accountMode==='login'?'btn active':'ghost')+'" data-act="accountMode" data-v="login">CONNEXION</button></div><label for="runneremail">E-mail</label><input id="runneremail" type="email" autocomplete="email" placeholder="Ton adresse e-mail"><label for="runnerpassword">Mot de passe (8 caractères minimum)</label><input id="runnerpassword" type="password" autocomplete="'+(accountMode==='login'?'current-password':'new-password')+'" placeholder="Ton mot de passe">';
     if(accountMode==='signup'){
       var chosen=getRunnerByName();
       var referralFromUrl='';try{referralFromUrl=(new URLSearchParams(window.location.search).get('parrain')||'').trim().toUpperCase();}catch(refErr){}
