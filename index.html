@@ -1592,7 +1592,8 @@ function parseKlikego(txt){
     name=cleanCell(name);time=cleanCell(time);
     if(!name||isAnonymousRunnerName(name)||!time||!/^(?:\d{1,2}:)?\d{1,2}:\d{2}:\d{2}$/.test(time))return;
     var key=(name+"|"+time).toLowerCase();if(seen[key])return;seen[key]=1;
-    out.push({rk:Number(rk)||0,name:name,sex:/^F$/i.test(cleanCell(sex))?"F":"H",cat:cleanCell(cat)||"SE",time:secs(time),city:cleanCell(city||"")});
+    var categoryInfo=parseCategorySex(cat,sex);
+    out.push({rk:Number(rk)||0,name:name,sex:categoryInfo.sex||(/^F$/i.test(cleanCell(sex))?"F":"H"),cat:categoryInfo.cat||cleanCell(cat)||"SE",time:secs(time),city:cleanCell(city||"")});
   }
   function rankFrom(v){var x=cleanCell(v);var m=x.match(/(\d+)\s*(?:er|e|è|ème)/i)||x.match(/^(\d+)$/);return m?m[1]:"";}
   // Klikego table copied as Markdown (including medal SVGs rendered as image links).
@@ -1668,9 +1669,9 @@ function parseIpitos(txt){
     if(!name||/^(nom|résultat|resultat)$/i.test(name))return;
     var tm=parseTime(timeCell);
     if(!tm)return;
-    var info=(c[6]||'').toUpperCase(),catMatch=info.match(/^(SEM|SEF|ESM|ESF|JUM|JUF|MAM|MAF|CAM|CAF|MIN|MIF|BEF|BEM|POM|POF|M\d|F\d)/);
+    var info=(c[6]||'').toUpperCase(),catMatch=info.match(/^(SEM|SEF|ESM|ESF|JUM|JUF|MAM|MAF|CAM|CAF|MIN|MIF|BEF|BEM|POM|POF|M\d{1,2}[FH]?|F\d)/);
     var sex=/F/.test((catMatch&&catMatch[1])||'')?'F':'H',cat='SE';
-    if(catMatch){var code=catMatch[1];cat=/^(SE|ES|JU|CA|MI|BE|PO|MA)/.exec(code);cat=cat?cat[1]:'SE';}
+    if(catMatch){var code=catMatch[1],catInfo=parseCategorySex(code,sex);cat=catInfo.cat||(/^(SE|ES|JU|CA|MI|BE|PO|MA)/.exec(code)||['SE'])[0];sex=catInfo.sex||sex;}
     var key=(name+'|'+tm).toLowerCase();if(seen[key])return;seen[key]=1;
     out.push({rk:rk,name:name,sex:sex,cat:cat,time:tm});
   });
