@@ -78,6 +78,8 @@
     db.auth.onAuthStateChange(function(){setTimeout(checkAdmin,0);});
     var nav=document.getElementById("nav-admin");
     if(nav&&window.MutationObserver)new MutationObserver(checkAdmin).observe(nav,{attributes:true,attributeFilter:["hidden"]});
+    var host=document.getElementById("v-races");
+    if(host&&window.MutationObserver)new MutationObserver(function(){checkAdmin();}).observe(host,{childList:true});
     setInterval(refresh,12000);
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
