@@ -1528,7 +1528,7 @@ function parseDelimitedResults(txt,provider){
     var ri=header?idx(header,[/\bpos/,/position/,/\brang/,/\bplace/]):0;
     var ni=header?idx(header,[/nom/,/coureur/,/athlete/]):2;
     var si=header?idx(header,[/sexe/,/\bsex\b/]):(provider==='klikego'?4:5),bi=header?idx(header,[/dossard/,/bib/]):-1;
-    var ci=header?idx(header,[/categorie/,/\bcat\b/]):(provider==='klikego'?5:4);var vi=header?idx(header,[/ville/,/city/]):(provider==='klikego'?ci+1:-1);
+    var ci=header?idx(header,[/categorie/,/\bcat\b/]):(provider==='klikego'?5:4),cli=header?idx(header,[/club/]):-1;var vi=header?idx(header,[/ville/,/city/]):(provider==='klikego'?ci+1:-1);
     var rk=rank(cells[ri]);if(!rk)continue;
     // Sans en-tête, Klikego place parfois FRA (nationalité) avant le nom.
     // On repère la cellule plutôt que de supposer une position fixe : le
@@ -1548,7 +1548,7 @@ function parseDelimitedResults(txt,provider){
     if(!tm){for(var j=0;j<cells.length;j++){var t=time(cells[j]);if(t){tm=t;break}}}
     if(!tm)continue;
     var key=(name+'|'+tm).toLowerCase();if(seen[key])continue;seen[key]=1;
-    var city=vi>=0?clean(cells[vi]):'';out.push({rk:rk,name:name,bib:/^\d+$/.test(bib)?bib:'',sex:sex==='F'||sex==='FEMME'?'F':'H',cat:cat,time:tm,city:city});
+    var city=vi>=0?clean(cells[vi]):'',club=cli>=0?clean(cells[cli]):'';out.push({rk:rk,name:name,bib:/^\d+$/.test(bib)?bib:'',sex:sex==='F'||sex==='FEMME'?'F':'H',cat:cat,time:tm,city:city,club:club});
   }
   return out;
 }
