@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELO COURSE • Règlement du site (Sarthe, Mayenne, Maine-et-Loire)</title>
+    <style>
+        /* Charte graphique stricte ELO COURSE & variables CSS */
+        :root {
+            --bg-night: #0B1724;       /* Bleu nuit principal */
+            --bg-panel: #172B3D;       /* Bleu des panneaux */
+            --bg-card: #1B3348;        /* Bleu des cartes */
+            --border-color: #294155;   /* Bordures */
+            --accent-green: #278A50;   /* Vert d'accentuation */
+            --accent-hover: #2fa35f;   /* Vert au survol */
+            --text-main: #f1f5f9;
+            --text-soft: #cbd5e1;
+            --text-muted: #94a3b8;
+            --amber-bg: rgba(245, 158, 11, 0.12);
+            --amber-border: rgba(245, 158, 11, 0.42);
+            --amber-text: #fcd34d;
+        }
+
+        /* Réinitialisation légère & typographie système instantanée sur mobile */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 5.5rem;
+        }
+
+        body {
+            background-color: var(--bg-night);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            line-height: 1.65;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Barre de navigation supérieure */
+        .navbar {
+            background-color: rgba(23, 43, 61, 0.96);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 0.85rem 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-icon {
+            background-color: var(--accent-green);
+            color: #ffffff;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .brand span {
+            color: var(--accent-green);
+        }
+
+        .editorial-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(39, 138, 80, 0.18);
+            color: #6ee7b7;
+            border: 1px solid rgba(39, 138, 80, 0.55);
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.3;
+            text-align: center;
+        }
+
+        /* En-tête Hero sobre & sportif */
+        .hero {
+            position: relative;
+            background: linear-gradient(180deg, #172B3D 0%, #0B1724 100%);
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+            padding: 2.5rem 1rem 3.25rem;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 820px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-pill {
+            display: inline-block;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: #6ee7b7;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            margin-bottom: 0.9rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.9rem, 4.2vw, 2.75rem);
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.65rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--text-soft);
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        /* Conteneur principal */
+        .main-container {
+            max-width: 920px;
+            width: 100%;
+            margin: -1.5rem auto 3rem;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 10;
+            flex-grow: 1;
+        }
+
+        /* Sommaire rapide mobile-first */
+        .toc-panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.28);
+        }
+
+        .toc-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-soft);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+        }
+
+        .toc-link:hover {
+            border-color: var(--accent-green);
+            background-color: rgba(39, 138, 80, 0.18);
+            color: #ffffff;
+        }
+
+        .toc-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background-color: rgba(39, 138, 80, 0.22);
+            color: #6ee7b7;
+            font-size: 0.72rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        /* Cartes des 10 articles du règlement */
+        .rules-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .rule-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+        }
+
+        .rule-header {
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .rule-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background-color: var(--accent-green);
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .rule-header h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .rule-body {
+            padding: 1.35rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            color: var(--text-soft);
+            font-size: 0.96rem;
+        }
+
+        .rule-body p {
+            margin: 0;
+        }
+
+        /* Encarts de paramètres / formules */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 0.75rem;
+            margin: 0.25rem 0;
+        }
+
+        .kpi-box {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 0.9rem;
+        }
+
+        .kpi-label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.2rem;
+        }
+
+        .kpi-value {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #6ee7b7;
+        }
+
+        .formula-box {
+            background-color: var(--bg-night);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .notice-amber {
+            background-color: var(--amber-bg);
+            border: 1px solid var(--amber-border);
+            color: var(--amber-text);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Liste des 5 indicateurs (Article 4) */
+        .indicators-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.2rem 0;
+        }
+
+        .indicator-pill {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 0.35rem 0.8rem;
+            border-radius: 9999px;
+        }
+
+        /* Jauges visuelles de pondération (Article 6) */
+        .gauges-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .gauge-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .gauge-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .gauge-name {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .gauge-desc {
+            color: var(--text-soft);
+            font-weight: 400;
+        }
+
+        .gauge-pct {
+            font-weight: 900;
+            color: #6ee7b7;
+            flex-shrink: 0;
+        }
+
+        .gauge-track {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg-night);
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .gauge-fill {
+            height: 100%;
+            background-color: var(--accent-green);
+            border-radius: 9999px;
+        }
+
+        /* Bouton principal e-mail (Article 10) */
+        .bug-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.35rem;
+        }
+
+        .btn-email {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--accent-green);
+            color: #ffffff;
+            text-decoration: none;
+            border: none;
+            border-radius: 12px;
+            padding: 0.85rem 1.4rem;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-email:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-email:active {
+            transform: scale(0.99);
+        }
+
+        .btn-helper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-panel);
+            color: var(--text-soft);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.85rem 1.15rem;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-helper:hover {
+            border-color: var(--accent-green);
+            color: #ffffff;
+        }
+
+        /* Mini assistant de rédaction de bug (dépliable) */
+        .bug-assistant {
+            display: none;
+            margin-top: 0.5rem;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .bug-assistant.open {
+            display: flex;
+        }
+
+        .bug-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .bug-field label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .bug-field input,
+        .bug-field textarea {
+            width: 100%;
+            background-color: var(--bg-night);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.65rem 0.85rem;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .bug-field input:focus,
+        .bug-field textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .bug-field textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        /* Pied de page */
+        footer {
+            background-color: var(--bg-panel);
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            font-size: 0.825rem;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barre de navigation ELO COURSE -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <div class="brand-icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                </div>
+                ELO<span>COURSE</span>
+            </a>
+
+            <span class="editorial-badge">Route &amp; Course Nature &bull; Hors Trail</span>
+        </div>
+    </nav>
+
+    <!-- En-tête Règlement du site -->
+    <header class="hero">
+        <svg class="hero-bg" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+                <radialGradient id="eloGlow" cx="50%" cy="50%" r="55%">
+                    <stop offset="0%" stop-color="#278A50" stop-opacity="0.35"/>
+                    <stop offset="65%" stop-color="#1B3348" stop-opacity="0.12"/>
+                    <stop offset="100%" stop-color="#0B1724" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+            <rect width="1200" height="260" fill="url(#eloGlow)"/>
+            <line x1="0" y1="210" x2="1200" y2="210" stroke="#294155" stroke-width="1.5" stroke-dasharray="10 10"/>
+        </svg>
+
+        <div class="hero-content">
+            <span class="hero-pill">Sarthe (72) &bull; Mayenne (53) &bull; Maine-et-Loire (49)</span>
+            <h1>Règlement du site</h1>
+            <p class="hero-subtitle">
+                Fonctionnement du classement ELO COURSE, formules de calcul, comparaisons, duels officiels et règles d’utilisation.
+            </p>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="main-container">
+
+        <!-- Sommaire d'accès rapide -->
+        <nav class="toc-panel" aria-label="Sommaire du règlement du site">
+            <div class="toc-title">Sommaire des rubriques</div>
+            <div class="toc-grid">
+                <a href="#article-1" class="toc-link"><span class="toc-num">1</span> Le principe</a>
+                <a href="#article-2" class="toc-link"><span class="toc-num">2</span> Le classement ELO officiel (V2)</a>
+                <a href="#article-3" class="toc-link"><span class="toc-num">3</span> Mode Ghost – Laboratoire &amp; Simulation ELO V2</a>
+                <a href="#article-4" class="toc-link"><span class="toc-num">4</span> Comparaison des coureurs</a>
+                <a href="#article-5" class="toc-link"><span class="toc-num">5</span> Les duels</a>
+                <a href="#article-6" class="toc-link"><span class="toc-num">6</span> Les cinq jauges et le score</a>
+                <a href="#article-7" class="toc-link"><span class="toc-num">7</span> Courses et résultats comptés</a>
+                <a href="#article-8" class="toc-link"><span class="toc-num">8</span> Classement commun &amp; filtres</a>
+                <a href="#article-9" class="toc-link"><span class="toc-num">9</span> Données, ELOCOINS et rectifications</a>
+                <a href="#article-10" class="toc-link"><span class="toc-num">10</span> Signaler un bug</a>
+            </div>
+        </nav>
+
+        <!-- Liste ordonnée des 10 articles -->
+        <div class="rules-stack">
+
+            <!-- 1. Le principe -->
+            <article id="article-1" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">1</span>
+                    <h2>Le principe</h2>
+                </div>
+                <div class="rule-body">
+                    <p>
+                        ELO COURSE rassemble les résultats officiels des courses sur route et des courses nature organisées en Sarthe, en Mayenne et en Maine-et-Loire. Les coureurs des autres départements peuvent également participer au classement grâce à leurs résultats sur ces épreuves.
+                    </p>
+                    <p>
+                        Chaque coureur possède une note ELO unique. Elle évolue selon ses résultats face aux autres participants, et non selon le seul temps brut réalisé.
+                    </p>
+                </div>
+            </article>
+
+            <!-- 2. Le classement ELO officiel – formule V2 en vigueur -->
+            <article id="article-2" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">2</span>
+                    <h2>Le classement ELO officiel – formule V2 en vigueur</h2>
+                </div>
+                <div class="rule-body">
+                    <div class="kpi-row">
+                        <div class="kpi-box">
+                            <span class="kpi-label">Note de départ</span>
+                            <span class="kpi-value">1 500 points</span>
+                        </div>
+                        <div class="kpi-box">
+                            <span class="kpi-label">Début d'expérience</span>
+                            <span class="kpi-value">K = 40</span>
+                        </div>
+                        <div class="kpi-box">
+                            <span class="kpi-label">Deux coureurs confirmés</span>
+                            <span class="kpi-value">K = 24</span>
+                        </div>
+                    </div>
+                    <p>Chaque coureur commence à 1 500 points. Dans une course, chaque participant est comparé aux autres : terminer devant un coureur constitue une victoire dans cette confrontation ; terminer derrière constitue une défaite ; une égalité de temps vaut un match nul.</p>
+                    <p>Le résultat attendu dépend de l'écart entre les notes ELO. À notes égales, chaque coureur a 50 % de chances théoriques de gagner. La probabilité attendue du coureur A est calculée ainsi :</p>
+                    <div class="formula-box">E = 1 / (1 + 10^((ELO adversaire − ELO A) / 400))</div>
+                    <p>La V2 tient aussi compte de l'écart relatif entre les chronos de deux participants. Le temps du plus rapide sert de référence :</p>
+                    <div class="formula-box">g = |temps A − temps B| / temps du plus rapide</div>
+                    <p>Le multiplicateur V2 appliqué à la confrontation est :</p>
+                    <div class="formula-box">M = min(1,5 ; 1 + 0,5 × ln(1 + g / 0,01))</div>
+                    <p>Le multiplicateur augmente progressivement avec l'écart relatif de temps, sans jamais dépasser 1,5. Les temps sont comparés au sein d'une même épreuve ; le calcul ne compare pas directement des chronos bruts entre distances différentes.</p>
+                    <p>Pour chaque confrontation, le coefficient est K = 40 si au moins l'un des deux coureurs en est à ses cinq premières courses ; K = 24 lorsque les deux coureurs ont déjà disputé au moins cinq courses. Les contributions de toutes les confrontations de l'épreuve sont cumulées pour obtenir l'évolution ELO de chaque participant.</p>
+                    <div class="notice-amber">Le classement officiel ELO COURSE utilise désormais la formule V2. Les simulations du Mode Ghost restent sans effet sur le classement, les résultats ou les données officielles.</div>
+                </div>
+            </article>
+
+            <!-- 3. Mode Ghost – Laboratoire & Simulation ELO V2 -->
+            <article id="article-3" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">3</span>
+                    <h2>Mode Ghost – Laboratoire &amp; Simulation ELO V2</h2>
+                </div>
+                <div class="rule-body">
+                    <p>Le Mode Ghost est un laboratoire d'essais sportifs et de simulation. Il permet de tester des chronos, des confrontations et des profils à partir des paramètres de la formule ELO V2, sans modifier le classement officiel.</p>
+                    <div class="indicators-pills" aria-label="Les quatre modules du Mode Ghost">
+                        <span class="indicator-pill">👻 Ghost Duel</span>
+                        <span class="indicator-pill">🏃 Toi vs Toi</span>
+                        <span class="indicator-pill">⏱ Calculateur d'allure</span>
+                        <span class="indicator-pill">📊 Profil Fantôme</span>
+                    </div>
+                    <p>Le Ghost Duel exploite les courses, les participants, les chronos et les notes ELO réels disponibles dans ELO COURSE. Lorsqu'un coureur est connecté et que son profil est validé, son ELO actuel et son expérience sont repris pour la simulation.</p>
+                    <p>Les quatre modules permettent également de saisir une distance personnalisée. Les distances de référence retenues sont de 21 km pour le semi-marathon et 42 km pour le marathon.</p>
+                    <div class="notice-amber">Une simulation Ghost ne crée aucun résultat officiel, ne change aucun ELO et ne modifie jamais les données Supabase. Seuls les résultats officiels intégrés au classement peuvent faire évoluer la note ELO.</div>
+                </div>
+            </article>
+
+            <!-- 4. Comparaison des coureurs -->
+            <article id="article-4" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">4</span>
+                    <h2>Comparaison des coureurs</h2>
+                </div>
+                <div class="rule-body">
+                    <p>
+                        La rubrique Comparaison permet de choisir librement deux profils et de consulter leurs notes ELO, leurs classements, leurs chronos, leurs statistiques, leurs courses communes et leurs confrontations passées. Cette comparaison est libre : aucune invitation ni acceptation n’est nécessaire.
+                    </p>
+                    <div class="indicators-pills" aria-label="Les cinq indicateurs">
+                        <span class="indicator-pill">⚡ Vitesse</span>
+                        <span class="indicator-pill">💪 Force</span>
+                        <span class="indicator-pill">🏆 ELO</span>
+                        <span class="indicator-pill">📈 Régularité</span>
+                        <span class="indicator-pill">🎯 Expérience</span>
+                    </div>
+                    <p>
+                        Les cinq indicateurs présentés sont la vitesse, la force, l’ELO, la régularité et l’expérience. Les données disponibles sont affichées pour aider à comprendre les différences entre les deux profils.
+                    </p>
+                </div>
+            </article>
+
+            <!-- 5. Les duels : un défi accepté par les deux coureurs -->
+            <article id="article-5" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">5</span>
+                    <h2>Les duels : un défi accepté par les deux coureurs</h2>
+                </div>
+                <div class="rule-body">
+                    <p>
+                        La rubrique Duel sert à lancer un défi sportif sur une course précise. Le coureur choisit une épreuve à laquelle il participe, puis recherche son adversaire parmi les profils ELO COURSE ou les participants identifiés sur une plateforme de résultats comme Klikego.
+                    </p>
+                    <p>
+                        Un participant trouvé sur une plateforme externe doit être correctement identifié et relié à son profil ELO COURSE. Une simple ressemblance de nom ne suffit pas pour fusionner deux profils.
+                    </p>
+                    <p>
+                        L’invitation doit être acceptée par l’adversaire pour devenir un duel officiel. Celui-ci peut accepter ou refuser. En cas de refus, le duel est annulé sans pénalité. En l’absence de réponse, l’invitation reste en attente jusqu’à son expiration, selon le délai qui sera défini.
+                    </p>
+                    <p>
+                        Après la course, le résultat est établi à partir du classement officiel publié par le chronométreur. Le duel ne peut être déclaré terminé avant que les résultats exploitables soient disponibles.
+                    </p>
+                </div>
+            </article>
+
+            <!-- 6. Les cinq jauges et le score du combat -->
+            <article id="article-6" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">6</span>
+                    <h2>Les cinq jauges et le score du combat</h2>
+                </div>
+                <div class="rule-body">
+                    <p>
+                        Avant la course, les cinq jauges servent à comparer le profil des deux adversaires et à présenter un favori statistique. La pondération proposée pour le score comparatif est :
+                    </p>
+
+                    <div class="gauges-list">
+                        <div class="gauge-item">
+                            <div class="gauge-top">
+                                <span><strong class="gauge-name">ELO : 30 %</strong> <span class="gauge-desc">– niveau officiel actuel du coureur.</span></span>
+                                <span class="gauge-pct">30 %</span>
+                            </div>
+                            <div class="gauge-track"><div class="gauge-fill" style="width: 30%;"></div></div>
+                        </div>
+
+                        <div class="gauge-item">
+                            <div class="gauge-top">
+                                <span><strong class="gauge-name">Force : 25 %</strong> <span class="gauge-desc">– niveau des performances et des adversaires rencontrés.</span></span>
+                                <span class="gauge-pct">25 %</span>
+                            </div>
+                            <div class="gauge-track"><div class="gauge-fill" style="width: 25%;"></div></div>
+                        </div>
+
+                        <div class="gauge-item">
+                            <div class="gauge-top">
+                                <span><strong class="gauge-name">Vitesse : 20 %</strong> <span class="gauge-desc">– performances chronométriques rapportées à des distances comparables.</span></span>
+                                <span class="gauge-pct">20 %</span>
+                            </div>
+                            <div class="gauge-track"><div class="gauge-fill" style="width: 20%;"></div></div>
+                        </div>
+
+                        <div class="gauge-item">
+                            <div class="gauge-top">
+                                <span><strong class="gauge-name">Régularité : 15 %</strong> <span class="gauge-desc">– constance des performances d’une course à l’autre.</span></span>
+                                <span class="gauge-pct">15 %</span>
+                            </div>
+                            <div class="gauge-track"><div class="gauge-fill" style="width: 15%;"></div></div>
+                        </div>
+
+                        <div class="gauge-item">
+                            <div class="gauge-top">
+                                <span><strong class="gauge-name">Expérience : 10 %</strong> <span class="gauge-desc">– quantité de résultats exploitables, sans récompenser automatiquement le simple fait d’avoir beaucoup couru.</span></span>
+                                <span class="gauge-pct">10 %</span>
+                            </div>
+                            <div class="gauge-track"><div class="gauge-fill" style="width: 10%;"></div></div>
+                        </div>
+                    </div>
+
+                    <p>
+                        Pour chaque critère, les deux parts comparatives sont ramenées à un total de 100. Le score final est la somme des cinq parts, chacune multipliée par son coefficient. Exemple de formule pour le coureur A : score A = 0,30 × ELO A + 0,25 × Force A + 0,20 × Vitesse A + 0,15 × Régularité A + 0,10 × Expérience A.
+                    </p>
+
+                    <div class="formula-box">
+                        score A = 0,30 × ELO A + 0,25 × Force A + 0,20 × Vitesse A + 0,15 × Régularité A + 0,10 × Expérience A
+                    </div>
+
+                    <p>
+                        Le total des deux coureurs est donc de 100 points. Ce score indique le favori avant la course ; il ne remplace pas le résultat sportif réel. Le vainqueur du duel est déterminé par le classement officiel de l’épreuve et ses règles de classement.
+                    </p>
+                    <p>
+                        La pondération est retenue comme base de simulation. Les formules détaillées et les contrôles de fiabilité des jauges doivent être vérifiés avant activation dans le site.
+                    </p>
+                </div>
+            </article>
+
+            <!-- 7. Quelles courses et quels résultats comptent ? -->
+            <article id="article-7" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">7</span>
+                    <h2>Quelles courses et quels résultats comptent ?</h2>
+                </div>
+                <div class="rule-body">
+                    <p>
+                        Le classement s’appuie sur les résultats officiels des courses chronométrées intégrées à ELO COURSE. Les courses prises en compte sont celles organisées dans les trois départements couverts. Les résultats doivent permettre d’identifier les coureurs, leur classement et, lorsque nécessaire, leur temps.
+                    </p>
+                </div>
+            </article>
+
+            <!-- 8. Un classement commun, des filtres par catégorie -->
+            <article id="article-8" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">8</span>
+                    <h2>Un classement commun, des filtres par catégorie</h2>
+                </div>
+                <div class="rule-body">
+                    <p>
+                        Chaque coureur possède un seul ELO, séparé entre la route et les courses nature. Les filtres par sexe ou catégorie servent à consulter des classements spécifiques ; ils ne changent pas la note ELO.
+                    </p>
+                    <p>
+                        Les catégories suivent les catégories d’âge de la Fédération française d’athlétisme. Elles évoluent selon les règles fédérales, notamment au changement de saison le 1er septembre.
+                    </p>
+                </div>
+            </article>
+
+            <!-- 9. Données, ELOCOINS et rectifications -->
+            <article id="article-9" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">9</span>
+                    <h2>Données, ELOCOINS et rectifications</h2>
+                </div>
+                <div class="rule-body">
+                    <p>Les fiches sportives peuvent être créées à partir des résultats importés. Un coureur peut demander une correction ou le retrait de sa fiche auprès de l’administration.</p>
+                    <p><strong>Bonus de bienvenue :</strong> 50 ELOCOINS sont crédités une seule fois lorsque le compte du nouveau coureur est validé.</p>
+                    <p><strong>Récompense par course :</strong> chaque résultat officiel enregistré et validé rapporte 10 ELOCOINS au coureur concerné.</p>
+                    <p><strong>Bonus Top 100 :</strong> un bonus supplémentaire récompense les 100 premiers : 100 ELOCOINS au 1er, 99 au 2e, puis une pièce de moins par place jusqu'à 1 ELOCOIN au 100e. À partir de la 101e place, aucun bonus de classement n'est ajouté.</p>
+                    <p><strong>Courses historiques :</strong> les résultats des courses déjà intégrées sont également pris en compte lorsque le compte coureur est validé et relié au profil. Chaque couple coureur/course ne peut être récompensé qu'une seule fois, même si les résultats sont réimportés.</p>
+                    <p><strong>Parrainage :</strong> le filleul reçoit les 50 ELOCOINS de bienvenue à la validation de son compte. Le parrain reçoit 20 ELOCOINS lorsque le compte du filleul est validé. Un filleul ne peut avoir qu'un seul parrain ; un parrain peut avoir autant de filleuls qu'il le souhaite. Chaque prime est attribuée une seule fois.</p>
+                    <p>La simple connexion quotidienne ne rapporte pas de pièces : les ELOCOINS sont gagnés par les résultats de course et les bonus de compte/parrainage. Les crédits sont enregistrés dans l'historique du portefeuille.</p>
+                </div>
+            </article>
+
+            <!-- 10. Signaler un bug -->
+            <article id="article-10" class="rule-card">
+                <div class="rule-header">
+                    <span class="rule-badge">10</span>
+                    <h2>Signaler un bug</h2>
+                </div>
+                <div class="rule-body">
+                    <p>
+                        Un souci ? Décris ce qui s’est passé, la page concernée et l’appareil utilisé, puis envoie-le par e-mail.
+                    </p>
+
+                    <div class="bug-actions">
+                        <a id="mailtoDirectBtn" href="mailto:mimi.6q@live.fr?subject=Signalement%20d%27un%20bug%20-%20ELO%20COURSE&body=Bonjour%2C%0A%0AVoici%20le%20souci%20rencontr%C3%A9%20sur%20ELO%20COURSE%20%3A%0A-%20Ce%20qui%20s%27est%20pass%C3%A9%20%3A%20%0A-%20Page%20concern%C3%A9e%20%3A%20%0A-%20Appareil%20utilis%C3%A9%20(t%C3%A9l%C3%A9phone%2C%20ordinateur%2C%20navigateur)%20%3A%20%0A" class="btn-email">
+                            <span>✉️ Envoyer par e-mail</span>
+                        </a>
+                        <button type="button" id="toggleBugHelper" class="btn-helper">
+                            Préparer le message ici
+                        </button>
+                    </div>
+
+                    <!-- Assistant optionnel pour pré-remplir le mailto avant envoi -->
+                    <div id="bugAssistant" class="bug-assistant">
+                        <div class="bug-field">
+                            <label for="bugPage">Page concernée</label>
+                            <input type="text" id="bugPage" placeholder="Ex : Classement ELO, Fiche coureur, Espace organisateur...">
+                        </div>
+                        <div class="bug-field">
+                            <label for="bugDevice">Appareil utilisé</label>
+                            <input type="text" id="bugDevice" placeholder="Ex : iPhone Safari, Android Chrome, PC...">
+                        </div>
+                        <div class="bug-field">
+                            <label for="bugDesc">Ce qui s’est passé</label>
+                            <textarea id="bugDesc" placeholder="Décris brièvement le problème constaté..."></textarea>
+                        </div>
+                        <div>
+                            <a id="mailtoPreparedBtn" href="mailto:mimi.6q@live.fr?subject=Signalement%20d%27un%20bug%20-%20ELO%20COURSE" class="btn-email">
+                                <span>✉️ Envoyer par e-mail</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+        &copy; 2026 ELO COURSE &bull; Règlement du site &bull; Route &amp; Course Nature (hors trail) en Sarthe (72), Mayenne (53) et Maine-et-Loire (49).
+    </footer>
+
+    <!-- Script minimaliste et non bloquant pour l'assistant e-mail -->
+    <script>
+        (function () {
+            const toggleBtn = document.getElementById('toggleBugHelper');
+            const assistant = document.getElementById('bugAssistant');
+            const bugPage = document.getElementById('bugPage');
+            const bugDevice = document.getElementById('bugDevice');
+            const bugDesc = document.getElementById('bugDesc');
+            const preparedBtn = document.getElementById('mailtoPreparedBtn');
+
+            function updateMailto() {
+                const subject = encodeURIComponent("Signalement d'un bug - ELO COURSE");
+                const bodyText =
+                    "Bonjour,\n\n" +
+                    "Voici le souci rencontré sur ELO COURSE :\n" +
+                    "- Ce qui s'est passé : " + (bugDesc.value.trim() || "") + "\n" +
+                    "- Page concernée : " + (bugPage.value.trim() || "") + "\n" +
+                    "- Appareil utilisé : " + (bugDevice.value.trim() || "") + "\n";
+                preparedBtn.href = "mailto:mimi.6q@live.fr?subject=" + subject + "&body=" + encodeURIComponent(bodyText);
+            }
+
+            toggleBtn.addEventListener('click', function () {
+                assistant.classList.toggle('open');
+                if (assistant.classList.contains('open')) {
+                    updateMailto();
+                    bugPage.focus();
+                }
+            });
+
+            [bugPage, bugDevice, bugDesc].forEach(function (field) {
+                field.addEventListener('input', updateMailto);
+            });
+        })();
+    </script>
+</body>
+</html>
