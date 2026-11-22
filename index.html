@@ -1515,6 +1515,16 @@ function parseDelimitedResults(txt,provider){
     var joined=norm(cells.join(' '));
     if(/(?:pos|position|rang|place)/.test(joined)&&/(?:nom|coureur|athlete)/.test(joined)){header=cells;continue}
     if(cells.every(function(x){return !x||/^[-:]+$/.test(x)}))continue;
+    // Tableau Markdown simple : Classement | Nom Prénom | Club | Catégorie | Chrono.
+    // Le format sans en-tête est fréquent dans les copier-coller du Maine Libre.
+    if(!header&&cells.length===5){
+      var simpleRank=rank(cells[0]),simpleName=clean(cells[1]),simpleClub=clean(cells[2]),simpleCat=clean(cells[3]),simpleTime=time(cells[4]);
+      if(simpleRank&&simpleName&&simpleClub&&simpleTime&&/^(?:SE|ES|JU|CA|MI|BE|PO|M\\d{1,2})(?:[MF])?$/i.test(simpleCat)){
+        var simpleKey=simpleRank+"|"+norm(simpleName)+"|"+simpleTime;
+        if(!seen[simpleKey]){seen[simpleKey]=1;out.push({rk:simpleRank,name:simpleName,club:simpleClub,sex:/F$/i.test(simpleCat)?"F":"H",cat:simpleCat.replace(/[MF]$/i,"").toUpperCase(),time:simpleTime,city:""});}
+        continue;
+      }
+    }
     var ri=header?idx(header,[/\bpos/,/position/,/\brang/,/\bplace/]):0;
     var ni=header?idx(header,[/nom/,/coureur/,/athlete/]):2;
     var si=header?idx(header,[/sexe/,/\bsex\b/]):(provider==='klikego'?4:5),bi=header?idx(header,[/dossard/,/bib/]):-1;
