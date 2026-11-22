@@ -1890,7 +1890,7 @@ document.addEventListener("input",function(e){
 })();
 function sendGhostRealRaces(){
   var frame=document.getElementById("ghost-frame");if(!frame||!frame.contentWindow||!Array.isArray(S.races)||!Array.isArray(S.runners))return;
-  var st=eloCache.all||ALL||{};if(!Object.keys(st).length)return;
+  var st=eloCache.all||ALL||{};if(!Object.keys(st).length&&eloPending.all)return;
   var runnersById={};S.runners.forEach(function(r){runnersById[String(r.id)]=r;});
   var races=S.races.map(function(c){
     var rawDist=String(c.dist||c.distance||"").trim(),dist=parseFloat(rawDist.replace(",","."));if(!(dist>0)){var nd=norm(rawDist);if(nd.indexOf("semi")>=0)dist=21;else if(nd.indexOf("marathon")>=0)dist=42;}if(!(dist>0))return null;
