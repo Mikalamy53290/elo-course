@@ -1503,6 +1503,15 @@ function parseMamertines(txt){
   });
   return out;
 }
+// Convertit les codes de catégorie avec suffixe de sexe (ex. M0F, M1H, SEF, SEM).
+// Le suffixe explicite prime sur une colonne sexe séparée éventuellement absente ou erronée.
+function parseCategorySex(value,sexValue){
+  var raw=String(value||"").trim().toUpperCase().replace(/\s+/g,"");
+  var m=raw.match(/^(CA|JU|ES|SE|MI|BE|PO|M\d{1,2})([MFH])?$/);
+  if(!m)return {cat:"",sex:normalizeSex(sexValue)};
+  var suffix=m[2]||"";
+  return {cat:m[1],sex:suffix?(suffix==="F"?"F":"H"):normalizeSex(sexValue)};
+}
 function parseDelimitedResults(txt,provider){
   var lines=String(txt||'').replace(/\r/g,'\n').split(/\n+/),out=[],seen={},header=null;
   function clean(v){return String(v||'').replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/<img\b[^>]*>/gi,'').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/<[^>]*>/g,'').replace(/\*\*/g,'').replace(/`/g,'').replace(/\s+/g,' ').trim()}
@@ -1510,7 +1519,7 @@ function parseDelimitedResults(txt,provider){
   function rank(v){var x=clean(v),m=x.match(/(?:^|\D)(\d{1,5})\s*(?:er|e|è|ème)?(?:\s|$)/i);return m?Number(m[1]):0}
   function time(v){var x=clean(v).replace(/\s/g,'');return /^\d{1,2}:\d{2}(?::\d{2})?$/.test(x)?secs(x):0}
   function cellsOf(line){if(line.indexOf('|')>=0){var c=line.split('|').map(clean);if(c[0]==='')c.shift();if(c[c.length-1]==='')c.pop();return c}if(line.indexOf('\t')>=0)return line.split('\t').map(clean);return null}
-  function category(v){return /^(?:CA|JU|ES|SE|MI|BE|PO|M\d{1,2})(?:[MF])?$/i.test(clean(v))}
+  function category(v){return !!parseCategorySex(clean(v),"").cat}
   for(var li=0;li<lines.length;li++){
     var cells=cellsOf(lines[li]);if(!cells||cells.length<4)continue;
     var joined=norm(cells.join(' '));
@@ -1540,8 +1549,8 @@ function parseDelimitedResults(txt,provider){
       // Sans cette détection, l'ancien index par défaut (cellule 3) prenait le club pour le nom.
       if(cells.length===5&&rk&&time(cells[4])&&category(cells[3])&&clean(cells[1])&&clean(cells[2])){
         var canonicalName=clean(cells[1]),canonicalCat=clean(cells[3]),canonicalSex='';
-        var cmc=canonicalCat.match(/^(SE|ES|JU|CA|MI|BE|PO)([MF])$/i);
-        if(cmc){canonicalCat=cmc[1].toUpperCase();canonicalSex=cmc[2].toUpperCase()==='F'?'F':'H';}
+        var canonicalInfo=parseCategorySex(canonicalCat,"");
+        if(canonicalInfo.cat){canonicalCat=canonicalInfo.cat;canonicalSex=canonicalInfo.sex;}
         var canonicalTime=time(cells[4]),canonicalKey=(canonicalName+'|'+canonicalTime).toLowerCase();
         if(!seen[canonicalKey]){seen[canonicalKey]=1;out.push({rk:rk,name:canonicalName,club:clean(cells[2]),sex:canonicalSex,cat:canonicalCat,time:canonicalTime,city:''});}
         continue;
@@ -1562,7 +1571,7 @@ function parseDelimitedResults(txt,provider){
     if(!name||/^(nom|prénom|prenom|coureur|FRA)$/i.test(name))continue;
     var sex=si>=0?clean(cells[si]).toUpperCase():'';
     if(!/^(F|M|H|FEMME|HOMME)$/.test(sex))sex='';
-    var cat=ci>=0?clean(cells[ci]):'';var cm=cat.match(/\b(CA|JU|ES|SE|MI|BE|PO|M\d{1,2})\b/i);cat=cm?cm[1].toUpperCase():'SE';
+    var catRaw=ci>=0?clean(cells[ci]):'';var catInfo=parseCategorySex(catRaw,sex);var cat=catInfo.cat||'SE';if(catInfo.sex)sex=catInfo.sex;
     var ti=header?idx(header,[/temps officiel/,/chrono officiel/,/^temps$/, /chrono/,/time/]): -1;
     var tm=ti>=0?time(cells[ti]):0;
     if(!tm){for(var j=0;j<cells.length;j++){var t=time(cells[j]);if(t){tm=t;break}}}
@@ -1583,7 +1592,8 @@ function parseKlikego(txt){
     name=cleanCell(name);time=cleanCell(time);
     if(!name||isAnonymousRunnerName(name)||!time||!/^(?:\d{1,2}:)?\d{1,2}:\d{2}:\d{2}$/.test(time))return;
     var key=(name+"|"+time).toLowerCase();if(seen[key])return;seen[key]=1;
-    out.push({rk:Number(rk)||0,name:name,sex:/^F$/i.test(cleanCell(sex))?"F":"H",cat:cleanCell(cat)||"SE",time:secs(time),city:cleanCell(city||"")});
+    var categoryInfo=parseCategorySex(cat,sex);
+    out.push({rk:Number(rk)||0,name:name,sex:categoryInfo.sex||(/^F$/i.test(cleanCell(sex))?"F":"H"),cat:categoryInfo.cat||cleanCell(cat)||"SE",time:secs(time),city:cleanCell(city||"")});
   }
   function rankFrom(v){var x=cleanCell(v);var m=x.match(/(\d+)\s*(?:er|e|è|ème)/i)||x.match(/^(\d+)$/);return m?m[1]:"";}
   // Klikego table copied as Markdown (including medal SVGs rendered as image links).
@@ -1598,7 +1608,8 @@ function parseKlikego(txt){
     var nameIndex=nat>=0?nat+1:2,sexIndex=-1;
     for(var sx=nameIndex+1;sx<Math.min(cells.length,nameIndex+5);sx++)if(/^[MF]$/i.test(cells[sx])){sex=cells[sx];sexIndex=sx;break;}
     // Klikego insère parfois le rang de catégorie (1er, 26e...) avant le code M3/SE.
-    for(var i=sexIndex+1;i<Math.min(cells.length,sexIndex+7);i++)if(/^(?:CA|JU|ES|SE|M\d{1,2})$/i.test(cells[i])){cat=cells[i];break;}
+    for(var i=sexIndex+1;i<Math.min(cells.length,sexIndex+7);i++)if(parseCategorySex(cells[i],"").cat){cat=cells[i];break;}
+    var parsedCat=parseCategorySex(cat,sex);cat=parsedCat.cat||cat;if(parsedCat.sex)sex=parsedCat.sex;
     for(var j=0;j<cells.length;j++)if(/^\d{1,2}:\d{2}:\d{2}$/.test(cells[j]))times.push(cells[j]);
     var city=cat?cells[cells.indexOf(cat)+1]||"":"";if(name&&/^[MF]$/i.test(sex)&&times.length)add(rk,name,sex,cat,times[0],city);
   });
@@ -1614,7 +1625,8 @@ function parseKlikego(txt){
     var name=vals[0]||"",sex="",cat="",times=[];
     for(var k=1;k<vals.length;k++){
       if(/^[MF]$/i.test(vals[k])){sex=vals[k];
-        for(var z=k+1;z<Math.min(vals.length,k+5);z++)if(/^(?:CA|JU|ES|SE|M\d{1,2})$/i.test(vals[z])){cat=vals[z];break;}
+        for(var z=k+1;z<Math.min(vals.length,k+5);z++)if(parseCategorySex(vals[z],"").cat){cat=vals[z];break;}
+        var parsedCat=parseCategorySex(cat,sex);cat=parsedCat.cat||cat;if(parsedCat.sex)sex=parsedCat.sex;
       }
       if(/^\d{1,2}:\d{2}:\d{2}$/.test(vals[k]))times.push(vals[k]);
     }
@@ -1657,9 +1669,9 @@ function parseIpitos(txt){
     if(!name||/^(nom|résultat|resultat)$/i.test(name))return;
     var tm=parseTime(timeCell);
     if(!tm)return;
-    var info=(c[6]||'').toUpperCase(),catMatch=info.match(/^(SEM|SEF|ESM|ESF|JUM|JUF|MAM|MAF|CAM|CAF|MIN|MIF|BEF|BEM|POM|POF|M\d|F\d)/);
+    var info=(c[6]||'').toUpperCase(),catMatch=info.match(/^(SEM|SEF|ESM|ESF|JUM|JUF|MAM|MAF|CAM|CAF|MIN|MIF|BEF|BEM|POM|POF|M\d{1,2}[FH]?|F\d)/);
     var sex=/F/.test((catMatch&&catMatch[1])||'')?'F':'H',cat='SE';
-    if(catMatch){var code=catMatch[1];cat=/^(SE|ES|JU|CA|MI|BE|PO|MA)/.exec(code);cat=cat?cat[1]:'SE';}
+    if(catMatch){var code=catMatch[1],catInfo=parseCategorySex(code,sex);cat=catInfo.cat||(/^(SE|ES|JU|CA|MI|BE|PO|MA)/.exec(code)||['SE'])[0];sex=catInfo.sex||sex;}
     var key=(name+'|'+tm).toLowerCase();if(seen[key])return;seen[key]=1;
     out.push({rk:rk,name:name,sex:sex,cat:cat,time:tm});
   });
