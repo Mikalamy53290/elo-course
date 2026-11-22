@@ -1694,7 +1694,7 @@ function parseKlikegoOld(txt){
 }
 function titleCase(s){return s.toLowerCase().replace(/(^|[\s'-])(\S)/g,function(m,a,b){return a+b.toUpperCase()})}
 function normCity(s){return norm(String(s||"").replace(/\([^)]*\)/g," ").replace(/\b\d{5}\b/g," ")).trim()}
-async function loadCitiesFor(ids){var out={};ids=Array.from(new Set(ids||[])).filter(Boolean);for(var i=0;i<ids.length;i+=100){try{var q=await sb.from("runner_profile_details").select("runner_id,city").in("runner_id",ids.slice(i,i+100));if(!q.error)(q.data||[]).forEach(function(x){if(x.city)out[x.runner_id]=x.city;});}catch(e){}}return out;}
+async function loadCitiesFor(ids){var out={};ids=Array.from(new Set(ids||[])).filter(Boolean);var batches=[];for(var i=0;i<ids.length;i+=500)batches.push(ids.slice(i,i+500));var results=await Promise.all(batches.map(async function(batch){try{return await sb.from("runner_profile_details").select("runner_id,city").in("runner_id",batch)}catch(e){return {error:e,data:[]}}}));results.forEach(function(q){if(!q.error)(q.data||[]).forEach(function(x){if(x.city)out[x.runner_id]=x.city;});});return out;}
 function sameRunnerName(a,b){
   var x=norm(a).trim().split(/\s+/).filter(Boolean).sort(),y=norm(b).trim().split(/\s+/).filter(Boolean).sort();
   return x.length>=2&&x.length===y.length&&x.every(function(w,i){return w===y[i]});
@@ -1735,25 +1735,24 @@ async function addRace(){
   txt=txt.normalize("NFC");var ents=parseMamertines(txt);if(!ents.length)ents=parseRaceScore(txt);if(!ents.length)ents=parseBreizhChrono(txt);if(!ents.length)ents=parseKlikego(txt);if(!ents.length)ents=parseIpitos(txt);
   if(!ents.length)txt.split(/\n/).forEach(function(l){var m=l.match(/\d{1,2}:\d{2}:\d{2}|\d{1,3}:\d{2}/);if(m)ents.push({name:l,time:secs(m[0])})});
   var res=[],pendingResults=[],seen={},seenPending={},anonymousSkipped=0,unmatched=0,autoCreated=0,createdRunnerIds=[],unmatchedNames=[],ambiguousNames=[];
-  var candidateIds=[];ents.forEach(function(en){var tk=norm(en.name).trim().split(/\s+/).filter(Boolean).sort();if(tk.length<2)return;S.runners.forEach(function(rr){if(rr.demo)return;var ww=norm(rr.name).trim().split(/\s+/).filter(Boolean).sort();if(ww.length===tk.length&&ww.every(function(w,j){return w===tk[j]}))candidateIds.push(rr.id);});});var cityById=await loadCitiesFor(candidateIds);
+  // Index en mémoire : une seule lecture des fiches, puis accès direct par nom normalisé.
+  // Évite le double parcours résultats × coureurs qui rendait les imports de plusieurs milliers de lignes très lents.
+  function runnerKey(value){return norm(value).trim().split(/\s+/).filter(Boolean).sort().join(' ')}
+  var runnerIndex=Object.create(null),candidateIds=[];
+  S.runners.forEach(function(rr){if(rr.demo)return;var key=runnerKey(rr.name);if(key.split(' ').filter(Boolean).length<2)return;(runnerIndex[key]||(runnerIndex[key]=[])).push(rr);});
+  ents.forEach(function(en){var key=runnerKey(en.name),matches=runnerIndex[key]||[];if(matches.length)matches.forEach(function(rr){candidateIds.push(rr.id);});});
+  var cityById=await loadCitiesFor(candidateIds);
   ents.forEach(function(en){
     if(isAnonymousRunnerName(en.name)){anonymousSkipped++;return;}
     // Correspondance stricte sur tous les mots, quel que soit leur ordre.
     // Si aucune fiche n'existe, on la crée à partir du résultat officiel.
-    var tokens=norm(en.name).trim().split(/\s+/).filter(Boolean).sort(),matches=[];
-    if(tokens.length>=2){
-      for(var i=0;i<S.runners.length;i++){
-        var runner=S.runners[i];if(runner.demo)continue;
-        var ws=norm(runner.name).trim().split(/\s+/).filter(Boolean).sort();
-        if(ws.length===tokens.length&&ws.every(function(w,j){return w===tokens[j]}))matches.push(runner);
-      }
-    }
+    var tokens=runnerKey(en.name).split(' ').filter(Boolean),matches=tokens.length>=2?(runnerIndex[tokens.join(' ')]||[]):[];
     var r=null,sourceCity=normCity(en.city||'');
     if(matches.length===1){var knownCity=normCity(cityById[matches[0].id]||(runnerDetails[matches[0].id]||{}).city||matches[0].city||'');if(sourceCity&&knownCity&&sourceCity!==knownCity)r=null;else r=matches[0];}
     else if(matches.length>1&&sourceCity){var cityMatches=matches.filter(function(x){var c=normCity(cityById[x.id]||(runnerDetails[x.id]||{}).city||x.city||'');return c&&c===sourceCity;});if(cityMatches.length===1)r=cityMatches[0];}
     if(!r&&matches.length===0&&tokens.length>=2){
       r={id:uid(),name:String(en.name||'').replace(/\s+/g,' ').trim(),sex:normalizeSex(en.sex)||'',cat:normalizeCategory(en.cat)||'',city:String(en.city||'').trim(),club:String(en.club||'').trim()};
-      S.runners.push(r);autoCreated++;createdRunnerIds.push(r.id);
+      S.runners.push(r);(runnerIndex[tokens.join(' ')]||(runnerIndex[tokens.join(' ')]=[])).push(r);autoCreated++;createdRunnerIds.push(r.id);
     }
     if(r&&en.club&&!String(r.club||'').trim())r.club=String(en.club).trim();
     if(!r){
