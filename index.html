@@ -1948,6 +1948,16 @@ document.addEventListener("click",function(e){
 
 document.addEventListener("click",function(e){
   var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act,v=b.dataset.v;
+  if(a==="focus_signup_identity"){
+    var identityField=document.getElementById("runneremail");
+    if(identityField){identityField.scrollIntoView({behavior:"smooth",block:"center"});identityField.focus();}
+    return;
+  }
+  if(a==="focus_signup_runner"){
+    var runnerField=document.getElementById("runnersearch");
+    if(runnerField){runnerField.scrollIntoView({behavior:"smooth",block:"center"});runnerField.focus();}
+    return;
+  }
   if(a==="racepage"){
     S.raceResultsPage=Math.max(1,Number(v)||1);
     var list=document.getElementById("race-result-list"),course=S.races.filter(function(c){return String(c.id)===String(S.open);})[0];
