@@ -1663,7 +1663,7 @@ function parseKlikegoOld(txt){
 }
 function titleCase(s){return s.toLowerCase().replace(/(^|[\s'-])(\S)/g,function(m,a,b){return a+b.toUpperCase()})}
 function normCity(s){return norm(String(s||"").replace(/\([^)]*\)/g," ").replace(/\b\d{5}\b/g," ")).trim()}
-async function loadCitiesFor(ids){var out={};ids=Array.from(new Set(ids||[])).filter(Boolean);var batches=[];for(var i=0;i<ids.length;i+=100)batches.push(ids.slice(i,i+100));await Promise.all(batches.map(async function(batch){try{var q=await sb.from("runner_profile_details").select("runner_id,city").in("runner_id",batch);if(!q.error)(q.data||[]).forEach(function(x){if(x.city)out[x.runner_id]=x.city;});}catch(e){}}));return out;}
+async function loadCitiesFor(ids){var out={};ids=Array.from(new Set(ids||[])).filter(Boolean);var batches=[];for(var i=0;i<ids.length;i+=100)batches.push(ids.slice(i,i+100));for(var j=0;j<batches.length;j+=5){await Promise.all(batches.slice(j,j+5).map(async function(batch){try{var q=await sb.from("runner_profile_details").select("runner_id,city").in("runner_id",batch);if(!q.error)(q.data||[]).forEach(function(x){if(x.city)out[x.runner_id]=x.city;});}catch(e){}}));}return out;}
 function runnerMatchKey(name){var words=norm(name).trim().split(/\s+/).filter(Boolean).sort();return words.length>=2?words.join(" "):"";}
 function sameRunnerName(a,b){var x=runnerMatchKey(a),y=runnerMatchKey(b);return !!x&&x===y;}
 function promotePendingProfiles(){
