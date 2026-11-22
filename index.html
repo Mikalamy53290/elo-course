@@ -1521,11 +1521,13 @@ function parseDelimitedResults(txt,provider){
       var ri=idx(header,[/\bpos/,/position/,/\brang/,/\bplace/,/classement/]);
       rk=ri>=0?rank(cells[ri]):0;
       // Ne jamais confondre « Nom du club » avec le nom du participant.
-      ni=idx(header,[/nom.*prenom|prenom.*nom/,/nom.*coureur|coureur.*nom/,/^nom complet$/, /^coureur$/, /^athlete$/, /^nom$/]);
-      if(ni<0){
-        lastNameIdx=idx(header,[/^nom$/]);
-        firstNameIdx=idx(header,[/^prenom$/]);
-        if(lastNameIdx<0||firstNameIdx<0){lastNameIdx=-1;firstNameIdx=-1;}
+      lastNameIdx=idx(header,[/^nom$/]);
+      firstNameIdx=idx(header,[/^prenom$/]);
+      if(lastNameIdx>=0&&firstNameIdx>=0){
+        ni=-1;
+      }else{
+        lastNameIdx=-1;firstNameIdx=-1;
+        ni=idx(header,[/nom.*prenom|prenom.*nom/,/nom.*coureur|coureur.*nom/,/^nom complet$/, /^coureur$/, /^athlete$/, /^nom$/]);
       }
       si=idx(header,[/sexe/,/^sex$/]);
       bi=idx(header,[/dossard/,/bib/]);
