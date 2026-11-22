@@ -75,7 +75,7 @@ BEGIN
           ORDER BY rr.time_seconds NULLS LAST
         ) AS computed_rank
       FROM raw_results AS rr
-      WHERE rr.imported_rank IS NOT NULL OR rr.time_seconds IS NOT NULL
+      WHERE rr.imported_rank > 0 OR rr.time_seconds > 0
     ),
     runner_races AS (
       SELECT DISTINCT ON (race_id)
@@ -176,6 +176,11 @@ SECURITY DEFINER
 SET search_path TO public, pg_temp
 AS $function$
 BEGIN
+  IF TG_OP = 'UPDATE'
+     AND NEW.data->'races' IS NOT DISTINCT FROM OLD.data->'races' THEN
+    RETURN NEW;
+  END IF;
+
   PERFORM public.elocoins_credit_all_race_rewards();
   RETURN NEW;
 END;
