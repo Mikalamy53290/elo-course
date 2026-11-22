@@ -4,3 +4,4 @@ supabase/
 worker.js
 wrangler.jsonc
 README.md
+donnees.json
