@@ -176,9 +176,10 @@ SECURITY DEFINER
 SET search_path TO public, pg_temp
 AS $function$
 BEGIN
-  IF TG_OP = 'UPDATE'
-     AND NEW.data->'races' IS NOT DISTINCT FROM OLD.data->'races' THEN
-    RETURN NEW;
+  IF TG_OP = 'UPDATE' THEN
+    IF NEW.data->'races' IS NOT DISTINCT FROM OLD.data->'races' THEN
+      RETURN NEW;
+    END IF;
   END IF;
 
   PERFORM public.elocoins_credit_all_race_rewards();
