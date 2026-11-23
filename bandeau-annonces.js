@@ -83,15 +83,16 @@
     input.value="";await refresh();
   }
   async function checkAdmin(){
+    if(adminBusy)return;adminBusy=true;
     try{
-      var u=await db.auth.getUser();
-      var nav=document.getElementById("nav-admin");
-      // Le menu Administration est déjà protégé par l’application principale.
-      // On accepte donc aussi son état visible si la session met plus de temps à remonter ici.
-      var ok=!!(u.data&&u.data.user&&u.data.user.id===ADMIN) || !!(nav&&!nav.hidden);
-      if(ok)makePanel();
+      var session=await db.auth.getSession();
+      var user=session&&session.data&&session.data.session&&session.data.session.user;
+      var host=document.getElementById("v-races");
+      var ok=!!(user&&user.id===ADMIN);
+      if(ok&&host)makePanel();
       else if(panel&&panel.parentNode)panel.parentNode.removeChild(panel);
     }catch(e){}
+    finally{adminBusy=false;}
   }
   async function init(){
     if(!document.body){document.addEventListener("DOMContentLoaded",init,{once:true});return;}
