@@ -2039,7 +2039,7 @@ document.addEventListener("click",function(e){
   if(a==='testPreview'){S.testPreview=v==='organizer'?'organizer':'runner';accountPopoverOpen=false;S.view='rank';render();window.scrollTo(0,0);return;}
   if(a==='closeTestPreview'){S.testPreview=null;render();return;}
   if(a==='testOrganizerPublish'){var m=document.getElementById('testorgmsg');if(m)m.textContent='Simulation réussie : la course apparaîtrait dans Courses à venir. Rien n’a été publié.';return;}
-  if(a==='toggleAccountPanel'){accountPopoverOpen=true;accountMode=v==='login'?'login':'signup';render();return;}
+  if(a==='toggleAccountPanel'){accountPopoverOpen=true;accountMode=v==='login'?'login':'signup';window.selectedRunnerLink=null;var accountPop=document.getElementById('accountpopover');if(accountPop){accountPop.hidden=false;accountPop.innerHTML=accountPanelHTML();if(accountMode==='signup'){refreshReferralUsage();var referralInput=document.getElementById('signupreferral');if(referralInput&&!referralInput.dataset.usageBound){referralInput.dataset.usageBound='1';referralInput.addEventListener('input',refreshReferralUsage);}}}return;}
   if(a==='shareRecord'){shareRecordCard(v,b.dataset.dist||'');return;}
   if(a==='shareRaceResult'){shareRaceResultCard(v,b.dataset.race||'');return;}
   if(a==='shareRace'){var raceToShare=S.races.filter(function(c){return c.id===v})[0];shareRace(raceToShare);return;}
