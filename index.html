@@ -1939,12 +1939,15 @@ function sendGhostRaceTitles(){
       if(raw.indexOf(":")>=0){var parts=raw.split(":").map(Number);if(parts.every(Number.isFinite)){var total=0;parts.forEach(function(x){total=total*60+x;});return total;}}
       return 0;
     }
-    var rows=(Array.isArray(course.results)?course.results:[]).filter(function(a){return a&&!a.pending&&a.id&&String(a.id)!==String(linkedRunner)&&toSeconds(a.time)>0;}).map(function(a){
-      var r=runnersById[String(a.id)]||{},p=st[String(a.id)+"|X"]||{};
-      return {name:r.name||r.nom||a.name||a.nom||"Coureur",club:r.club||a.club||"",elo:Number.isFinite(Number(p.elo))?Number(p.elo):1500,experience:Number(p.n)||0,time:toSeconds(a.time),rank:Number(a.rk||a.rank||a.position)||null};
+    var rows=(Array.isArray(course.results)?course.results:[]).filter(function(a){
+      var p=a&&a.id?st[String(a.id)+"|X"]:null;
+      return a&&!a.pending&&a.id&&String(a.id)!==String(linkedRunner)&&toSeconds(a.time)>0&&p&&Number(p.n)>0&&Number.isFinite(Number(p.elo));
+    }).map(function(a){
+      var r=runnersById[String(a.id)]||{},p=st[String(a.id)+"|X"];
+      return {name:r.name||r.nom||a.name||a.nom||"Coureur",club:r.club||a.club||"",elo:Number(p.elo),experience:Number(p.n)||0,time:toSeconds(a.time),rank:Number(a.rk||a.rank||a.position)||null};
     }).sort(function(a,b){return a.time-b.time;});
     if(rows.length<2){
-      try{frame.contentWindow.postMessage({type:"elo-ghost-race-data",error:"Moins de deux résultats avec un chrono exploitable dans cette course."},"*");}catch(e){}
+      try{frame.contentWindow.postMessage({type:"elo-ghost-race-data",error:"Les ELO calculés ne correspondent pas aux résultats de cette course. Aucun ELO fictif n’a été ajouté."},"*");}catch(e){}
       return;
     }
     var base=rows[Math.min(3,rows.length-1)].time;
