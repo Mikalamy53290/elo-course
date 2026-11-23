@@ -2368,6 +2368,20 @@ sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRu
     var n=Number(raw);
     return Number.isFinite(n)&&n>0?n:null;
   }
+  window.addEventListener("message",function(event){
+    if(!frame.contentWindow||event.source!==frame.contentWindow||!event.data)return;
+    if(event.data.type==="elo-ghost-request-directory"){try{sendGhostRaceTitles();}catch(e){}}
+    if(event.data.type==="elo-ghost-request-full-race"){
+      var course=S.races.find(function(c){return String(c.id)===String(event.data.raceId);});
+      var people=S.runners||[];
+      var rows=course&&Array.isArray(course.results)?course.results:[];
+      var results=rows.filter(function(a){return a&&!a.pending&&a.id&&a.time;}).map(function(a){
+        var p=people.find(function(x){return String(x.id)===String(a.id);})||{};
+        return{id:String(a.id),name:String(p.name||p.nom||((p.prenom||"")+" "+(p.nom||"")).trim()||a.name||a.nom||"Coureur"),time:a.time,rank:a.rk||a.rank||a.position||null};
+      });
+      frame.contentWindow.postMessage({type:"elo-ghost-full-race-data",raceId:String(event.data.raceId),results:results},"*");
+    }
+  });
 })();
 </script>
 
