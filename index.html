@@ -1930,7 +1930,7 @@ function sendGhostRaceTitles(){
   window.addEventListener("message",function(event){
     if(!frame.contentWindow||event.source!==frame.contentWindow||!event.data||event.data.type!=="elo-ghost-request-race")return;
     var course=S.races.find(function(c){return String(c.id)===String(event.data.raceId);});if(!course)return;
-    var st=eloCache.all||ALL||{};if(!Object.keys(st).length)return;
+    var st=eloCache.all||ALL||{};
     var runnersById={};S.runners.forEach(function(r){runnersById[String(r.id)]=r;});
     function toSeconds(v){
       if(typeof v==="number"&&isFinite(v))return v;
@@ -1939,10 +1939,14 @@ function sendGhostRaceTitles(){
       if(raw.indexOf(":")>=0){var parts=raw.split(":").map(Number);if(parts.every(Number.isFinite)){var total=0;parts.forEach(function(x){total=total*60+x;});return total;}}
       return 0;
     }
-    var rows=(Array.isArray(course.results)?course.results:[]).filter(function(a){return a&&!a.pending&&a.id&&String(a.id)!==String(linkedRunner)&&toSeconds(a.time)>0&&runnersById[String(a.id)]&&st[String(a.id)+"|X"]&&st[String(a.id)+"|X"].n>0;}).map(function(a){
-      var r=runnersById[String(a.id)],p=st[String(a.id)+"|X"];return {name:r.name||"Runner",club:r.club||"",elo:Number(p.elo),experience:Number(p.n)||0,time:toSeconds(a.time),rank:Number(a.rk)||null};
+    var rows=(Array.isArray(course.results)?course.results:[]).filter(function(a){return a&&!a.pending&&a.id&&String(a.id)!==String(linkedRunner)&&toSeconds(a.time)>0;}).map(function(a){
+      var r=runnersById[String(a.id)]||{},p=st[String(a.id)+"|X"]||{};
+      return {name:r.name||r.nom||a.name||a.nom||"Coureur",club:r.club||a.club||"",elo:Number.isFinite(Number(p.elo))?Number(p.elo):1500,experience:Number(p.n)||0,time:toSeconds(a.time),rank:Number(a.rk||a.rank||a.position)||null};
     }).sort(function(a,b){return a.time-b.time;});
-    if(rows.length<2)return;
+    if(rows.length<2){
+      try{frame.contentWindow.postMessage({type:"elo-ghost-race-data",error:"Moins de deux résultats avec un chrono exploitable dans cette course."},"*");}catch(e){}
+      return;
+    }
     var base=rows[Math.min(3,rows.length-1)].time;
     function fmt(t){var h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=Math.floor(t%60);return h?String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0"):String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");}
     var rawDist=String(course.dist||course.distance||"").trim(),dist=parseFloat(rawDist.replace(",","."));
