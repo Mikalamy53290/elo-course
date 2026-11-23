@@ -1,0 +1,30 @@
+name: Build ELO COURSE test ZIP
+on:
+  push:
+    branches:
+      - fix/ghost-real-data-lazy-loading
+    paths:
+      - 'index.html'
+      - 'bandeau-annonces.js'
+      - 'bandeau-annonces.sql'
+      - 'BANDEAU-ANNONCES.md'
+      - 'worker.js'
+      - 'wrangler.jsonc'
+      - '.github/workflows/build-test-zip.yml'
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package test version
+        run: |
+          zip -r ELO-COURSE-test-Ghost-bandeau.zip . \
+            -x '.git/*' '.github/workflows/*' 'ELO-COURSE-test-Ghost-bandeau.zip'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ELO-COURSE-test-Ghost-bandeau
+          path: ELO-COURSE-test-Ghost-bandeau.zip
+          if-no-files-found: error
+          retention-days: 7
