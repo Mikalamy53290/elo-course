@@ -1910,9 +1910,15 @@ document.addEventListener("input",function(e){
 })();
 function sendGhostRaceTitles(){
  var frame=document.getElementById("ghost-frame");if(!frame||!frame.contentWindow||!Array.isArray(S.races)||!Array.isArray(S.runners))return;
- var races=S.races.map(function(c){var raw=String(c.dist||c.distance||"").trim(),d=parseFloat(raw.replace(",","."));if(!(d>0)){var q=norm(raw);if(q.indexOf("semi")>=0)d=21.0975;else if(q.indexOf("marathon")>=0)d=42.195;}return d>0?{id:String(c.id),name:String(c.name||c.nom||"Course"),date:c.date||"",distance:d}:null;}).filter(Boolean);
+ var st=eloCache.all||ALL||{};
+ var races=S.races.map(function(c){var raw=String(c.dist||c.distance||"").trim(),d=parseFloat(raw.replace(",","."));if(!(d>0)){var q=norm(raw);if(q.indexOf("semi")>=0)d=21.0975;else if(q.indexOf("marathon")>=0)d=42.195;}return d>0?{id:String(c.id),name:String(c.name||c.nom||"Course"),date:c.date||"",type:String(c.type||c.discipline||c.category||"Route"),distance:d,participantCount:Array.isArray(c.results)?c.results.length:0}:null;}).filter(Boolean).sort(function(a,b){return String(b.date||"").localeCompare(String(a.date||""));});
  var runners=S.runners.map(function(r){return{id:String(r.id),name:String(r.name||r.nom||((r.prenom||"")+" "+(r.nom||"")).trim()||"Coureur"),club:r.club||"",city:r.city||r.ville||""};});
- try{frame.contentWindow.postMessage({type:"elo-ghost-real-races",races:races,currentRunnerId:linkedRunner||null},"*");frame.contentWindow.postMessage({type:"elo-ghost-race-directory",races:races},"*");frame.contentWindow.postMessage({type:"elo-ghost-runner-directory",runners:runners},"*");}catch(e){}
+ var current=linkedRunner?st[String(linkedRunner)+"|X"]:null;
+ try{
+  frame.contentWindow.postMessage({type:"elo-ghost-real-races",races:races,currentRunnerId:linkedRunner||null,currentRunnerElo:current&&current.n?Math.round(Number(current.elo)):null,currentRunnerN:current?Number(current.n):null,currentRunnerK:current?(current.n<5?40:24):null},"*");
+  frame.contentWindow.postMessage({type:"elo-ghost-race-directory",races:races},"*");
+  frame.contentWindow.postMessage({type:"elo-ghost-runner-directory",runners:runners},"*");
+ }catch(e){}
 }
 (function(){
   var frame=document.getElementById("ghost-frame");if(!frame)return;
