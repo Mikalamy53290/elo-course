@@ -11,6 +11,8 @@ on:
       - 'worker.js'
       - 'wrangler.jsonc'
       - '.github/workflows/build-test-zip.yml'
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
   package:
     runs-on: ubuntu-latest
