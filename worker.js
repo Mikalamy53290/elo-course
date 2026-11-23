@@ -112,6 +112,7 @@ async function routeSEO(request, env) {
     const copyByView = {
       rank:["Classement ELO des coureurs","Le classement ELO d’ELO COURSE compare les performances des coureurs à partir des résultats de courses publiés. Retrouvez les classements généraux et par catégorie."],
       races:["Résultats des courses","ELO COURSE rassemble les résultats des courses à pied et trails, avec les classements et les chronos publiés par les organisateurs et chronométreurs."],
+      ghost:["Mode Ghost – simulation ELO","Le Mode Ghost permet d’explorer et de simuler l’évolution du classement ELO à partir des performances de course."],
       chrono:["Chronométreurs et résultats de course","ELO COURSE référence les résultats publiés par les chronométreurs et organisateurs de courses, notamment pour les épreuves en Sarthe, Mayenne et Maine-et-Loire."],
       help:["Règlement ELO COURSE","Présentation du fonctionnement du classement ELO COURSE, des profils coureurs et des résultats publiés."]
     };
