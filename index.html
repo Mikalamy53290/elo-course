@@ -1935,7 +1935,7 @@ function sendGhostRaceTitles(){
     function toSeconds(v){
       if(typeof v==="number"&&isFinite(v))return v;
       var raw=String(v||"").trim();
-      if(/^\\d+(?:\\.\\d+)?$/.test(raw))return Number(raw);
+      if(/^\d+(?:\.\d+)?$/.test(raw))return Number(raw);
       if(raw.indexOf(":")>=0){var parts=raw.split(":").map(Number);if(parts.every(Number.isFinite)){var total=0;parts.forEach(function(x){total=total*60+x;});return total;}}
       return 0;
     }
