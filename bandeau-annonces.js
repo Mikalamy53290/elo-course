@@ -68,7 +68,10 @@
   async function checkAdmin(){
     try{
       var u=await db.auth.getUser();
-      var ok=!!(u.data&&u.data.user&&u.data.user.id===ADMIN);
+      var nav=document.getElementById("nav-admin");
+      // Le menu Administration est déjà protégé par l’application principale.
+      // On accepte donc aussi son état visible si la session met plus de temps à remonter ici.
+      var ok=!!(u.data&&u.data.user&&u.data.user.id===ADMIN) || !!(nav&&!nav.hidden);
       if(ok)makePanel();
       else if(panel&&panel.parentNode)panel.parentNode.removeChild(panel);
     }catch(e){}
