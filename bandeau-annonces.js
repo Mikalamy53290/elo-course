@@ -41,18 +41,6 @@
     }catch(e){if(status)status.textContent="Lecture du bandeau impossible : "+(e.message||e);}
     finally{refreshBusy=false;}
   }
-  async function checkAdmin(){
-    if(adminBusy)return;adminBusy=true;
-    try{
-      var session=await db.auth.getSession();
-      var user=session&&session.data&&session.data.session&&session.data.session.user;
-      var host=document.getElementById("v-races");
-      var ok=!!(user&&user.id===ADMIN);
-      if(ok&&host)makePanel();
-      else if(panel&&panel.parentNode)panel.parentNode.removeChild(panel);
-    }catch(e){}
-    finally{adminBusy=false;}
-  }
   function makePanel(){
     var host=document.getElementById("v-races");
     if(!host)return;
