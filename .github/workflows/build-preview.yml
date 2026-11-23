@@ -1,0 +1,17 @@
+name: Build ELO COURSE preview ZIP
+on:
+  push:
+    branches:
+      - ghost-course-animation-preview
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package preview site
+        run: zip -r ELO-COURSE-ghost-preview.zip . -x ".git/*" ".github/*"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ELO-COURSE-ghost-preview
+          path: ELO-COURSE-ghost-preview.zip
+          retention-days: 7
