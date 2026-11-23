@@ -1914,7 +1914,7 @@ function sendGhostRaceTitles(){
   var frame=document.getElementById("ghost-frame");
   if(!frame||!frame.contentWindow||!Array.isArray(S.races)||!Array.isArray(S.runners))return;
   var st=eloCache.all||ALL||{};
-  var races=S.races.map(function(c){
+  var races=S.races.filter(function(c){return !!linkedRunner&&Array.isArray(c.results)&&c.results.some(function(a){return !a.pending&&String(a.id)===String(linkedRunner);});}).map(function(c){
     var rawDist=String(c.dist||c.distance||"").trim(),dist=parseFloat(rawDist.replace(",","."));
     if(!(dist>0)){var nd=norm(rawDist);if(nd.indexOf("semi")>=0)dist=21.0975;else if(nd.indexOf("marathon")>=0)dist=42.195;}
     if(!(dist>0))return null;
@@ -2356,6 +2356,6 @@ sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRu
   }
 })();
 </script>
-<script src="/bandeau-annonces.js?v=20261123-3"></script>
+<script src="/bandeau-annonces.js?v=20261123-4"></script>
 </body>
 </html>
