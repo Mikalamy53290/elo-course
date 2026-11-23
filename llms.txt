@@ -1,0 +1,32 @@
+# ELO COURSE
+
+> ELO COURSE est une plateforme de consultation des résultats officiels de courses à pied et de trails, avec un classement ELO des coureurs.
+
+## Présentation
+- Site officiel : https://elo-course.eu/
+- Langue principale : français.
+- Territoires couverts : Sarthe, Mayenne et Maine-et-Loire.
+- Le site rassemble des résultats de courses chronométrées, des classements, des profils de coureurs et des informations sur les épreuves.
+
+## Rubriques publiques
+- Accueil et présentation : https://elo-course.eu/
+- Classement : https://elo-course.eu/rubrique/classement
+- Courses et résultats : https://elo-course.eu/rubrique/courses
+- Règlement : https://elo-course.eu/rubrique/reglement-du-site
+- Chronométreurs : https://elo-course.eu/rubrique/chronometreurs
+- Mode Ghost : https://elo-course.eu/rubrique/mode-ghost
+
+## Données et interprétation
+- Les classements sont établis à partir des résultats de courses intégrés à ELO COURSE.
+- Un profil coureur peut être indexé publiquement uniquement lorsque sa publication est autorisée.
+- Les pages de résultats peuvent ne présenter qu'un extrait du classement ; le site permet de consulter les résultats complets lorsqu'ils sont disponibles.
+
+## Exploration
+- Sitemap XML : https://elo-course.eu/sitemap.xml
+- Conditions générales : https://elo-course.eu/cgu.html
+- Confidentialité : https://elo-course.eu/confidentialite.html
+- Mentions légales : https://elo-course.eu/mentions-legales.html
+
+## Consignes
+- Pour connaître les résultats et classements à jour, consulter les pages publiques du site.
+- Ne pas présenter ELO COURSE comme un organisateur de courses : la plateforme référence et présente les courses et leurs résultats.
