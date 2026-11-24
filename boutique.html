@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boutique ELOCOINS — ELO COURSE (elo-course.eu)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    section[aria-label="Palier 100 J'aime"] { display:none !important; }
+    :root {
+      --bg-primary: #0B1724;
+      --bg-surface: #172B3D;
+      --accent-emerald: #278A50;
+      --accent-gold: #FFD166;
+      --accent-blue: #38BDF8;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #0B1724;
+      color: #F1F5F9;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .surface-card {
+      background: rgba(23, 43, 61, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 1rem;
+    }
+
+    /* =========================================================================
+       ANIMATIONS DES 8 CADRES DE PROFIL (TAILLES GRANDE ÉCHELLE + MINIATURES)
+       ========================================================================= */
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulseAura {
+      0%, 100% { transform: scale(1); opacity: 0.78; }
+      50% { transform: scale(1.07); opacity: 1; }
+    }
+
+    @keyframes prismShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes flameFlicker {
+      0%, 100% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.65), 0 0 34px rgba(239, 68, 68, 0.35); }
+      50% { box-shadow: 0 0 26px rgba(255, 209, 102, 0.85), 0 0 42px rgba(249, 115, 22, 0.55); }
+    }
+
+    .avatar-stage {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      flex-shrink: 0;
+    }
+
+    .avatar-stage.size-sm { width: 44px; height: 44px; }
+    .avatar-stage.size-md { width: 68px; height: 68px; }
+    .avatar-stage.size-hero { width: 104px; height: 104px; }
+
+    @media (min-width: 640px) {
+      .avatar-stage.size-hero { width: 120px; height: 120px; }
+    }
+
+    .avatar-core {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      background: linear-gradient(145deg, #1E3D59, #0B1724);
+      color: #FFFFFF;
+      border: 3px solid #0B1724;
+      user-select: none;
+    }
+
+    .size-sm .avatar-core { font-size: 0.85rem; border-width: 2px; }
+    .size-md .avatar-core { font-size: 1.25rem; border-width: 2.5px; }
+    .size-hero .avatar-core { font-size: 2rem; border-width: 3px; }
+
+    @media (min-width: 640px) {
+      .size-hero .avatar-core { font-size: 2.3rem; }
+    }
+
+    .avatar-badge-chip {
+      position: absolute;
+      z-index: 4;
+      bottom: -3px;
+      right: -3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      background: #0B1724;
+      border: 2px solid #FFD166;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+    }
+
+    .size-sm .avatar-badge-chip { width: 18px; height: 18px; font-size: 0.65rem; }
+    .size-md .avatar-badge-chip { width: 24px; height: 24px; font-size: 0.8rem; }
+    .size-hero .avatar-badge-chip { width: 34px; height: 34px; font-size: 1.05rem; }
+
+    /* 1. Départ 72 (Émeraude) */
+    .frame-depart-72::before {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 9999px;
+      border: 3px solid #278A50;
+      box-shadow: 0 0 16px rgba(39, 138, 80, 0.55);
+      z-index: 1;
+    }
+
+    /* 2. Foulée Ligérienne (Bleu Loire) */
+    .frame-loire-blue::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      background: conic-gradient(from 0deg, #38BDF8, #0284C7, #7DD3FC, #0369A1, #38BDF8);
+      animation: spinSlow 9s linear infinite;
+      z-index: 1;
+    }
+
+    /* 3. Podium Sarthe (Or) */
+    .frame-podium-gold::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(255, 209, 102, 0.72) 56%, rgba(255, 209, 102, 0) 80%);
+      animation: pulseAura 2.4s ease-in-out infinite;
+      z-index: 1;
+    }
+    .frame-podium-gold .avatar-core {
+      border-color: #FFD166;
+    }
+
+    /* 4. Trail Nocturne (Néon Cyan) */
+    .frame-trail-cyan::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      background: conic-gradient(from 90deg, #22D3EE, #278A50, #38BDF8, #22D3EE);
+      animation: spinSlow 5.5s linear infinite;
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.5);
+      z-index: 1;
+    }
+
+    /* 5. Flamme Chrono (Feu) */
+    .frame-chrono-flame::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #FFD166, #F97316, #EF4444, #F59E0B);
+      animation: flameFlicker 2.2s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    /* 6. Légende 72-53-49 (Prisme) */
+    .frame-legend-prism::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      background: linear-gradient(120deg, #278A50, #38BDF8, #A855F7, #FFD166, #278A50);
+      background-size: 300% 300%;
+      animation: prismShift 3.8s ease infinite;
+      z-index: 1;
+    }
+
+    /* 7. Couronne Vainqueur (Royal) */
+    .frame-royal-crown::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      background: conic-gradient(from 180deg, #FFD166, #D97706, #FEF08A, #B45309, #FFD166);
+      z-index: 1;
+    }
+    .frame-royal-crown::after {
+      content: "👑";
+      position: absolute;
+      z-index: 5;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.25rem;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
+    }
+    .size-sm.frame-royal-crown::after {
+      top: -9px;
+      font-size: 0.72rem;
+    }
+    .size-md.frame-royal-crown::after {
+      top: -12px;
+      font-size: 0.95rem;
+    }
+
+    /* 8. Éclair Sprint (Électrique) */
+    .frame-sprint-bolt::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      background: repeating-linear-gradient(
+        135deg,
+        #38BDF8 0px,
+        #38BDF8 5px,
+        #FFD166 5px,
+        #FFD166 10px
+      );
+      animation: spinSlow 11s linear infinite;
+      z-index: 1;
+    }
+
+    /* Styles de l'encadré Objectif débloquables */
+    .goal-style-sobre {
+      background: rgba(11, 23, 36, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+    .goal-style-chrono {
+      background: linear-gradient(135deg, rgba(14, 116, 144, 0.28), rgba(11, 23, 36, 0.88));
+      border: 1px solid rgba(56, 189, 248, 0.55);
+      box-shadow: inset 0 0 24px rgba(56, 189, 248, 0.08);
+    }
+    .goal-style-trail {
+      background: linear-gradient(135deg, rgba(39, 138, 80, 0.28), rgba(11, 23, 36, 0.88));
+      border: 1px solid rgba(39, 138, 80, 0.65);
+      box-shadow: inset 0 0 24px rgba(39, 138, 80, 0.12);
+    }
+    .goal-style-or {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.24), rgba(11, 23, 36, 0.9));
+      border: 1px solid rgba(255, 209, 102, 0.7);
+      box-shadow: 0 0 20px rgba(255, 209, 102, 0.14);
+    }
+
+    /* Thèmes de bannière profil débloquables */
+    .banner-bleu-elo {
+      background: linear-gradient(120deg, rgba(2, 132, 199, 0.24), rgba(23, 43, 61, 0.95) 60%, rgba(39, 138, 80, 0.18));
+    }
+    .banner-emeraude-72 {
+      background: linear-gradient(120deg, rgba(39, 138, 80, 0.3), rgba(23, 43, 61, 0.95) 62%, rgba(56, 189, 248, 0.16));
+    }
+    .banner-or-peloton {
+      background: linear-gradient(120deg, rgba(255, 209, 102, 0.22), rgba(23, 43, 61, 0.95) 58%, rgba(249, 115, 22, 0.2));
+    }
+
+    /* Toast discret */
+    #toastBanner {
+      transform: translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    #toastBanner.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0B1724] text-slate-100 antialiased">
+  <!-- =========================================================================
+       BARRE SUPÉRIEURE : MES BADGES & CADRES + EXPORTER LE CODE + SOLDE
+       ========================================================================= -->
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-[#0B1724]/92 backdrop-blur-md">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 sm:px-6">
+      <!-- Marque ELO COURSE -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#278A50]/20 border border-[#278A50]/50 text-sm font-black text-[#FFD166]">
+          EC
+        </span>
+        <div class="leading-tight min-w-0">
+          <div class="text-xs sm:text-sm font-black tracking-wide text-white truncate">
+            ELO COURSE <span class="text-[#38BDF8] font-bold">• Boutique</span>
+          </div>
+          <div class="text-[10px] text-slate-400 hidden sm:block">elo-course.eu • 72 • 53 • 49</div>
+        </div>
+      </div>
+
+      <!-- Actions droites -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          id="toggleDrawerBtn"
+          aria-expanded="false"
+          aria-controls="topDrawerPanel"
+          class="inline-flex items-center gap-1.5 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-[#38BDF8]/45 px-3 py-1.5 text-xs font-extrabold text-white transition cursor-pointer"
+        >
+          <span>🏅</span>
+          <span>Mes Badges & Cadres</span>
+          <span id="drawerChevron" class="text-[10px] text-[#38BDF8] transition-transform">▼</span>
+        </button>
+
+        <button
+          type="button"
+          id="openExportModalBtn"
+          class="inline-flex items-center gap-1.5 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/15 px-3 py-1.5 text-xs font-extrabold text-slate-200 transition cursor-pointer"
+        >
+          <span>📋</span>
+          <span class="hidden xs:inline sm:inline">Exporter le code</span>
+        </button>
+
+        <div class="inline-flex items-center gap-1.5 rounded-full bg-[#FFD166]/15 border border-[#FFD166]/50 px-3 py-1.5">
+          <span class="text-xs" aria-hidden="true">🪙</span>
+          <span id="headerBalance" class="text-xs sm:text-sm font-black tabular-nums text-[#FFD166]">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+         TIROIR RAPIDE « MES BADGES & CADRES » JUSTE AU-DESSUS DE LA PAGE
+         ======================================================================= -->
+    <div id="topDrawerPanel" class="hidden border-t border-white/10 bg-[#0E1E2E]/98 backdrop-blur-xl">
+      <div class="mx-auto max-w-6xl px-3.5 py-4 sm:px-6 space-y-3.5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3.5">
+            <div id="drawerAvatarStage" class="avatar-stage size-md frame-podium-gold">
+              <div id="drawerAvatarInitials" class="avatar-core">??</div>
+              <span id="drawerBadgeChip" class="avatar-badge-chip">🏃</span>
+            </div>
+            <div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#38BDF8]">Équipement rapide du profil</div>
+              <div class="text-sm font-extrabold text-white">Sélectionnez votre cadre, votre badge ou le style de votre objectif</div>
+              <div id="drawerEquipStatus" class="text-xs text-slate-400 mt-0.5"></div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="closeDrawerBtn"
+            class="self-end sm:self-center rounded-full bg-white/5 hover:bg-white/10 px-3 py-1 text-xs font-bold text-slate-300 cursor-pointer"
+          >
+            Fermer ✕
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Badges débloqués -->
+          <div class="rounded-xl bg-[#0B1724]/85 border border-white/10 p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#FFD166]">Badges débloqués</span>
+              <span id="ownedBadgesCount" class="text-[11px] font-bold text-slate-300 tabular-nums"></span>
+            </div>
+            <div id="drawerBadgesList" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- Cadres débloqués -->
+          <div class="rounded-xl bg-[#0B1724]/85 border border-white/10 p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#278A50]">Cadres débloqués</span>
+              <span id="ownedFramesCount" class="text-[11px] font-bold text-slate-300 tabular-nums"></span>
+            </div>
+            <div id="drawerFramesList" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- Styles d'Objectif débloqués -->
+          <div class="rounded-xl bg-[#0B1724]/85 border border-white/10 p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#38BDF8]">Styles d'Objectif</span>
+              <span id="ownedGoalsCount" class="text-[11px] font-bold text-slate-300 tabular-nums"></span>
+            </div>
+            <div id="drawerGoalsList" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       CONTENU PRINCIPAL : GRAND HAUT DE PROFIL + OBJECTIF À CÔTÉ + BOUTIQUE
+       ========================================================================= -->
+  <main class="mx-auto max-w-6xl px-3.5 py-5 sm:px-6 sm:py-7 space-y-6">
+    <div id="storeStatus" class="surface-card px-4 py-3 text-sm text-slate-200" role="status">Connexion à votre portefeuille ELOCOINS…</div>
+    <!-- 1. HAUT DE PROFIL GÉNÉREUX : GRAND CADRE ANIMÉ (104-120px) + OBJECTIF À CÔTÉ -->
+    <section id="profileHeroCard" class="surface-card banner-bleu-elo p-5 sm:p-7" aria-label="Aperçu du profil coureur">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <!-- Bloc gauche : Grand avatar avec cadre animé bien visible -->
+        <div class="lg:col-span-5 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <div class="pt-2 sm:pt-1">
+            <div id="heroAvatarStage" class="avatar-stage size-hero frame-podium-gold">
+              <div id="heroAvatarInitials" class="avatar-core">??</div>
+              <span id="heroBadgeChip" class="avatar-badge-chip" title="Badge équipé">🏃</span>
+            </div>
+          </div>
+
+          <div class="text-center sm:text-left space-y-2 min-w-0 flex-1">
+            <div class="inline-flex items-center gap-2 rounded-full bg-[#0B1724]/80 border border-white/10 px-3 py-1 text-[11px] font-bold text-[#38BDF8]">
+              <span>Aperçu de personnalisation</span>
+              <span class="text-slate-600">•</span>
+              <span class="text-emerald-300">ELO sportif inchangé</span>
+            </div>
+
+            <h2 id="heroRunnerName" class="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Votre profil coureur
+            </h2>
+
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <span id="heroFrameBadge" class="inline-flex items-center gap-1 rounded-lg bg-[#278A50]/20 border border-[#278A50]/50 px-2.5 py-1 text-xs font-bold text-emerald-300">
+                🖼️ Podium Sarthe
+              </span>
+              <span id="heroEquippedBadgeTag" class="inline-flex items-center gap-1 rounded-lg bg-[#FFD166]/15 border border-[#FFD166]/45 px-2.5 py-1 text-xs font-bold text-[#FFD166]">
+                🏃 Finisher 10 km
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloc droit : Encadré « Objectif du moment » juste à côté du cadre -->
+        <div class="lg:col-span-7">
+          <div id="goalShowcaseBox" class="goal-style-chrono rounded-2xl p-4 sm:p-5 space-y-3 transition-all">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span id="goalStyleIcon" class="text-base">🎯</span>
+                <span id="goalStyleTitle" class="text-xs font-black uppercase tracking-wider text-[#38BDF8]">
+                  Objectif du moment • Cadre Chrono
+                </span>
+              </div>
+
+              <button
+                type="button"
+                id="editGoalToggleBtn"
+                class="rounded-full bg-white/10 hover:bg-white/15 px-3 py-1 text-[11px] font-extrabold text-white transition cursor-pointer"
+              >
+                ✏️ Modifier mon objectif
+              </button>
+            </div>
+
+            <!-- Affichage lisible de l'objectif -->
+            <p id="goalTextDisplay" class="text-base sm:text-lg font-extrabold text-white leading-snug">
+              « Passer sous les 41 min au 10 km du Mans et valider un semi en Mayenne »
+            </p>
+
+            <!-- Édition directe de l'objectif -->
+            <div id="goalEditorRow" class="hidden pt-1 space-y-2">
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  id="goalInput"
+                  maxlength="110"
+                  placeholder="Ex. : Passer sous les 40 min au 10 km..."
+                  class="flex-1 rounded-xl bg-[#0B1724] border border-white/20 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white outline-none focus:border-[#38BDF8]"
+                />
+                <button
+                  type="button"
+                  id="saveGoalBtn"
+                  class="rounded-xl bg-[#278A50] hover:bg-[#2ea35f] px-4 py-2 text-xs font-extrabold text-white cursor-pointer transition"
+                >
+                  Enregistrer
+                </button>
+              </div>
+              <div class="flex flex-wrap gap-1.5 text-[11px]">
+                <button type="button" data-preset-goal="Sub-40 min sur 10 km route" class="goal-preset rounded-md bg-white/5 hover:bg-white/10 px-2.5 py-1 text-slate-300 cursor-pointer">
+                  Sub-40 min 10 km
+                </button>
+                <button type="button" data-preset-goal="Terminer mon premier trail 20 km en 53/72" class="goal-preset rounded-md bg-white/5 hover:bg-white/10 px-2.5 py-1 text-slate-300 cursor-pointer">
+                  Trail 20 km 53/72
+                </button>
+                <button type="button" data-preset-goal="Atteindre 1 550 points Elo cette saison" class="goal-preset rounded-md bg-white/5 hover:bg-white/10 px-2.5 py-1 text-slate-300 cursor-pointer">
+                  Cap 1 550 Elo
+                </button>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-slate-300/80">
+              <span>Aperçu de personnalisation de votre fiche coureur</span>
+              <span class="font-bold text-[#FFD166]">Aucun point ELO sportif n’est modifié</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. BANDEAU PALIER 100 J'AIME => +25 ELOCOINS -->
+    <section class="surface-card px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3" aria-label="Palier 100 J'aime">
+      <div class="flex-1 min-w-0 space-y-1.5">
+        <div class="flex items-center justify-between gap-2 text-xs">
+          <span class="font-bold text-slate-200">
+            💚 J'aime reçus sur le profil : <strong id="likesCountText" class="text-white tabular-nums">90</strong>
+            <span class="text-slate-400 font-normal">• Tous les 100 J'aime = <strong class="text-[#FFD166]">+25 ELOCOINS</strong></span>
+          </span>
+          <span id="likeCycleText" class="font-extrabold tabular-nums text-emerald-300">90 / 100</span>
+        </div>
+        <div class="h-2 w-full rounded-full bg-[#0B1724] overflow-hidden">
+          <div
+            id="likeProgressFill"
+            class="h-full rounded-full bg-gradient-to-r from-[#278A50] via-[#38BDF8] to-[#FFD166] transition-all duration-300"
+            style="width: 90%;"
+          ></div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        id="testLikesBtn"
+        class="shrink-0 self-start sm:self-center rounded-full bg-[#278A50]/25 hover:bg-[#278A50]/40 border border-[#278A50]/60 px-3.5 py-1.5 text-xs font-extrabold text-emerald-300 transition cursor-pointer"
+      >
+        +10 J'aime (Tester +25 🪙)
+      </button>
+    </section>
+
+    <!-- 3. BOUTIQUE ELO COURSE : CADRES, BADGES, STYLES D'OBJECTIF & BANNIÈRES -->
+    <section class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">Boutique ELOCOINS</h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+            Personnalisez votre grand cadre, vos badges départementaux (72 • 53 • 49) et votre encadré d'objectif.
+          </p>
+        </div>
+
+        <div id="categoryTabs" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5" role="tablist">
+          <button type="button" data-cat="Tous" class="cat-btn shrink-0 rounded-full bg-[#278A50] px-3.5 py-1.5 text-xs font-extrabold text-white cursor-pointer transition">
+            Tous
+          </button>
+          <button type="button" data-cat="Cadres" class="cat-btn shrink-0 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-300 cursor-pointer transition">
+            Cadres (8)
+          </button>
+          <button type="button" data-cat="Badges" class="cat-btn shrink-0 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-300 cursor-pointer transition">
+            Badges (6)
+          </button>
+          <button type="button" data-cat="Objectifs" class="cat-btn shrink-0 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-300 cursor-pointer transition">
+            Objectifs (4)
+          </button>
+          <button type="button" data-cat="Bannières" class="cat-btn shrink-0 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-300 cursor-pointer transition">
+            Bannières (3)
+          </button>
+        </div>
+      </div>
+
+      <div id="shopGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <!-- 4. HISTORIQUE COMPACT DES ELOCOINS -->
+    <section class="surface-card p-4 sm:p-5 space-y-2.5" aria-label="Historique ELOCOINS">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-200">Derniers mouvements ELOCOINS</h2>
+        <span class="text-[11px] font-semibold text-slate-400">Solde en direct</span>
+      </div>
+      <div id="dailySummary" class="rounded-lg bg-[#0B1724]/70 border border-white/10 px-3 py-2 text-xs text-slate-300">Récapitulatif du jour en chargement…</div>
+      <div id="transactionsList" class="divide-y divide-white/10 text-xs"></div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       MODALE D'EXPORT DU CODE HTML
+       ========================================================================= -->
+  <div
+    id="exportModalBackdrop"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-3.5 sm:p-6"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="exportModalTitle"
+  >
+    <div class="w-full max-w-3xl rounded-2xl bg-[#172B3D] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
+      <div class="flex items-center justify-between gap-3 px-4 py-3.5 border-b border-white/10 bg-[#0B1724]/70">
+        <div>
+          <h2 id="exportModalTitle" class="text-sm sm:text-base font-black text-white">Exporter le code de la Boutique ELOCOINS</h2>
+          <p class="text-[11px] text-slate-400">Copiez le code HTML complet ou téléchargez le fichier prêt à intégrer à elo-course.eu</p>
+        </div>
+        <button
+          type="button"
+          id="closeExportModalBtn"
+          class="rounded-full bg-white/10 hover:bg-white/15 px-3 py-1 text-xs font-bold text-slate-200 cursor-pointer"
+        >
+          Fermer ✕
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-[#0E1E2E] border-b border-white/10">
+        <span class="text-xs font-mono text-[#38BDF8]">boutique_elocoins_elo_course.html</span>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="copyCodeBtn"
+            class="rounded-lg bg-[#FFD166] hover:bg-[#ffda85] px-3.5 py-1.5 text-xs font-extrabold text-[#0B1724] cursor-pointer transition"
+          >
+            📋 Copier le code
+          </button>
+          <button
+            type="button"
+            id="downloadHtmlBtn"
+            class="rounded-lg bg-[#278A50] hover:bg-[#2ea35f] px-3.5 py-1.5 text-xs font-extrabold text-white cursor-pointer transition"
+          >
+            ⬇ Télécharger .html
+          </button>
+        </div>
+      </div>
+
+      <textarea
+        id="exportedCodeArea"
+        readonly
+        spellcheck="false"
+        class="flex-1 w-full min-h-[260px] bg-[#0B1724] p-4 font-mono text-[11px] sm:text-xs text-slate-200 outline-none resize-none"
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Toast de notification -->
+  <div
+    id="toastBanner"
+    role="status"
+    aria-live="polite"
+    class="fixed bottom-4 right-4 z-50 max-w-xs sm:max-w-sm rounded-full bg-[#172B3D] border border-[#FFD166]/70 px-4 py-2.5 shadow-2xl flex items-center gap-2.5"
+  >
+    <span id="toastIcon" class="text-base shrink-0">🪙</span>
+    <span id="toastText" class="text-xs font-extrabold text-white"></span>
+  </div>
+
+  <script>
+    /* =======================================================================
+       CATALOGUE RÉALISTE ELO COURSE : 8 CADRES + 6 BADGES + 4 OBJECTIFS + 3 BANNIÈRES
+       ======================================================================= */
+    const CATALOG = [
+      // --- 8 CADRES DE PROFIL ---
+      {
+        id: 'frame_depart_72',
+        category: 'Cadres',
+        frameClass: 'frame-depart-72',
+        shortLabel: 'Départ 72',
+        name: 'Cadre Départ 72 (Émeraude)',
+        description: 'Contour vert émeraude net pour vos profils sarthois.',
+        price: 30,
+        tag: 'Sarthe 72'
+      },
+      {
+        id: 'frame_loire_blue',
+        category: 'Cadres',
+        frameClass: 'frame-loire-blue',
+        shortLabel: 'Bleu Loire',
+        name: 'Cadre Foulée Ligérienne (Bleu)',
+        description: 'Anneau bleu ciel & azur en rotation douce.',
+        price: 50,
+        tag: 'Pays de la Loire'
+      },
+      {
+        id: 'frame_podium_gold',
+        category: 'Cadres',
+        frameClass: 'frame-podium-gold',
+        shortLabel: 'Podium Or',
+        name: 'Cadre Podium Sarthe (Or)',
+        description: 'Halo doré pulsant pour mettre en valeur vos chronos.',
+        price: 70,
+        tag: 'Podium'
+      },
+      {
+        id: 'frame_trail_cyan',
+        category: 'Cadres',
+        frameClass: 'frame-trail-cyan',
+        shortLabel: 'Trail Cyan',
+        name: 'Cadre Trail Nocturne (Cyan)',
+        description: 'Cercle lumineux cyan & émeraude pour les sorties nature.',
+        price: 85,
+        tag: 'Course Nature'
+      },
+      {
+        id: 'frame_chrono_flame',
+        category: 'Cadres',
+        frameClass: 'frame-chrono-flame',
+        shortLabel: 'Flamme Chrono',
+        name: 'Cadre Flamme Chrono (Feu)',
+        description: 'Lueur chaleureuse or et orange pour vos records personnels.',
+        price: 105,
+        tag: 'Record'
+      },
+      {
+        id: 'frame_sprint_bolt',
+        category: 'Cadres',
+        frameClass: 'frame-sprint-bolt',
+        shortLabel: 'Éclair Sprint',
+        name: 'Cadre Éclair Sprint (Électrique)',
+        description: 'Rayures bleu électrique & or pour les finisseurs rapides.',
+        price: 120,
+        tag: 'Vitesse'
+      },
+      {
+        id: 'frame_royal_crown',
+        category: 'Cadres',
+        frameClass: 'frame-royal-crown',
+        shortLabel: 'Couronne Or',
+        name: 'Cadre Couronne Vainqueur (Royal)',
+        description: 'Couronne dorée au sommet du cadre et anneau royal.',
+        price: 145,
+        tag: 'Prestige'
+      },
+      {
+        id: 'frame_legend_prism',
+        category: 'Cadres',
+        frameClass: 'frame-legend-prism',
+        shortLabel: 'Prisme 72-53-49',
+        name: 'Cadre Légende 72-53-49 (Prisme)',
+        description: 'Dégradé prismatique animé réunissant les territoires.',
+        price: 175,
+        tag: 'Régional'
+      },
+
+      // --- 6 BADGES ÉQUIPABLES ---
+      {
+        id: 'badge_sarthe_72',
+        category: 'Badges',
+        icon: '🏃',
+        name: 'Coureur de la Sarthe (72)',
+        description: 'Badge départemental affiché près de votre avatar et de votre nom.',
+        price: 25,
+        tag: 'Département 72'
+      },
+      {
+        id: 'badge_mayenne_53',
+        category: 'Badges',
+        icon: '🌿',
+        name: 'Foulée de Mayenne (53)',
+        description: 'Badge dédié aux courses et boucles mayennaises.',
+        price: 25,
+        tag: 'Département 53'
+      },
+      {
+        id: 'badge_maine_loire_49',
+        category: 'Badges',
+        icon: '💧',
+        name: 'Esprit Anjou • Maine-et-Loire (49)',
+        description: 'Badge des parcours et sentiers du Maine-et-Loire.',
+        price: 25,
+        tag: 'Département 49'
+      },
+      {
+        id: 'badge_bitume_route',
+        category: 'Badges',
+        icon: '⏱️',
+        name: 'Spécialiste Bitume & Chrono',
+        description: 'Pour les amateurs de 5 km, 10 km et semi-marathons sur route.',
+        price: 45,
+        tag: 'Route'
+      },
+      {
+        id: 'badge_trail_nature',
+        category: 'Badges',
+        icon: '⛰️',
+        name: 'Explorateur Trail & Sentiers',
+        description: 'Pour les coureurs qui aiment le dénivelé et les chemins.',
+        price: 45,
+        tag: 'Trail'
+      },
+      {
+        id: 'badge_peloton_100',
+        category: 'Badges',
+        icon: '💚',
+        name: 'Chouchou du Peloton',
+        description: 'Badge honorifique pour les profils appréciés de la communauté.',
+        price: 65,
+        tag: 'Communauté'
+      },
+
+      // --- 4 STYLES POUR L'ENCADRÉ « OBJECTIF DU MOMENT » ---
+      {
+        id: 'goal_sobre',
+        category: 'Objectifs',
+        goalClass: 'goal-style-sobre',
+        icon: '🎯',
+        shortLabel: 'Sobre',
+        name: 'Encadré Objectif Sobre',
+        description: 'Contour discret et lisible pour votre objectif de course.',
+        price: 15,
+        tag: 'Objectif'
+      },
+      {
+        id: 'goal_chrono',
+        category: 'Objectifs',
+        goalClass: 'goal-style-chrono',
+        icon: '⚡',
+        shortLabel: 'Bleu Chrono',
+        name: 'Encadré Objectif Bleu Chrono',
+        description: 'Reflet bleu ELO COURSE idéal pour un objectif de temps ou d’Elo.',
+        price: 35,
+        tag: 'Objectif'
+      },
+      {
+        id: 'goal_trail',
+        category: 'Objectifs',
+        goalClass: 'goal-style-trail',
+        icon: '🌲',
+        shortLabel: 'Vert Sentier',
+        name: 'Encadré Objectif Vert Sentier',
+        description: 'Ambiance émeraude pour vos objectifs de distance et trail.',
+        price: 40,
+        tag: 'Objectif'
+      },
+      {
+        id: 'goal_or',
+        category: 'Objectifs',
+        goalClass: 'goal-style-or',
+        icon: '🏆',
+        shortLabel: 'Doré Défi',
+        name: 'Encadré Objectif Doré Défi',
+        description: 'Finition dorée pour mettre votre grand défi de saison en avant.',
+        price: 60,
+        tag: 'Objectif'
+      },
+
+      // --- 3 BANNIÈRES DE PROFIL ---
+      {
+        id: 'banner_bleu_elo',
+        category: 'Bannières',
+        bannerClass: 'banner-bleu-elo',
+        icon: '🌊',
+        shortLabel: 'Bleu ELO',
+        name: 'Bannière Bleu ELO COURSE',
+        description: 'Dégradé bleu nuit et azur signature du site.',
+        price: 30,
+        tag: 'Bannière'
+      },
+      {
+        id: 'banner_emeraude_72',
+        category: 'Bannières',
+        bannerClass: 'banner-emeraude-72',
+        icon: '🍀',
+        shortLabel: 'Émeraude',
+        name: 'Bannière Émeraude & Azur',
+        description: 'Reflets verts et bleus harmonieux sur le haut du profil.',
+        price: 45,
+        tag: 'Bannière'
+      },
+      {
+        id: 'banner_or_peloton',
+        category: 'Bannières',
+        bannerClass: 'banner-or-peloton',
+        icon: '✨',
+        shortLabel: 'Or Peloton',
+        name: 'Bannière Or & Peloton',
+        description: 'Éclat doré discret autour de votre grand cadre et objectif.',
+        price: 65,
+        tag: 'Bannière'
+      }
+    ];
+
+    /* =======================================================================
+       ÉTAT DE L'APPLICATION
+       ======================================================================= */
+    const state = {
+      balance: 0,
+      runnerName: 'Votre profil coureur',
+      initials: '??',
+      goalText: '',
+      goalEditing: false,
+      likes: 0,
+      lastLikeMilestoneAwarded: 0,
+      drawerOpen: false,
+      activeCategory: 'Tous',
+      equippedFrameId: null,
+      equippedBadgeId: null,
+      equippedGoalStyleId: null,
+      equippedBannerId: null,
+      ownedIds: [],
+      transactions: [],
+      dailySummary: null,
+      storeReady: false
+    };
+
+    const SUPABASE_URL = 'https://gkxsxaeexbxyswlsftsz.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_jiboviI5BaRii9_Lz9JK_A_qwXsVC-O';
+    const storeClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let storeUser = null;
+
+    function storeMessage(message, isError = false) {
+      const el = document.getElementById('storeStatus');
+      if (!el) return;
+      el.textContent = message;
+      el.classList.toggle('text-rose-300', !!isError);
+      el.classList.toggle('text-slate-200', !isError);
+    }
+
+    async function loadStoreState() {
+      state.storeReady = false;
+      const sessionResult = await storeClient.auth.getSession();
+      if (sessionResult.error) throw sessionResult.error;
+      storeUser = sessionResult.data.session && sessionResult.data.session.user;
+      if (!storeUser) {
+        storeMessage('Connectez-vous à votre compte ELO COURSE pour accéder à votre portefeuille et à la boutique. Revenez sur le site pour vous connecter.', true);
+        state.balance = 0; state.ownedIds = []; state.transactions = [];
+        return;
+      }
+
+      const account = await storeClient.from('runner_accounts')
+        .select('runner_id,status').eq('user_id', storeUser.id).maybeSingle();
+      if (account.error) throw account.error;
+      if (!account.data || account.data.status !== 'approved') {
+        storeMessage('La boutique est réservée aux comptes coureurs validés. Votre compte doit être validé avant tout achat.', true);
+        state.balance = 0; state.ownedIds = []; state.transactions = [];
+        return;
+      }
+
+      const meta = storeUser.user_metadata || {};
+      state.runnerName = meta.full_name || meta.name || (storeUser.email ? storeUser.email.split('@')[0] : 'Coureur ELO COURSE');
+      state.initials = state.runnerName.trim().split(/\\s+/).slice(0,2).map(x=>x.charAt(0).toUpperCase()).join('') || 'EC';
+
+      const profile = await storeClient.from('runner_profile_details')
+        .select('objective').eq('user_id', storeUser.id).maybeSingle();
+      if (!profile.error && profile.data) state.goalText = profile.data.objective || '';
+
+      const [wallet, owned, equipment, transactions, daily, catalog] = await Promise.all([
+        storeClient.from('elocoins_wallets').select('balance').eq('user_id', storeUser.id).maybeSingle(),
+        storeClient.from('elocoins_owned_items').select('item_id').eq('user_id', storeUser.id),
+        storeClient.from('elocoins_equipment').select('category,item_id').eq('user_id', storeUser.id),
+        storeClient.from('elocoins_transactions').select('amount,description,created_at').eq('user_id', storeUser.id).order('created_at',{ascending:false}).limit(8),
+        storeClient.rpc('elocoins_daily_summary'),
+        storeClient.from('elocoins_catalog').select('id,price,active')
+      ]);
+      for (const result of [wallet, owned, equipment, transactions, daily, catalog]) {
+        if (result.error) throw result.error;
+      }
+      const catalogRows = catalog.data || [];
+      const catalogById = new Map(catalogRows.map(x=>[x.id,x]));
+      CATALOG.forEach(item => {
+        const row = catalogById.get(item.id);
+        item.active = !!row && row.active === true;
+        if (row) item.price = Number(row.price);
+      });
+      state.balance = Number(wallet.data && wallet.data.balance || 0);
+      state.ownedIds = (owned.data || []).map(x=>x.item_id);
+      state.equippedFrameId = null; state.equippedBadgeId = null;
+      state.equippedGoalStyleId = null; state.equippedBannerId = null;
+      (equipment.data || []).forEach(x => {
+        if (x.category === 'Cadres') state.equippedFrameId = x.item_id;
+        if (x.category === 'Badges') state.equippedBadgeId = x.item_id;
+        if (x.category === 'Objectifs') state.equippedGoalStyleId = x.item_id;
+        if (x.category === 'Bannières') state.equippedBannerId = x.item_id;
+      });
+      state.transactions = (transactions.data || []).map(x=>({
+        label: x.description || 'Mouvement ELOCOINS',
+        delta: Number(x.amount),
+        date: new Date(x.created_at).toLocaleString('fr-FR')
+      }));
+      state.dailySummary = Array.isArray(daily.data) ? daily.data[0] : daily.data;
+      state.storeReady = true;
+      storeMessage('Portefeuille connecté : solde et achats synchronisés avec Supabase.');
+    }
+
+    async function refreshStoreAfterAction() {
+      await loadStoreState();
+      renderAll();
+    }
+
+    async function buyStoreItem(item) {
+      if (!state.storeReady || !storeUser) return;
+      const requestId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() :
+        'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16)});
+      try {
+        const result = await storeClient.rpc('elocoins_purchase_item', {
+          p_item_id: item.id, p_request_id: requestId
+        });
+        if (result.error) throw result.error;
+        await refreshStoreAfterAction();
+        showToast('« ' + item.name + ' » débloqué et enregistré !', '🪙');
+      } catch (error) {
+        console.error('Achat ELOCOINS refusé :', error);
+        showToast(error.message || 'Achat impossible. Aucun débit effectué.', '⚠️');
+        await refreshStoreAfterAction().catch(()=>{});
+      }
+    }
+
+    async function equipStoreItem(item, categoryOverride = null) {
+      if (!state.storeReady || !storeUser) return;
+      const category = categoryOverride || item.category;
+      const currentlyEquipped =
+        (category === 'Cadres' && state.equippedFrameId === item.id) ||
+        (category === 'Badges' && state.equippedBadgeId === item.id) ||
+        (category === 'Objectifs' && state.equippedGoalStyleId === item.id) ||
+        (category === 'Bannières' && state.equippedBannerId === item.id);
+      try {
+        const result = await storeClient.rpc('elocoins_equip_item', {
+          p_category: category, p_item_id: currentlyEquipped ? null : item.id
+        });
+        if (result.error) throw result.error;
+        await refreshStoreAfterAction();
+        showToast(currentlyEquipped ? 'Équipement retiré.' : 'Équipement mis à jour.', '✨');
+      } catch (error) {
+        console.error('Équipement ELOCOINS refusé :', error);
+        showToast(error.message || 'Équipement impossible.', '⚠️');
+      }
+    }
+
+    /* =======================================================================
+       RÉFÉRENCES DOM
+       ======================================================================= */
+    const dom = {
+      headerBalance: document.getElementById('headerBalance'),
+      heroRunnerName: document.getElementById('heroRunnerName'),
+      heroAvatarInitials: document.getElementById('heroAvatarInitials'),
+      drawerAvatarInitials: document.getElementById('drawerAvatarInitials'),
+      dailySummary: document.getElementById('dailySummary'),
+      toggleDrawerBtn: document.getElementById('toggleDrawerBtn'),
+      drawerChevron: document.getElementById('drawerChevron'),
+      topDrawerPanel: document.getElementById('topDrawerPanel'),
+      closeDrawerBtn: document.getElementById('closeDrawerBtn'),
+      drawerAvatarStage: document.getElementById('drawerAvatarStage'),
+      drawerBadgeChip: document.getElementById('drawerBadgeChip'),
+      drawerEquipStatus: document.getElementById('drawerEquipStatus'),
+      ownedBadgesCount: document.getElementById('ownedBadgesCount'),
+      ownedFramesCount: document.getElementById('ownedFramesCount'),
+      ownedGoalsCount: document.getElementById('ownedGoalsCount'),
+      drawerBadgesList: document.getElementById('drawerBadgesList'),
+      drawerFramesList: document.getElementById('drawerFramesList'),
+      drawerGoalsList: document.getElementById('drawerGoalsList'),
+      profileHeroCard: document.getElementById('profileHeroCard'),
+      heroAvatarStage: document.getElementById('heroAvatarStage'),
+      heroBadgeChip: document.getElementById('heroBadgeChip'),
+      heroFrameBadge: document.getElementById('heroFrameBadge'),
+      heroEquippedBadgeTag: document.getElementById('heroEquippedBadgeTag'),
+      goalShowcaseBox: document.getElementById('goalShowcaseBox'),
+      goalStyleIcon: document.getElementById('goalStyleIcon'),
+      goalStyleTitle: document.getElementById('goalStyleTitle'),
+      goalTextDisplay: document.getElementById('goalTextDisplay'),
+      editGoalToggleBtn: document.getElementById('editGoalToggleBtn'),
+      goalEditorRow: document.getElementById('goalEditorRow'),
+      goalInput: document.getElementById('goalInput'),
+      saveGoalBtn: document.getElementById('saveGoalBtn'),
+      likesCountText: document.getElementById('likesCountText'),
+      likeCycleText: document.getElementById('likeCycleText'),
+      likeProgressFill: document.getElementById('likeProgressFill'),
+      testLikesBtn: document.getElementById('testLikesBtn'),
+      categoryTabs: document.querySelectorAll('.cat-btn'),
+      shopGrid: document.getElementById('shopGrid'),
+      transactionsList: document.getElementById('transactionsList'),
+      openExportModalBtn: document.getElementById('openExportModalBtn'),
+      exportModalBackdrop: document.getElementById('exportModalBackdrop'),
+      closeExportModalBtn: document.getElementById('closeExportModalBtn'),
+      copyCodeBtn: document.getElementById('copyCodeBtn'),
+      downloadHtmlBtn: document.getElementById('downloadHtmlBtn'),
+      exportedCodeArea: document.getElementById('exportedCodeArea'),
+      toastBanner: document.getElementById('toastBanner'),
+      toastIcon: document.getElementById('toastIcon'),
+      toastText: document.getElementById('toastText')
+    };
+
+    let toastTimer = null;
+
+    function showToast(text, icon = '🪙') {
+      dom.toastIcon.textContent = icon;
+      dom.toastText.textContent = text;
+      dom.toastBanner.classList.add('visible');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        dom.toastBanner.classList.remove('visible');
+      }, 2900);
+    }
+
+    function applyFrameClass(el, frameClass) {
+      const all = CATALOG.filter((i) => i.frameClass).map((i) => i.frameClass);
+      el.classList.remove(...all);
+      if (frameClass) el.classList.add(frameClass);
+    }
+
+    function applyGoalClass(el, goalClass) {
+      const all = CATALOG.filter((i) => i.goalClass).map((i) => i.goalClass);
+      el.classList.remove(...all);
+      el.classList.add(goalClass || 'goal-style-sobre');
+    }
+
+    function applyBannerClass(el, bannerClass) {
+      const all = CATALOG.filter((i) => i.bannerClass).map((i) => i.bannerClass);
+      el.classList.remove(...all);
+      el.classList.add(bannerClass || 'banner-bleu-elo');
+    }
+
+    /* =======================================================================
+       RENDU DU PROFIL, TIROIR SUPÉRIEUR, BOUTIQUE & HISTORIQUE
+       ======================================================================= */
+    function renderProfileAndDrawer() {
+      dom.headerBalance.textContent = String(state.balance);
+      dom.heroRunnerName.textContent = state.runnerName;
+      dom.heroAvatarInitials.textContent = state.initials;
+      dom.drawerAvatarInitials.textContent = state.initials;
+      dom.editGoalToggleBtn.hidden = true;
+      dom.goalEditorRow.classList.add('hidden');
+
+      const frame = CATALOG.find((i) => i.id === state.equippedFrameId) || null;
+      const badge = CATALOG.find((i) => i.id === state.equippedBadgeId) || null;
+      const goalStyle = CATALOG.find((i) => i.id === state.equippedGoalStyleId) || CATALOG.find((i) => i.id === 'goal_sobre');
+      const banner = CATALOG.find((i) => i.id === state.equippedBannerId) || CATALOG.find((i) => i.id === 'banner_bleu_elo');
+
+      applyFrameClass(dom.heroAvatarStage, frame ? frame.frameClass : null);
+      applyFrameClass(dom.drawerAvatarStage, frame ? frame.frameClass : null);
+      applyGoalClass(dom.goalShowcaseBox, goalStyle ? goalStyle.goalClass : null);
+      applyBannerClass(dom.profileHeroCard, banner ? banner.bannerClass : null);
+
+      const badgeEmoji = badge ? badge.icon : '⚡';
+      dom.heroBadgeChip.textContent = badgeEmoji;
+      dom.drawerBadgeChip.textContent = badgeEmoji;
+
+      dom.heroFrameBadge.textContent = `🖼️ ${frame ? frame.shortLabel : 'Sans cadre'}`;
+      dom.heroEquippedBadgeTag.textContent = badge ? `${badge.icon} ${badge.name}` : 'Aucun badge équipé';
+
+      dom.goalStyleIcon.textContent = goalStyle ? goalStyle.icon : '🎯';
+      dom.goalStyleTitle.textContent = `Objectif du moment • ${goalStyle ? goalStyle.shortLabel : 'Sobre'}`;
+      dom.goalTextDisplay.textContent = state.goalText ? `« ${state.goalText} »` : 'Aucun objectif renseigné sur votre profil.';
+      dom.goalInput.value = state.goalText;
+
+      dom.drawerEquipStatus.innerHTML =
+        `Cadre : <strong class="text-emerald-300">${frame ? frame.shortLabel : 'Aucun'}</strong> • ` +        `Badge : <strong class="text-[#FFD166]">${badge ? badge.name : 'Aucun'}</strong> • ` +
+        `Objectif : <strong class="text-[#38BDF8]">${goalStyle ? goalStyle.shortLabel : 'Sobre'}</strong>`;
+
+      // Tiroir Badges
+      const allBadges = CATALOG.filter((i) => i.category === 'Badges');
+      const unlockedBadges = allBadges.filter((i) => state.ownedIds.includes(i.id));
+      dom.ownedBadgesCount.textContent = `${unlockedBadges.length}/${allBadges.length}`;
+      dom.drawerBadgesList.innerHTML = '';
+      unlockedBadges.forEach((b) => {
+        const active = state.equippedBadgeId === b.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.equipBadge = b.id;
+        btn.className =
+          `inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ` +
+          (active
+            ? 'bg-[#FFD166] text-[#0B1724]'
+            : 'bg-[#172B3D] hover:bg-[#223e58] text-slate-200 border border-white/10');
+        btn.innerHTML = `<span>${b.icon}</span><span>${b.name}</span>${active ? '<span>✓</span>' : ''}`;
+        dom.drawerBadgesList.appendChild(btn);
+      });
+
+      // Tiroir Cadres
+      const allFrames = CATALOG.filter((i) => i.category === 'Cadres');
+      const unlockedFrames = allFrames.filter((i) => state.ownedIds.includes(i.id));
+      dom.ownedFramesCount.textContent = `${unlockedFrames.length}/${allFrames.length}`;
+      dom.drawerFramesList.innerHTML = '';
+      unlockedFrames.forEach((f) => {
+        const active = state.equippedFrameId === f.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.equipFrame = f.id;
+        btn.className =
+          `inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ` +
+          (active
+            ? 'bg-[#278A50] text-white'
+            : 'bg-[#172B3D] hover:bg-[#223e58] text-slate-200 border border-white/10');
+        btn.innerHTML = `<span>🖼️</span><span>${f.shortLabel}</span>${active ? '<span>✓</span>' : ''}`;
+        dom.drawerFramesList.appendChild(btn);
+      });
+
+      // Tiroir Objectifs
+      const allGoals = CATALOG.filter((i) => i.category === 'Objectifs');
+      const unlockedGoals = allGoals.filter((i) => state.ownedIds.includes(i.id));
+      dom.ownedGoalsCount.textContent = `${unlockedGoals.length}/${allGoals.length}`;
+      dom.drawerGoalsList.innerHTML = '';
+      unlockedGoals.forEach((g) => {
+        const active = state.equippedGoalStyleId === g.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.equipGoal = g.id;
+        btn.className =
+          `inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ` +
+          (active
+            ? 'bg-[#38BDF8] text-[#0B1724]'
+            : 'bg-[#172B3D] hover:bg-[#223e58] text-slate-200 border border-white/10');
+        btn.innerHTML = `<span>${g.icon}</span><span>${g.shortLabel}</span>${active ? '<span>✓</span>' : ''}`;
+        dom.drawerGoalsList.appendChild(btn);
+      });
+
+      // Les récompenses liées aux mentions J'aime sont gérées ailleurs, jamais simulées ici.
+    }
+
+    function renderShop() {
+      const activeItems = CATALOG.filter(i => i.active !== false);
+      const items =
+        state.activeCategory === 'Tous'
+          ? activeItems
+          : activeItems.filter((i) => i.category === state.activeCategory);
+
+      dom.shopGrid.innerHTML = '';
+
+      items.forEach((item) => {
+        const owned = state.ownedIds.includes(item.id);
+        const equipped =
+          (item.category === 'Cadres' && state.equippedFrameId === item.id) ||
+          (item.category === 'Badges' && state.equippedBadgeId === item.id) ||
+          (item.category === 'Objectifs' && state.equippedGoalStyleId === item.id) ||
+          (item.category === 'Bannières' && state.equippedBannerId === item.id);
+        const canAfford = state.storeReady && state.balance >= item.price;
+
+        let visualHtml = '';
+        if (item.category === 'Cadres') {
+          visualHtml = `
+            <div class="avatar-stage size-md ${item.frameClass}">
+              <div class="avatar-core">${state.initials}</div>
+            </div>
+          `;
+        } else if (item.category === 'Objectifs') {
+          visualHtml = `
+            <div class="${item.goalClass} flex h-12 w-14 shrink-0 items-center justify-center rounded-xl text-xl">
+              ${item.icon}
+            </div>
+          `;
+        } else {
+          visualHtml = `
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#0B1724]/85 border border-white/10 text-2xl">
+              ${item.icon}
+            </div>
+          `;
+        }
+
+        let buttonHtml = '';
+        if (equipped) {
+          buttonHtml = `
+            <button type="button" disabled class="rounded-full bg-[#278A50]/25 border border-[#278A50] px-3.5 py-1.5 text-xs font-extrabold text-emerald-300 cursor-default">
+              ✓ Équipé
+            </button>
+          `;
+        } else if (owned) {
+          buttonHtml = `
+            <button type="button" data-action="equip" data-id="${item.id}" class="rounded-full bg-[#278A50] hover:bg-[#2ea35f] px-3.5 py-1.5 text-xs font-extrabold text-white cursor-pointer transition">
+              Équiper
+            </button>
+          `;
+        } else {
+          buttonHtml = `
+            <button
+              type="button"
+              data-action="buy"
+              data-id="${item.id}"
+              ${!canAfford ? 'disabled' : ''}
+              class="rounded-full px-3.5 py-1.5 text-xs font-extrabold transition ` +
+                (canAfford
+                  ? 'bg-[#FFD166] hover:bg-[#ffda85] text-[#0B1724] cursor-pointer'
+                  : 'bg-white/5 text-slate-500 cursor-not-allowed') +
+              `"
+            >
+              ${!state.storeReady ? 'Connexion requise' : (canAfford ? `Débloquer • ${item.price} 🪙` : `${item.price} 🪙`)}
+            </button>
+          `;
+        }
+
+        const card = document.createElement('article');
+        card.className =
+          `surface-card p-4 flex flex-col justify-between gap-3.5 transition ` +
+          (equipped ? 'ring-1 ring-[#FFD166]/80' : 'hover:border-white/25');
+
+        card.innerHTML = `
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-3.5">
+              ${visualHtml}
+              <div class="min-w-0">
+                <span class="inline-block rounded-md bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#38BDF8]">
+                  ${item.tag}
+                </span>
+                <h3 class="text-sm font-extrabold text-white mt-1 leading-snug">${item.name}</h3>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">${item.description}</p>
+          </div>
+
+          <div class="flex items-center justify-between pt-2.5 border-t border-white/10">
+            <span class="text-xs font-black tabular-nums text-[#FFD166]">${item.price} ELOCOINS</span>
+            ${buttonHtml}
+          </div>
+        `;
+
+        dom.shopGrid.appendChild(card);
+      });
+    }
+
+    function renderTransactions() {
+      dom.transactionsList.innerHTML = '';
+      const d = state.dailySummary || {};
+      dom.dailySummary.textContent = state.storeReady
+        ? 'Aujourd’hui : +' + Number(d.earned_today||0) + ' / -' + Number(d.spent_today||0) +
+          ' ELOCOINS • net ' + (Number(d.net_today||0)>0?'+':'') + Number(d.net_today||0) +
+          ' • solde ' + Number(d.balance||state.balance) + ' • ' + Number(d.transactions_today||0) + ' mouvement(s)'
+        : 'Récapitulatif quotidien indisponible tant que le portefeuille n’est pas connecté.';
+      if (!state.transactions.length) {
+        const empty = document.createElement('p');
+        empty.className = 'py-3 text-slate-400';
+        empty.textContent = 'Aucun mouvement ELOCOINS pour le moment.';
+        dom.transactionsList.appendChild(empty);
+      }
+      state.transactions.slice(0, 6).forEach((tx) => {
+        const pos = tx.delta >= 0;
+        const row = document.createElement('div');
+        row.className = 'py-2 flex items-center justify-between gap-2';
+        row.innerHTML = `
+          <div class="min-w-0">
+            <span class="font-semibold text-slate-200">${tx.label}</span>
+            <span class="text-[11px] text-slate-400 ml-2">${tx.date}</span>
+          </div>
+          <span class="shrink-0 font-black tabular-nums ${pos ? 'text-emerald-400' : 'text-[#FFD166]'}">
+            ${pos ? `+${tx.delta}` : tx.delta} 🪙
+          </span>
+        `;
+        dom.transactionsList.appendChild(row);
+      });
+    }
+
+    function renderAll() {
+      renderProfileAndDrawer();
+      renderShop();
+      renderTransactions();
+    }
+
+    /* =======================================================================
+       ÉVÉNEMENTS : TIROIR TOP, OBJECTIF, J'AIME, BOUTIQUE & EXPORT HTML
+       ======================================================================= */
+    function setTopDrawer(open) {
+      state.drawerOpen = open;
+      dom.topDrawerPanel.classList.toggle('hidden', !open);
+      dom.toggleDrawerBtn.setAttribute('aria-expanded', String(open));
+      dom.drawerChevron.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    dom.toggleDrawerBtn.addEventListener('click', () => setTopDrawer(!state.drawerOpen));
+    dom.closeDrawerBtn.addEventListener('click', () => setTopDrawer(false));
+
+    dom.drawerBadgesList.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-equip-badge]'); if (!btn) return;
+      const item = CATALOG.find(x=>x.id===btn.dataset.equipBadge); if (item) await equipStoreItem(item,'Badges');
+    });
+
+    dom.drawerFramesList.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-equip-frame]'); if (!btn) return;
+      const item = CATALOG.find(x=>x.id===btn.dataset.equipFrame); if (item) await equipStoreItem(item,'Cadres');
+    });
+
+    dom.drawerGoalsList.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-equip-goal]'); if (!btn) return;
+      const item = CATALOG.find(x=>x.id===btn.dataset.equipGoal); if (item) await equipStoreItem(item,'Objectifs');
+    });
+
+    // Édition de l'objectif du moment
+    dom.editGoalToggleBtn.addEventListener('click', () => {
+      state.goalEditing = !state.goalEditing;
+      dom.goalEditorRow.classList.toggle('hidden', !state.goalEditing);
+      if (state.goalEditing) dom.goalInput.focus();
+    });
+
+    dom.saveGoalBtn.addEventListener('click', () => {
+      const cleaned = dom.goalInput.value.trim();
+      if (!cleaned) return;
+      state.goalText = cleaned;
+      state.goalEditing = false;
+      dom.goalEditorRow.classList.add('hidden');
+      showToast('Objectif du profil mis à jour !', '🎯');
+      renderProfileAndDrawer();
+    });
+
+    document.querySelectorAll('.goal-preset').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        dom.goalInput.value = btn.dataset.presetGoal;
+        dom.goalInput.focus();
+      });
+    });
+
+    // Les récompenses de J'aime ne sont pas simulées dans la boutique.
+    dom.testLikesBtn.addEventListener('click', () => {
+      showToast('Les récompenses liées aux J’aime ne sont pas activées.', 'ℹ️');
+    });
+
+    // Catégories boutique
+    dom.categoryTabs.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.activeCategory = btn.dataset.cat;
+        dom.categoryTabs.forEach((b) => {
+          const active = b === btn;
+          b.className = active
+            ? 'cat-btn shrink-0 rounded-full bg-[#278A50] px-3.5 py-1.5 text-xs font-extrabold text-white cursor-pointer transition'
+            : 'cat-btn shrink-0 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-300 cursor-pointer transition';
+        });
+        renderShop();
+      });
+    });
+
+    // Achat ou équipement dans la grille
+    dom.shopGrid.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const item = CATALOG.find((i) => i.id === btn.dataset.id);
+      if (!item) return;
+
+      const equipItem = (it) => {
+        if (it.category === 'Cadres') state.equippedFrameId = it.id;
+        if (it.category === 'Badges') state.equippedBadgeId = it.id;
+        if (it.category === 'Objectifs') state.equippedGoalStyleId = it.id;
+        if (it.category === 'Bannières') state.equippedBannerId = it.id;
+      };
+
+      if (action === 'equip') {
+        await equipStoreItem(item);
+        return;
+      }
+      if (action === 'buy') {
+        if (state.ownedIds.includes(item.id) || state.balance < item.price) return;
+        btn.disabled = true;
+        await buyStoreItem(item);
+      }
+    });
+
+    // Modale d'export du code HTML
+    function getFullHtmlSource() {
+      return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    }
+
+    dom.openExportModalBtn.addEventListener('click', () => {
+      dom.exportedCodeArea.value = getFullHtmlSource();
+      dom.exportModalBackdrop.classList.remove('hidden');
+      dom.exportModalBackdrop.classList.add('flex');
+    });
+
+    dom.closeExportModalBtn.addEventListener('click', () => {
+      dom.exportModalBackdrop.classList.add('hidden');
+      dom.exportModalBackdrop.classList.remove('flex');
+    });
+
+    dom.exportModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === dom.exportModalBackdrop) {
+        dom.exportModalBackdrop.classList.add('hidden');
+        dom.exportModalBackdrop.classList.remove('flex');
+      }
+    });
+
+    dom.copyCodeBtn.addEventListener('click', () => {
+      dom.exportedCodeArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Code HTML copié dans le presse-papiers !', '📋');
+      } catch (err) {
+        showToast('Sélectionnez le texte puis faites Ctrl+C / Cmd+C', '📋');
+      }
+    });
+
+    dom.downloadHtmlBtn.addEventListener('click', () => {
+      try {
+        const blob = new Blob([getFullHtmlSource()], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'boutique_elocoins_elo_course.html';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast('Fichier .html téléchargé !', '⬇');
+      } catch (err) {
+        showToast('Utilisez « Copier le code » pour coller dans votre éditeur', '📋');
+      }
+    });
+
+    // Actualise le portefeuille si l'utilisateur se connecte ou se déconnecte dans un autre onglet.
+    storeClient.auth.onAuthStateChange(function () {
+      setTimeout(function () {
+        loadStoreState().then(renderAll).catch(function (error) {
+          storeMessage(error.message || 'Impossible d’actualiser le portefeuille.', true);
+        });
+      }, 0);
+    });
+
+    // Initialisation : aucune donnée fictive, le portefeuille réel fait foi.
+    (async function initStore() {
+      try {
+        await loadStoreState();
+      } catch (error) {
+        console.error('Initialisation boutique ELOCOINS :', error);
+        storeMessage('La boutique ne peut pas encore lire les nouvelles tables Supabase. La migration doit être appliquée avant son activation.', true);
+      }
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
