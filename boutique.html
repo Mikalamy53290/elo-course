@@ -1469,6 +1469,15 @@
       }
     });
 
+    // Actualise le portefeuille si l'utilisateur se connecte ou se déconnecte dans un autre onglet.
+    storeClient.auth.onAuthStateChange(function () {
+      setTimeout(function () {
+        loadStoreState().then(renderAll).catch(function (error) {
+          storeMessage(error.message || 'Impossible d’actualiser le portefeuille.', true);
+        });
+      }, 0);
+    });
+
     // Initialisation : aucune donnée fictive, le portefeuille réel fait foi.
     (async function initStore() {
       try {
