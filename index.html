@@ -1363,7 +1363,7 @@ function raceResultsBody(c,by,formatRaceTime){
   var all=(c.results||[]).map(function(x,i){return {x:x,index:i,rank:Number(x.rk)||i+1,runner:by[x.id]||{name:x.pendingName||"?"}};});
   all.sort(function(a,b){return a.rank-b.rank||a.index-b.index;});
   var query=norm(S.raceResultsQuery||"").trim();
-  if(query)all=all.filter(function(item){return norm((item.runner.name||"")+" "+item.rank+" "+formatRaceTime(item.x.time)).indexOf(query)>=0;});
+  if(query)all=all.filter(function(item){var r=item.runner||{},details=runnerDetails[r.id]||{};return searchTermsMatch([r.name,r.club,r.city,details.club,details.city,item.rank,formatRaceTime(item.x.time)].filter(Boolean).join(" "),query);});
   var pageSize=100,pages=Math.max(1,Math.ceil(all.length/pageSize));
   S.raceResultsPage=Math.min(Math.max(1,Number(S.raceResultsPage)||1),pages);
   var first=(S.raceResultsPage-1)*pageSize,shown=all.slice(first,first+pageSize);
@@ -1393,7 +1393,7 @@ function upcomingHTML(){
   var selectedDept=window.upcomingDept||'Tous',searchText=window.upcomingSearchText||'';
   if(deptList.indexOf(selectedDept)<0&&selectedDept!=='Tous')selectedDept='Tous';
   var allItems=upcomingCourses.filter(function(c){return (selectedDept==='Tous'||c.department===selectedDept)&&c.is_published!==false;}).slice().sort(function(a,b){return String(a.race_date||'').localeCompare(String(b.race_date||''));});
-  var items=allItems.filter(function(c){return searchTermsMatch([c.race_name,c.location,c.city,c.commune,c.department,c.distance,c.discipline,c.organization_name,c.description].filter(Boolean).join(' '),searchText);});
+  var items=allItems.filter(function(c){var fields=[];collectRaceSearchFields(c,fields,0);return searchTermsMatch(fields.join(" "),searchText);});
   var h='<section class="courses-head"><div class="gem-eyebrow">ELO COURSE · CALENDRIER RÉGIONAL</div><h2>Courses à venir</h2><p>Retrouve les épreuves annoncées en Sarthe, en Mayenne et en Maine-et-Loire.</p><div class="courses-tabs"><button class="ghost gem-secondary" data-act="view" data-v="races">Résultats des courses</button><button class="btn gem-primary" data-act="view" data-v="upcoming" aria-current="page">Courses à venir</button>'+(S.admin?'<button class="ghost" data-act="adminentry">Courses administration</button>':'')+'</div></section><div class="gem-results-tools"><input id="upcoming-search" class="gem-results-search" type="search" autocomplete="off" placeholder="Rechercher une course, une ville ou un organisateur…" value="'+esc(searchText)+'" aria-label="Rechercher une course, une ville ou un organisateur"></div><div class="department-tabs" role="group" aria-label="Choisir un département"><button class="'+(selectedDept==='Tous'?'active':'')+'" data-act="upcomingdept" data-v="Tous">Tous</button>'+deptList.map(function(d){return '<button class="'+(selectedDept===d?'active':'')+'" data-act="upcomingdept" data-v="'+d+'">'+d+'</button>';}).join('')+'</div><div id="upcoming-search-results"><p class="meta">'+items.length+' course(s) trouvée(s) sur '+allItems.length+' dans ce département.</p>';
   if(!items.length){h+='<div class="gem-result-empty"><strong>Aucune course ne correspond à cette recherche</strong><p style="margin:6px 0 0">Essaie une autre ville, un autre nom ou un autre département.</p></div></div>';return h;}
   h+='<div class="upcoming-list">'+items.map(function(c){
