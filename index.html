@@ -566,7 +566,7 @@ var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_pub
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
 var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,elocoinsBalance=0,referralCode='',referralUsageCount=0,avatarMap={},runnerDetails={},socialBusy=false;
-var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false;
+var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,raceCitiesLoaded=false,raceCitiesLoading=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false;
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
 var KEY="elo-site-v2",UI_KEY="elo-course-ui-v1",MINR=1,ADMIN_AUTH_USER_ID="26789cc4-2ac3-4129-95c8-2234b1dc748d",ALL={},CONTACT="mimi.6q@live.fr";
@@ -585,7 +585,7 @@ function save(dataChanged){
   // Le parcours complet des résultats n'est effectué qu'après une vraie modification
   // d'une course ou d'un résultat, jamais lors d'un simple changement d'onglet/filtre.
   if(dataChanged){
-    raceListCache=null;raceListCacheRaces=null;raceListCacheRunners=null;
+    raceListCache=null;raceListCacheRaces=null;raceListCacheRunners=null;raceCitiesLoaded=false;raceCitiesLoading=null;
     var nextFingerprint=S.races.map(function(c){return [c.id,c.date,c.dist,c.type||c.discipline||"",c.department||c.departement||"",(c.results||[]).map(function(a){return (a.id||a.pendingKey||'')+':'+a.time+':'+(a.pendingName||'')}).join(',')].join('~')}).join('|');
     if(nextFingerprint!==eloFingerprint){eloCache={};eloVersion++;eloPending={};eloFingerprint=nextFingerprint;}
   }
@@ -1249,9 +1249,30 @@ function raceDepartment(c){
   if(n.indexOf('maine et loire')>=0||n.indexOf('maine-et-loire')>=0||/\b49\b/.test(raw))return 'Maine-et-Loire';
   return 'Non renseigné';
 }
+function searchTermsMatch(haystack,query){
+  var terms=norm(query).trim().split(/\s+/).filter(Boolean);
+  var text=norm(haystack);
+  return !terms.length||terms.every(function(term){return text.indexOf(term)>=0;});
+}
 function raceResultSearchText(items,title,byId){
-  var names=[];items.forEach(function(c){(c.results||[]).forEach(function(x){var r=byId[x.id];if(r)names.push(r.name||'',r.club||'',r.city||'');else names.push(x.pendingName||'');});});
-  var c=items[0]||{};return norm([title,c.name,c.event,c.dist,c.provider,c.department,c.departement,c.location,c.city,c.commune].concat(names).join(' '));
+  var names=[],raceFields=[];
+  items.forEach(function(c){
+    raceFields.push(c.name,c.event,c.race_name,c.dist,c.distance,c.provider,c.department,c.departement,c.dept,c.location,c.city,c.commune,c.town,c.ville,c.place,c.address);
+    (c.results||[]).forEach(function(x){var r=byId[x.id],details=runnerDetails[x.id]||{};if(r)names.push(r.name||'',r.club||'',r.city||'',details.city||'',details.club||'');else names.push(x.pendingName||'',x.pendingCity||'');});
+  });
+  return norm([title].concat(raceFields,names).filter(Boolean).join(' '));
+}
+function ensureRaceCitiesLoaded(){
+  if(raceCitiesLoaded||raceCitiesLoading)return raceCitiesLoading;
+  var ids=[],seen=Object.create(null);
+  S.races.forEach(function(c){(c.results||[]).forEach(function(x){if(x&&x.id&&!x.pending&&!seen[x.id]){seen[x.id]=1;ids.push(x.id);}});});
+  if(!ids.length){raceCitiesLoaded=true;return Promise.resolve();}
+  raceCitiesLoading=loadCitiesFor(ids).then(function(cities){
+    Object.keys(cities||{}).forEach(function(id){runnerDetails[id]=Object.assign(runnerDetails[id]||{runner_id:id},{city:cities[id]});});
+    raceCitiesLoaded=true;raceListCache=null;
+    if(S.view==="races")render();
+  }).catch(function(){raceCitiesLoaded=false;}).then(function(){raceCitiesLoading=null;});
+  return raceCitiesLoading;
 }
 function getRaceListIndex(){
   if(raceListCache&&raceListCacheRaces===S.races&&raceListCacheRunners===S.runners)return raceListCache;
@@ -1269,7 +1290,7 @@ function racesHTML(){
   if(S.admin)h+='<div class="admin-exit" style="margin:8px 0 16px"><span><strong>Mode administrateur actif</strong><br><span class="meta">Quitter l’administration et revenir au site public</span></span><button class="ghost" data-act="adminoff">Passer en vue visiteur</button></div>';
   h+='<div class="gem-results-tools"><input id="race-search" class="gem-results-search" type="search" autocomplete="off" placeholder="Rechercher une course, un coureur ou un club…" value="'+esc(window.raceSearchText||'')+'" aria-label="Rechercher une course, un coureur ou un club"><div class="department-tabs" role="group" aria-label="Filtrer par département"><button class="'+(selectedDept==='Sarthe'?'active':'')+'" data-act="racedepartment" data-v="Sarthe">Sarthe</button><button class="'+(selectedDept==='Mayenne'?'active':'')+'" data-act="racedepartment" data-v="Mayenne">Mayenne</button><button class="'+(selectedDept==='Maine-et-Loire'?'active':'')+'" data-act="racedepartment" data-v="Maine-et-Loire">Maine-et-Loire</button><button class="'+(selectedDept==='Tous'?'active':'')+'" data-act="racedepartment" data-v="Tous">Toutes</button></div></div>';
   if(S.races.length){
-    var filtered=raceIndex.list.map(function(entry){var items=entry.items,current=items.filter(function(c){return c.id===S.open})[0]||items[0],dept=raceDepartment(current);return {items:items,current:current,title:entry.title,dept:dept,haystack:entry.haystack};}).filter(function(entry){return (selectedDept==='Tous'||entry.dept===selectedDept||entry.dept==='Non renseigné')&&(!searchText||entry.haystack.indexOf(searchText)>=0);});
+    var filtered=raceIndex.list.map(function(entry){var items=entry.items,current=items.filter(function(c){return c.id===S.open})[0]||items[0],dept=raceDepartment(current);return {items:items,current:current,title:entry.title,dept:dept,haystack:entry.haystack};}).filter(function(entry){return (selectedDept==='Tous'||entry.dept===selectedDept||entry.dept==='Non renseigné')&&searchTermsMatch(entry.haystack,searchText);});
     var visibleCount=filtered.length,limit=Math.max(30,Number(window.raceListLimit)||30);
     if(S.open){var openIndex=filtered.findIndex(function(entry){return entry.items.some(function(c){return c.id===S.open;});});if(openIndex>=limit)limit=openIndex+1;}
     var page=filtered.slice(0,limit);
@@ -1347,10 +1368,12 @@ function helpHTML(){
 }
 function upcomingHTML(){
   var deptList=['Sarthe','Mayenne','Maine-et-Loire'];
-  var selectedDept=deptList.indexOf(window.upcomingDept)>=0?window.upcomingDept:'Sarthe';
-  var items=upcomingCourses.filter(function(c){return c.department===selectedDept&&c.is_published!==false;}).slice().sort(function(a,b){return String(a.race_date||'').localeCompare(String(b.race_date||''));});
-  var h='<section class="courses-head"><div class="gem-eyebrow">ELO COURSE · CALENDRIER RÉGIONAL</div><h2>Courses à venir</h2><p>Retrouve les épreuves annoncées en Sarthe, en Mayenne et en Maine-et-Loire.</p><div class="courses-tabs"><button class="ghost gem-secondary" data-act="view" data-v="races">Résultats des courses</button><button class="btn gem-primary" data-act="view" data-v="upcoming" aria-current="page">Courses à venir</button>'+(S.admin?'<button class="ghost" data-act="adminentry">Courses administration</button>':'')+'</div></section><div class="department-tabs" role="group" aria-label="Choisir un département">'+deptList.map(function(d){return '<button class="'+(selectedDept===d?'active':'')+'" data-act="upcomingdept" data-v="'+d+'">'+d+'</button>';}).join('')+'</div>';
-  if(!items.length){h+='<div class="gem-result-empty"><strong>Aucune course annoncée pour le moment</strong><p style="margin:6px 0 0">Les prochaines épreuves publiées par les organisateurs apparaîtront ici.</p></div>';return h;}
+  var selectedDept=window.upcomingDept||'Tous',searchText=window.upcomingSearchText||'';
+  if(deptList.indexOf(selectedDept)<0&&selectedDept!=='Tous')selectedDept='Tous';
+  var allItems=upcomingCourses.filter(function(c){return (selectedDept==='Tous'||c.department===selectedDept)&&c.is_published!==false;}).slice().sort(function(a,b){return String(a.race_date||'').localeCompare(String(b.race_date||''));});
+  var items=allItems.filter(function(c){return searchTermsMatch([c.race_name,c.location,c.city,c.commune,c.department,c.distance,c.discipline,c.organization_name,c.description].filter(Boolean).join(' '),searchText);});
+  var h='<section class="courses-head"><div class="gem-eyebrow">ELO COURSE · CALENDRIER RÉGIONAL</div><h2>Courses à venir</h2><p>Retrouve les épreuves annoncées en Sarthe, en Mayenne et en Maine-et-Loire.</p><div class="courses-tabs"><button class="ghost gem-secondary" data-act="view" data-v="races">Résultats des courses</button><button class="btn gem-primary" data-act="view" data-v="upcoming" aria-current="page">Courses à venir</button>'+(S.admin?'<button class="ghost" data-act="adminentry">Courses administration</button>':'')+'</div></section><div class="gem-results-tools"><input id="upcoming-search" class="gem-results-search" type="search" autocomplete="off" placeholder="Rechercher une course, une ville ou un organisateur…" value="'+esc(searchText)+'" aria-label="Rechercher une course, une ville ou un organisateur"></div><div class="department-tabs" role="group" aria-label="Choisir un département"><button class="'+(selectedDept==='Tous'?'active':'')+'" data-act="upcomingdept" data-v="Tous">Tous</button>'+deptList.map(function(d){return '<button class="'+(selectedDept===d?'active':'')+'" data-act="upcomingdept" data-v="'+d+'">'+d+'</button>';}).join('')+'</div><p class="meta">'+items.length+' course(s) trouvée(s) sur '+allItems.length+' dans ce département.</p>';
+  if(!items.length){h+='<div class="gem-result-empty"><strong>Aucune course ne correspond à cette recherche</strong><p style="margin:6px 0 0">Essaie une autre ville, un autre nom ou un autre département.</p></div>';return h;}
   h+='<div class="upcoming-list">'+items.map(function(c){
     var dateLabel=c.race_date?new Date(String(c.race_date).slice(0,10)+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'Date à préciser';
     var discipline=c.discipline==='route'?'Courses sur route':c.discipline==='nature'?'Courses nature':'Discipline à préciser';
@@ -1430,7 +1453,8 @@ function testPreviewHTML(){
   if(S.testPreview==='organizer')return '<div class="card"><button class="ghost" data-act="closeTestPreview">← Retour</button><h2>🏁 Espace organisateur — aperçu de test</h2><p class="meta">Bac à sable local : aucune annonce réelle ne sera publiée.</p><label>Nom de l’association</label><input id="testorgname" value="Association Démonstration"><label>Nom de la course</label><input id="testorgrace" value="Les Foulées de Démonstration"><label>Date</label><input id="testorgdate" type="date" value="2027-05-16"><label>Département</label><select id="testorgdept"><option>Mayenne</option><option>Sarthe</option><option>Maine-et-Loire</option></select><label>Distance</label><input id="testorgdist" value="10 km"><label>Lien d’inscription</label><input id="testorglink" type="url" placeholder="https://…"><label>Présentation</label><textarea id="testorgdesc" rows="3" placeholder="Présentez votre événement…"></textarea><button class="btn" data-act="testOrganizerPublish">Simuler la publication</button><p class="msg" id="testorgmsg">Aperçu uniquement : aucune donnée ne sera envoyée au serveur.</p></div>';
   return '';
 }
-function render(){setTimeout(arrows,30);MINR=1;
+function render(){window.ELO_ADMIN_MODE=!!S.admin;setTimeout(arrows,30);MINR=1;
+  if(S.view==="races"&&!raceCitiesLoaded&&!raceCitiesLoading)ensureRaceCitiesLoaded();
   if(S.view==="ghost"){if(eloCache.all)sendGhostRaceTitles();}
   // Le calcul ELO reste partagé, mais seule la rubrique visible est reconstruite.
   var needsStats=S.view==="rank"||S.view==="me"||S.view==="accueil";
@@ -1871,6 +1895,12 @@ document.addEventListener("input",function(e){
     window.raceSearchText=e.target.value;window.raceListLimit=30;
     var start=e.target.selectionStart,end=e.target.selectionEnd;render();
     var next=document.getElementById('race-search');if(next){next.focus();try{next.setSelectionRange(start,end)}catch(ignoreRaceSearchSelection){}}
+    return;
+  }
+  if(e.target.id==="upcoming-search"){
+    window.upcomingSearchText=e.target.value;
+    var startUpcoming=e.target.selectionStart,endUpcoming=e.target.selectionEnd;render();
+    var nextUpcoming=document.getElementById('upcoming-search');if(nextUpcoming){nextUpcoming.focus();try{nextUpcoming.setSelectionRange(startUpcoming,endUpcoming)}catch(ignoreUpcomingSearchSelection){}}
     return;
   }
   if(e.target.id==="cex"){
@@ -2429,6 +2459,6 @@ sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRu
 })();
 </script>
 
-<script src="/bandeau-annonces.js?v=20261123-8"></script>
+<script src="/bandeau-annonces.js?v=20261124-1"></script>
 </body>
 </html>
