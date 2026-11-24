@@ -10,6 +10,7 @@
   var lastMessage=null, lastActive=null;
   var style=document.createElement("style");
   style.textContent="#elo-announcement{position:sticky;top:0;z-index:9998;display:none;overflow:hidden;background:linear-gradient(90deg,#101d35,#193b63);color:#fff;border-bottom:2px solid #d7ad52;padding:10px 0;font-weight:700;font-size:14px}#elo-announcement .elo-track{display:flex;width:max-content;white-space:nowrap;animation:elo-scroll 24s linear infinite}#elo-announcement .elo-item{padding-right:80px}#elo-announcement:hover .elo-track,#elo-announcement:focus-within .elo-track{animation-play-state:paused}@keyframes elo-scroll{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}@media(prefers-reduced-motion:reduce){#elo-announcement .elo-track{animation:none;width:auto;justify-content:center;white-space:normal;padding:0 16px}}#elo-announcement-admin{margin:18px 0;padding:16px;border:1px solid #d7ad52;border-radius:14px;background:rgba(20,35,58,.06)}#elo-announcement-admin textarea{box-sizing:border-box;width:100%;min-height:84px;padding:10px;border:1px solid #aab4c2;border-radius:8px;font:inherit}#elo-announcement-admin button{margin:8px 8px 0 0;padding:9px 13px;border:0;border-radius:8px;background:#193b63;color:white;font-weight:700}#elo-announcement-admin button.stop{background:#8d3030}#elo-announcement-admin small{display:block;margin-top:8px}";
+  style.textContent += "body.elo-profile-view #elo-announcement{display:none!important}";
   document.head.appendChild(style);
   function makeBar(){
     if(bar)return;
