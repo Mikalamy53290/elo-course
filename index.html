@@ -1250,7 +1250,7 @@ function raceDepartment(c){
   return 'Non renseigné';
 }
 function searchTermsMatch(haystack,query){
-  var terms=norm(query).trim().split(/\\s+/).filter(Boolean);
+  var terms=norm(query).trim().split(/\s+/).filter(Boolean);
   var text=norm(haystack);
   return !terms.length||terms.every(function(term){return text.indexOf(term)>=0;});
 }
