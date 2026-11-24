@@ -30,13 +30,14 @@ jobs:
           sa configuration Wrangler, la page boutique et la migration SQL ELOCOINS.
           
           AVANT LA MISE EN LIGNE :
-          1. Vérifier la migration supabase/migrations/20261124120000_elocoins_shop.sql
-             et l'appliquer au projet Supabase de production.
+          1. Vérifier puis appliquer au projet Supabase de production les scripts SQL requis :
+             - bandeau-annonces.sql (si le bandeau n'est pas déjà activé)
+             - supabase/migrations/20261124120000_elocoins_shop.sql (boutique ELOCOINS).
           2. Depuis ce dossier, installer/utiliser Wrangler avec un compte Cloudflare
              autorisé, puis lancer : npx wrangler deploy
           3. Vérifier https://elo-course.eu/boutique.html et le parcours d'achat.
           
-          La migration SQL n'est PAS appliquée par cette archive.
+          Aucun script SQL n'est appliqué automatiquement par cette archive.
           Aucun déploiement Cloudflare n'est effectué par cette archive.
           Ne pas publier avant validation de la migration et tests.
           EOF
