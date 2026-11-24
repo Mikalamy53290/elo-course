@@ -1610,7 +1610,7 @@ function parseCategorySex(value,sexValue){
 function parseDelimitedResults(txt,provider){
   var lines=String(txt||'').replace(/\r/g,'\n').split(/\n+/),out=[],seen={},header=null;
   function clean(v){return String(v||'').replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/<img\b[^>]*>/gi,'').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/<[^>]*>/g,'').replace(/\*\*/g,'').replace(/`/g,'').replace(/\s+/g,' ').trim()}
-  function idx(h,tests){for(var i=0;i<h.length;i++){var x=norm(h[i]);if(tests.some(function(re){return re.test(x)}))return i}return -1}
+  function idx(h,tests){for(var i=0;i<h.length;i++){var x=norm(h[i]).trim();if(tests.some(function(re){return re.test(x)}))return i}return -1}
   function rank(v){var x=clean(v),m=x.match(/(?:^|\D)(\d{1,5})\s*(?:er|e|è|ème)?(?:\s|$)/i);return m?Number(m[1]):0}
   function time(v){var x=clean(v).replace(/\s/g,'');return /^\d{1,2}:\d{2}(?::\d{2})?$/.test(x)?secs(x):0}
   function cellsOf(line){if(line.indexOf('|')>=0){var c=line.split('|').map(clean);if(c[0]==='')c.shift();if(c[c.length-1]==='')c.pop();return c}if(line.indexOf('\t')>=0)return line.split('\t').map(clean);return null}
@@ -1625,13 +1625,13 @@ function parseDelimitedResults(txt,provider){
       var ri=idx(header,[/\bpos/,/position/,/\brang/,/\bplace/,/classement/]);
       rk=ri>=0?rank(cells[ri]):0;
       // Ne jamais confondre « Nom du club » avec le nom du participant.
-      lastNameIdx=idx(header,[/^nom$/]);
-      firstNameIdx=idx(header,[/^prenom$/]);
+      lastNameIdx=idx(header,[/^nom$/, /^nom de famille$/, /^nom famille$/, /^surname$/, /^last name$/, /^family name$/]);
+      firstNameIdx=idx(header,[/^prenom$/, /^prénom$/, /^first name$/, /^given name$/, /^forename$/]);
       if(lastNameIdx>=0&&firstNameIdx>=0){
         ni=-1;
       }else{
         lastNameIdx=-1;firstNameIdx=-1;
-        ni=idx(header,[/nom.*prenom|prenom.*nom/,/nom.*coureur|coureur.*nom/,/^nom complet$/, /^coureur$/, /^athlete$/, /^nom$/]);
+        ni=idx(header,[/nom.*prenom|prenom.*nom|nom.*first.*name|first.*name.*nom/,/nom.*coureur|coureur.*nom/,/^nom complet$/, /^nom et prenom$/, /^full name$/, /^runner name$/, /^coureur$/, /^athlete$/, /^runner$/, /^nom$/]);
       }
       si=idx(header,[/sexe/,/^sex$/]);
       bi=idx(header,[/dossard/,/bib/]);

@@ -10,12 +10,24 @@
   var lastMessage=null, lastActive=null;
   var style=document.createElement("style");
   style.textContent="#elo-announcement{position:sticky;top:0;z-index:9998;display:none;overflow:hidden;background:linear-gradient(90deg,#101d35,#193b63);color:#fff;border-bottom:2px solid #d7ad52;padding:10px 0;font-weight:700;font-size:14px}#elo-announcement .elo-track{display:flex;width:max-content;white-space:nowrap;animation:elo-scroll 24s linear infinite}#elo-announcement .elo-item{padding-right:80px}#elo-announcement:hover .elo-track,#elo-announcement:focus-within .elo-track{animation-play-state:paused}@keyframes elo-scroll{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}@media(prefers-reduced-motion:reduce){#elo-announcement .elo-track{animation:none;width:auto;justify-content:center;white-space:normal;padding:0 16px}}#elo-announcement-admin{margin:18px 0;padding:16px;border:1px solid #d7ad52;border-radius:14px;background:rgba(20,35,58,.06)}#elo-announcement-admin textarea{box-sizing:border-box;width:100%;min-height:84px;padding:10px;border:1px solid #aab4c2;border-radius:8px;font:inherit}#elo-announcement-admin button{margin:8px 8px 0 0;padding:9px 13px;border:0;border-radius:8px;background:#193b63;color:white;font-weight:700}#elo-announcement-admin button.stop{background:#8d3030}#elo-announcement-admin small{display:block;margin-top:8px}";
+  style.textContent += "body.elo-profile-view #elo-announcement{display:none!important}";
   document.head.appendChild(style);
   function makeBar(){
     if(bar)return;
     bar=document.createElement("div");bar.id="elo-announcement";bar.setAttribute("role","status");bar.setAttribute("aria-live","polite");
     var track=document.createElement("div");track.className="elo-track";var item=document.createElement("span");item.className="elo-item";track.appendChild(item);bar.appendChild(track);
     document.body.insertBefore(bar,document.body.firstChild);
+  }
+  function isRunnerProfileVisible(){
+    return !!document.querySelector("#v-me.on, #v-rank.on .pf");
+  }
+  function syncProfileVisibility(){
+    var onProfile=isRunnerProfileVisible();
+    document.body.classList.toggle("elo-profile-view",onProfile);
+    if(bar){
+      if(onProfile)bar.style.setProperty("display","none","important");
+      else{bar.style.removeProperty("display");bar.style.display=lastActive?"block":"none";}
+    }
   }
   function render(row){
     makeBar();
@@ -26,14 +38,21 @@
       bar.style.display=active?"block":"none";
       lastActive=active;lastMessage=message;
     }
+    syncProfileVisibility();
   }
   async function refresh(){
     try{
-      var r=await db.from("site_announcements").select("message,active,updated_at").eq("id",1).maybeSingle();
-      if(r.error) throw r.error;
-      render(r.data||{active:false,message:""});
-      if(status) status.textContent=r.data&&r.data.active?"Annonce publiée.":"Aucune annonce active.";
-      if(input&&document.activeElement!==input&&r.data&&r.data.message) input.value=r.data.message;
+      // Lecture publique volontairement anonyme : ne dépend pas de la session
+      // du visiteur ou du compte coureur connecté.
+      var response=await fetch(URL+"/rest/v1/site_announcements?id=eq.1&select=message,active,updated_at",{
+        method:"GET",
+        headers:{"apikey":KEY,"Accept":"application/json"}
+      });
+      if(!response.ok)throw new Error("HTTP "+response.status+" lors de la lecture publique");
+      var rows=await response.json(),row=Array.isArray(rows)&&rows.length?rows[0]:{active:false,message:""};
+      render(row);
+      if(status) status.textContent=row.active?"Annonce publiée.":"Aucune annonce active.";
+      if(input&&document.activeElement!==input&&row.message) input.value=row.message;
     }catch(e){if(status)status.textContent="Lecture Supabase impossible : "+(e.message||e);}
   }
   function makePanel(){
@@ -66,15 +85,18 @@
     input.value="";await refresh();
   }
   async function checkAdmin(){
+    syncProfileVisibility();
     try{
       var u=await db.auth.getUser();
-      var ok=!!(u.data&&u.data.user&&u.data.user.id===ADMIN);
+      var appAdminMode=window.ELO_ADMIN_MODE===true;
+      var ok=!!(appAdminMode&&u.data&&u.data.user&&u.data.user.id===ADMIN);
       if(ok)makePanel();
       else if(panel&&panel.parentNode)panel.parentNode.removeChild(panel);
     }catch(e){}
   }
   async function init(){
-    makeBar();await refresh();await checkAdmin();
+    makeBar();syncProfileVisibility();await refresh();await checkAdmin();
+    if(window.MutationObserver){var profileObserver=new MutationObserver(syncProfileVisibility);profileObserver.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden"]});}
     db.auth.onAuthStateChange(function(){setTimeout(checkAdmin,0);});
     var nav=document.getElementById("nav-admin");
     if(nav&&window.MutationObserver)new MutationObserver(checkAdmin).observe(nav,{attributes:true,attributeFilter:["hidden"]});
