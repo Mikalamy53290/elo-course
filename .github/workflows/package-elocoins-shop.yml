@@ -1,0 +1,47 @@
+name: Package boutique ELOCOINS
+on:
+  push:
+    branches:
+      - feature/elocoins-shop-clean-2026-11-24
+    paths:
+      - 'boutique.html'
+      - 'index.html'
+      - 'supabase/migrations/20261124120000_elocoins_shop.sql'
+      - '.github/workflows/package-elocoins-shop.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build ZIP
+        run: |
+          mkdir -p ELO-COURSE-boutique-ELOCOINS/supabase/migrations
+          cp boutique.html index.html ELO-COURSE-boutique-ELOCOINS/
+          cp supabase/migrations/20261124120000_elocoins_shop.sql ELO-COURSE-boutique-ELOCOINS/supabase/migrations/
+          cat > ELO-COURSE-boutique-ELOCOINS/LISEZ-MOI.txt <<'EOF'
+          ELO COURSE — Boutique ELOCOINS
+          
+          Contenu :
+          - boutique.html : interface boutique connectée à Supabase
+          - index.html : lien d'accès depuis le profil coureur
+          - supabase/migrations/20261124120000_elocoins_shop.sql : migration catalogue, inventaire et fonctions sécurisées
+          
+          IMPORTANT :
+          Cette archive correspond à une version de travail.
+          La migration SQL n'est pas appliquée en production.
+          Aucun déploiement Cloudflare n'a été effectué.
+          Ne pas mettre en ligne avant revue et activation de la migration Supabase.
+          EOF
+          zip -r ELO-COURSE-boutique-ELOCOINS.zip ELO-COURSE-boutique-ELOCOINS
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: ELO-COURSE-boutique-ELOCOINS
+          path: ELO-COURSE-boutique-ELOCOINS.zip
+          if-no-files-found: error
+          retention-days: 30
