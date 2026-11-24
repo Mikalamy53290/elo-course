@@ -1457,7 +1457,7 @@ function topInfoHTML(st){
       if(item)html+='<span class="top-account-elo"><span>CLASSEMENT '+(rank>0?rank+'e':'PROVISOIRE')+'</span><strong>'+formatElo(item.p.elo)+' pts ELO</strong></span>';
       if(sexInfo)html+='<span>'+(sexInfo.sex==='F'?'Femmes':'Hommes')+' : '+(sexInfo.rank?sexInfo.rank+'e / '+sexInfo.total:'non classé')+'</span>';
       if(catInfo)html+='<span>'+esc(catInfo.category)+' · '+(catInfo.sex==='F'?'Femmes':'Hommes')+' : '+(catInfo.rank?catInfo.rank+'e / '+catInfo.total:'non classé')+'</span>';
-      html+='</div><button class="top-account-profile" data-act="view" data-v="me">Mon profil</button>';
+      html+='</div><button class="top-account-profile" data-act="view" data-v="me">Mon profil</button><a href="/boutique-elocoins.html" class="top-account-profile" style="text-decoration:none">🪙 Boutique</a>';
     }else{
       html+='<div class="top-account-summary"><span class="top-account-kicker">COMPTE CONNECTÉ</span><strong>'+esc(authUser.email||'Compte ELO COURSE')+'</strong><span>'+(pendingRunner?'Demande de rattachement coureur en attente de validation.':'Accès organisateur disponible.')+'</span></div>';
     }
