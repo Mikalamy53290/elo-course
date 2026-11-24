@@ -1319,10 +1319,10 @@ function refreshUpcomingSearchResults(){
   else host.innerHTML='<div class="gem-result-empty">La recherche ne peut pas afficher les courses à venir. Recharge la rubrique.</div>';
 }
 function racesHTML(){
-  var selectedDept=window.raceDept||'Tous',searchText=norm(window.raceSearchText||'').trim(),raceIndex=getRaceListIndex();
+  var selectedDept=window.raceDept||'Tous',searchText='',raceIndex=getRaceListIndex();
   var h='<section class="courses-head"><div class="gem-eyebrow">ELO COURSE · SARTHE · MAYENNE · MAINE-ET-LOIRE</div><h2>Résultats officiels des courses</h2><p>Retrouve les épreuves chronométrées, consulte les podiums et ouvre les classements complets. Les résultats affichés proviennent des données ELO COURSE ; les informations de département sont indiquées lorsqu’elles sont renseignées.</p><div class="courses-tabs"><button class="btn gem-primary" data-act="view" data-v="races" aria-current="page">Résultats des courses</button><button class="ghost gem-secondary" data-act="view" data-v="upcoming">Courses à venir</button>'+(S.admin?'<button class="ghost" data-act="adminentry">Courses administration</button>':'')+'</div></section>'+(msg.sync?'<p class="msg" role="status">'+esc(msg.sync)+'</p>':'')+(msg.race?'<p class="msg" role="alert" style="font-weight:500;color:'+(/^(Aucun|Moins|Donne)/.test(msg.race)?'var(--down)':'var(--up)')+'">'+esc(msg.race)+'</p>'+(/retenus/.test(msg.race)?'<button class="btn" data-act="view" data-v="rank" style="margin-bottom:12px">Voir le classement</button>':''):'');
   if(S.admin)h+='<div class="admin-exit" style="margin:8px 0 16px"><span><strong>Mode administrateur actif</strong><br><span class="meta">Quitter l’administration et revenir au site public</span></span><button class="ghost" data-act="adminoff">Passer en vue visiteur</button></div>';
-  h+='<div class="gem-results-tools"><input id="race-search" class="gem-results-search" type="search" autocomplete="off" placeholder="Rechercher une course, un coureur ou un club…" value="'+esc(window.raceSearchText||'')+'" aria-label="Rechercher une course, un coureur ou un club"><div class="department-tabs" role="group" aria-label="Filtrer par département"><button class="'+(selectedDept==='Sarthe'?'active':'')+'" data-act="racedepartment" data-v="Sarthe">Sarthe</button><button class="'+(selectedDept==='Mayenne'?'active':'')+'" data-act="racedepartment" data-v="Mayenne">Mayenne</button><button class="'+(selectedDept==='Maine-et-Loire'?'active':'')+'" data-act="racedepartment" data-v="Maine-et-Loire">Maine-et-Loire</button><button class="'+(selectedDept==='Tous'?'active':'')+'" data-act="racedepartment" data-v="Tous">Toutes</button></div></div>';
+  h+='<div class="gem-results-tools"><div class="department-tabs" role="group" aria-label="Filtrer par département"><button class="'+(selectedDept==='Sarthe'?'active':'')+'" data-act="racedepartment" data-v="Sarthe">Sarthe</button><button class="'+(selectedDept==='Mayenne'?'active':'')+'" data-act="racedepartment" data-v="Mayenne">Mayenne</button><button class="'+(selectedDept==='Maine-et-Loire'?'active':'')+'" data-act="racedepartment" data-v="Maine-et-Loire">Maine-et-Loire</button><button class="'+(selectedDept==='Tous'?'active':'')+'" data-act="racedepartment" data-v="Tous">Toutes</button></div></div>';
   if(S.races.length){
     var filtered=raceIndex.list.map(function(entry){var items=entry.items,current=items.filter(function(c){return c.id===S.open})[0]||items[0],dept=raceDepartment(current);return {items:items,current:current,title:entry.title,dept:dept,haystack:entry.haystack};}).filter(function(entry){return (selectedDept==='Tous'||entry.dept===selectedDept||entry.dept==='Non renseigné')&&searchTermsMatch(entry.haystack,searchText);});
     var visibleCount=filtered.length,limit=searchText?visibleCount:Math.max(30,Number(window.raceListLimit)||30);
@@ -1610,28 +1610,28 @@ function parseCategorySex(value,sexValue){
 function parseDelimitedResults(txt,provider){
   var lines=String(txt||'').replace(/\r/g,'\n').split(/\n+/),out=[],seen={},header=null;
   function clean(v){return String(v||'').replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/<img\b[^>]*>/gi,'').replace(/\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/<[^>]*>/g,'').replace(/\*\*/g,'').replace(/`/g,'').replace(/\s+/g,' ').trim()}
-  function idx(h,tests){for(var i=0;i<h.length;i++){var x=norm(h[i]);if(tests.some(function(re){return re.test(x)}))return i}return -1}
+  function idx(h,tests){for(var i=0;i<h.length;i++){var x=norm(h[i]).trim();if(tests.some(function(re){return re.test(x)}))return i}return -1}
   function rank(v){var x=clean(v),m=x.match(/(?:^|\D)(\d{1,5})\s*(?:er|e|è|ème)?(?:\s|$)/i);return m?Number(m[1]):0}
   function time(v){var x=clean(v).replace(/\s/g,'');return /^\d{1,2}:\d{2}(?::\d{2})?$/.test(x)?secs(x):0}
   function cellsOf(line){if(line.indexOf('|')>=0){var c=line.split('|').map(clean);if(c[0]==='')c.shift();if(c[c.length-1]==='')c.pop();return c}if(line.indexOf('\t')>=0)return line.split('\t').map(clean);return null}
   function category(v){return !!parseCategorySex(clean(v),"").cat}
   for(var li=0;li<lines.length;li++){
-    var cells=cellsOf(lines[li]);if(!cells||cells.length<4)continue;
+    var cells=cellsOf(lines[li]);if(!cells||cells.length<3)continue;
     var joined=norm(cells.join(' '));
-    if(/(?:pos|position|rang|place|classement)/.test(joined)&&/(?:nom|coureur|athlete)/.test(joined)){header=cells;continue}
+    if(/(?:pos|position|rang|place|classement)/.test(joined)&&/(?:nom|prenom|coureur|athlete)/.test(joined)){header=cells;continue}
     if(cells.every(function(x){return !x||/^[-:]+$/.test(x)}))continue;
     var rk=0,ni=-1,si=-1,bi=-1,ci=-1,vi=-1,cli=-1,firstNameIdx=-1,lastNameIdx=-1;
     if(header){
       var ri=idx(header,[/\bpos/,/position/,/\brang/,/\bplace/,/classement/]);
       rk=ri>=0?rank(cells[ri]):0;
       // Ne jamais confondre « Nom du club » avec le nom du participant.
-      lastNameIdx=idx(header,[/^nom$/]);
-      firstNameIdx=idx(header,[/^prenom$/]);
+      lastNameIdx=idx(header,[/^nom$/, /^nom de famille$/, /^nom famille$/, /^surname$/, /^last name$/, /^family name$/]);
+      firstNameIdx=idx(header,[/^prenom$/, /^prénom$/, /^first name$/, /^given name$/, /^forename$/]);
       if(lastNameIdx>=0&&firstNameIdx>=0){
         ni=-1;
       }else{
         lastNameIdx=-1;firstNameIdx=-1;
-        ni=idx(header,[/nom.*prenom|prenom.*nom/,/nom.*coureur|coureur.*nom/,/^nom complet$/, /^coureur$/, /^athlete$/, /^nom$/]);
+        ni=idx(header,[/nom.*prenom|prenom.*nom|nom.*first.*name|first.*name.*nom/,/nom.*coureur|coureur.*nom/,/^nom complet$/, /^nom et prenom$/, /^full name$/, /^runner name$/, /^coureur$/, /^athlete$/, /^runner$/, /^nom$/]);
       }
       si=idx(header,[/sexe/,/^sex$/]);
       bi=idx(header,[/dossard/,/bib/]);
@@ -1839,7 +1839,7 @@ async function addRace(){
   var name=$("#cn").value.trim(),txt=$("#ctxt").value,dist=(($("#cdistother").value.trim())||($("#cdist").value==="Autre"?"":$("#cdist").value)).trim().replace(/\s+/g," "),date=$("#cdate").value;
   if(!name){msg.race="Donne un nom à la course.";return render2("races")}
   if(!dist){msg.race="Indique la distance exacte de la course (ex. 11 km).";return render2("races")}
-  txt=txt.normalize("NFC");var ents=parseMamertines(txt);if(!ents.length)ents=parseRaceScore(txt);if(!ents.length)ents=parseBreizhChrono(txt);if(!ents.length)ents=parseKlikego(txt);if(!ents.length)ents=parseIpitos(txt);
+  txt=txt.normalize("NFC");var ents=parseMamertines(txt);if(!ents.length)ents=parseDelimitedResults(txt,"excel");if(!ents.length)ents=parseRaceScore(txt);if(!ents.length)ents=parseBreizhChrono(txt);if(!ents.length)ents=parseKlikego(txt);if(!ents.length)ents=parseIpitos(txt);
   if(!ents.length)txt.split(/\n/).forEach(function(l){var m=l.match(/\d{1,2}:\d{2}:\d{2}|\d{1,3}:\d{2}/);if(m)ents.push({name:l,time:secs(m[0])})});
   var res=[],pendingResults=[],seen={},seenPending={},anonymousSkipped=0,unmatched=0,autoCreated=0,createdRunnerIds=[],unmatchedNames=[],ambiguousNames=[];
   // Index en mémoire : une seule lecture des fiches, puis accès direct par nom normalisé.
@@ -1923,12 +1923,6 @@ document.addEventListener("input",function(e){
     var by={};S.runners.forEach(function(r){by[r.id]=r;});
     function fmt(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=Math.round(t%60);if(sec===60){sec=0;m++;}return h+":"+String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");}
     list.innerHTML=raceResultsBody(course,by,fmt);
-    return;
-  }
-  if(e.target.id==="race-search"){
-    window.raceSearchText=e.target.value;window.raceListLimit=30;
-    raceListCache=null;
-    refreshRaceSearchResults();
     return;
   }
   if(e.target.id==="upcoming-search"){
@@ -2492,6 +2486,6 @@ sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRu
 })();
 </script>
 
-<script src="/bandeau-annonces.js?v=20261124-4"></script>
+<!-- Bandeau d’annonces désactivé temporairement sur cette branche de test. -->
 </body>
 </html>
