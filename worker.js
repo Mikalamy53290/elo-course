@@ -103,8 +103,21 @@ async function routeSEO(request, env) {
   const url = new URL(request.url), path = decodeURI(url.pathname);
   if (path === "/robots.txt") return new Response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /compte\nSitemap: "+SITE+"/sitemap.xml\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
   if (path === "/sitemap.xml") {
-    try { const data=await getData(env); const consentedIds=await getConsentIds(); const sections=await getSections(env); return new Response(await sitemap(data,consentedIds,sections),{headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}}); }
-    catch(e) { return new Response("Sitemap temporairement indisponible",{status:503,headers:{"content-type":"text/plain; charset=utf-8","cache-control":"no-store"}}); }
+    try {
+      const data=await getData(env);
+      const consentedIds=await getConsentIds();
+      const sections=await getSections(env);
+      return new Response(await sitemap(data,consentedIds,sections),{headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}});
+    } catch(e) {
+      // En cas d'indisponibilité temporaire de Supabase, ne pas renvoyer une erreur 503 à Google.
+      // On sert le sitemap statique de secours depuis les assets, puis un sitemap minimal si nécessaire.
+      try {
+        const fallback=await env.ASSETS.fetch(new Request(new URL("/sitemap.xml",url)));
+        if(fallback.ok) return new Response(fallback.body,{status:200,headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}});
+      } catch(_) {}
+      const minimal='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+SITE+'/</loc></url></urlset>';
+      return new Response(minimal,{status:200,headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}});
+    }
   }
   const sections = path.startsWith("/rubrique/") ? await getSections(env) : [];
   const section = sections.find(item => item.path === path);
