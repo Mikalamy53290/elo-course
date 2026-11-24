@@ -1374,25 +1374,9 @@
       });
     });
 
-    // Palier 100 J'aime => +25 ELOCOINS
-    dom.testLikesBtn.addEventListener('click', () => { return; /* test de démonstration désactivé */
-      state.likes += 10;
-      const tiers = Math.floor(state.likes / 100);
-      if (tiers > state.lastLikeMilestoneAwarded) {
-        const gainedTiers = tiers - state.lastLikeMilestoneAwarded;
-        const bonus = gainedTiers * 25;
-        state.lastLikeMilestoneAwarded = tiers;
-        state.balance += bonus;
-        state.transactions.unshift({
-          label: `Palier ${tiers * 100} J'aime atteint sur le profil`,
-          delta: bonus,
-          date: 'À l’instant'
-        });
-        showToast(`Palier ${tiers * 100} J'aime ! +${bonus} ELOCOINS`, '🎉');
-      } else {
-        showToast(`${state.likes} J'aime sur votre profil`, '💚');
-      }
-      renderAll();
+    // Les récompenses de J'aime ne sont pas simulées dans la boutique.
+    dom.testLikesBtn.addEventListener('click', () => {
+      showToast('Les récompenses liées aux J’aime ne sont pas activées.', 'ℹ️');
     });
 
     // Catégories boutique
