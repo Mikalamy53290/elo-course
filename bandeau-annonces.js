@@ -29,11 +29,17 @@
   }
   async function refresh(){
     try{
-      var r=await db.from("site_announcements").select("message,active,updated_at").eq("id",1).maybeSingle();
-      if(r.error) throw r.error;
-      render(r.data||{active:false,message:""});
-      if(status) status.textContent=r.data&&r.data.active?"Annonce publiée.":"Aucune annonce active.";
-      if(input&&document.activeElement!==input&&r.data&&r.data.message) input.value=r.data.message;
+      // Lecture publique volontairement anonyme : ne dépend pas de la session
+      // du visiteur ou du compte coureur connecté.
+      var response=await fetch(URL+"/rest/v1/site_announcements?id=eq.1&select=message,active,updated_at",{
+        method:"GET",
+        headers:{"apikey":KEY,"Accept":"application/json"}
+      });
+      if(!response.ok)throw new Error("HTTP "+response.status+" lors de la lecture publique");
+      var rows=await response.json(),row=Array.isArray(rows)&&rows.length?rows[0]:{active:false,message:""};
+      render(row);
+      if(status) status.textContent=row.active?"Annonce publiée.":"Aucune annonce active.";
+      if(input&&document.activeElement!==input&&row.message) input.value=row.message;
     }catch(e){if(status)status.textContent="Lecture Supabase impossible : "+(e.message||e);}
   }
   function makePanel(){
