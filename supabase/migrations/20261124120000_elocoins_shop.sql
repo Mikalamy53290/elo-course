@@ -174,7 +174,7 @@ begin
   if v_status is distinct from 'approved' then
     raise exception 'Compte coureur non validé' using errcode='42501';
   end if;
-  if p_category not in ('Cadres','Badges','Objectifs','Bannières') then raise exception 'Catégorie invalide'; end if;
+  if p_category is null or p_category not in ('Cadres','Badges','Objectifs','Bannières') then raise exception 'Catégorie invalide'; end if;
 
   if p_item_id is null then
     delete from public.elocoins_equipment where user_id=v_user and category=p_category;
