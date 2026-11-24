@@ -100,7 +100,7 @@ begin
     raise exception 'Compte coureur non validé' using errcode='42501';
   end if;
 
-  v_event_key := 'shop:' || p_item_id || ':' || p_request_id::text;
+  v_event_key := 'shop:' || p_request_id::text;
 
   -- Le verrou portefeuille sérialise les achats simultanés d’un même compte.
   select balance into v_balance from public.elocoins_wallets
