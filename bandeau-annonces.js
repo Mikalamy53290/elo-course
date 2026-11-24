@@ -68,7 +68,9 @@
   async function checkAdmin(){
     try{
       var u=await db.auth.getUser();
-      var ok=!!(u.data&&u.data.user&&u.data.user.id===ADMIN);
+      var adminNav=document.getElementById("nav-admin");
+      var appAdminMode=!!(adminNav&&!adminNav.hidden);
+      var ok=!!(appAdminMode&&u.data&&u.data.user&&u.data.user.id===ADMIN);
       if(ok)makePanel();
       else if(panel&&panel.parentNode)panel.parentNode.removeChild(panel);
     }catch(e){}
