@@ -91,6 +91,7 @@ declare
   v_balance bigint;
   v_tx_id bigint;
   v_event_key text;
+  v_existing_description text;
 begin
   if v_user is null then raise exception 'Connexion requise' using errcode='42501'; end if;
   if p_request_id is null or p_item_id is null then raise exception 'Demande d’achat invalide'; end if;
@@ -107,17 +108,22 @@ begin
    where user_id=v_user for update;
   if not found then raise exception 'Portefeuille ELOCOINS introuvable'; end if;
 
-  -- Idempotence : une répétition de la même requête ne débite jamais deux fois.
-  select id into v_tx_id from public.elocoins_transactions
-   where user_id=v_user and event_key=v_event_key;
-  if found then
-    select balance into v_balance from public.elocoins_wallets where user_id=v_user;
-    return jsonb_build_object('ok',true,'replayed',true,'transaction_id',v_tx_id,'balance',v_balance);
-  end if;
-
   select price,name,category into v_price,v_name,v_category
     from public.elocoins_catalog where id=p_item_id and active=true;
   if not found then raise exception 'Article indisponible'; end if;
+
+  -- Idempotence : une répétition de la même requête ne débite jamais deux fois.
+  -- Une clé déjà utilisée pour un autre article est refusée.
+  select id,description into v_tx_id,v_existing_description
+    from public.elocoins_transactions
+   where user_id=v_user and event_key=v_event_key;
+  if found then
+    if v_existing_description is distinct from ('Achat boutique : ' || v_name) then
+      raise exception 'Identifiant de demande déjà utilisé pour un autre article';
+    end if;
+    select balance into v_balance from public.elocoins_wallets where user_id=v_user;
+    return jsonb_build_object('ok',true,'replayed',true,'transaction_id',v_tx_id,'balance',v_balance);
+  end if;
 
   if exists(select 1 from public.elocoins_owned_items where user_id=v_user and item_id=p_item_id) then
     raise exception 'Article déjà acheté';
