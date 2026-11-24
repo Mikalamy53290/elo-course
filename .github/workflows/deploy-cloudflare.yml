@@ -1,0 +1,32 @@
+name: Deploy ELO COURSE to Cloudflare
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'boutique.html'
+      - 'worker.js'
+      - 'wrangler.jsonc'
+      - 'bandeau-annonces.js'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'cgu.html'
+      - 'confidentialite.html'
+      - 'mentions-legales.html'
+      - 'donnees.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy Worker and static assets
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
