@@ -4,10 +4,7 @@ on:
     branches:
       - feature/elocoins-shop-clean-2026-11-24
     paths:
-      - 'boutique.html'
-      - 'index.html'
-      - 'supabase/migrations/20261124120000_elocoins_shop.sql'
-      - '.github/workflows/package-elocoins-shop.yml'
+      - '**'
   pull_request:
     branches:
       - main
@@ -22,30 +19,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build ZIP
+      - name: Build complete Cloudflare Worker package
         run: |
-          mkdir -p ELO-COURSE-boutique-ELOCOINS/supabase/migrations
-          cp boutique.html index.html ELO-COURSE-boutique-ELOCOINS/
-          cp supabase/migrations/20261124120000_elocoins_shop.sql ELO-COURSE-boutique-ELOCOINS/supabase/migrations/
-          cat > ELO-COURSE-boutique-ELOCOINS/LISEZ-MOI.txt <<'EOF'
-          ELO COURSE — Boutique ELOCOINS
+          mkdir -p ELO-COURSE-deploiement/supabase/migrations
+          git archive HEAD | tar -x -C ELO-COURSE-deploiement
+          cat > ELO-COURSE-deploiement/DEPLOIEMENT-ELO-COURSE.txt <<'EOF'
+          ELO COURSE — paquet complet de déploiement
           
-          Contenu :
-          - boutique.html : interface boutique connectée à Supabase
-          - index.html : lien d'accès depuis le profil coureur
-          - supabase/migrations/20261124120000_elocoins_shop.sql : migration catalogue, inventaire et fonctions sécurisées
+          Ce paquet contient les fichiers du site, le Worker Cloudflare,
+          sa configuration Wrangler, la page boutique et la migration SQL ELOCOINS.
           
-          IMPORTANT :
-          Cette archive correspond à une version de travail.
-          La migration SQL n'est pas appliquée en production.
-          Aucun déploiement Cloudflare n'a été effectué.
-          Ne pas mettre en ligne avant revue et activation de la migration Supabase.
+          AVANT LA MISE EN LIGNE :
+          1. Vérifier la migration supabase/migrations/20261124120000_elocoins_shop.sql
+             et l'appliquer au projet Supabase de production.
+          2. Depuis ce dossier, installer/utiliser Wrangler avec un compte Cloudflare
+             autorisé, puis lancer : npx wrangler deploy
+          3. Vérifier https://elo-course.eu/boutique.html et le parcours d'achat.
+          
+          La migration SQL n'est PAS appliquée par cette archive.
+          Aucun déploiement Cloudflare n'est effectué par cette archive.
+          Ne pas publier avant validation de la migration et tests.
           EOF
-          zip -r ELO-COURSE-boutique-ELOCOINS.zip ELO-COURSE-boutique-ELOCOINS
+          cd ELO-COURSE-deploiement
+          zip -qr ../ELO-COURSE-deploiement.zip .
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: ELO-COURSE-boutique-ELOCOINS
-          path: ELO-COURSE-boutique-ELOCOINS.zip
+          name: ELO-COURSE-deploiement
+          path: ELO-COURSE-deploiement.zip
           if-no-files-found: error
           retention-days: 30
