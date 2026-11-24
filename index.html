@@ -1442,7 +1442,7 @@ function testPreviewHTML(){
   if(S.testPreview==='organizer')return '<div class="card"><button class="ghost" data-act="closeTestPreview">← Retour</button><h2>🏁 Espace organisateur — aperçu de test</h2><p class="meta">Bac à sable local : aucune annonce réelle ne sera publiée.</p><label>Nom de l’association</label><input id="testorgname" value="Association Démonstration"><label>Nom de la course</label><input id="testorgrace" value="Les Foulées de Démonstration"><label>Date</label><input id="testorgdate" type="date" value="2027-05-16"><label>Département</label><select id="testorgdept"><option>Mayenne</option><option>Sarthe</option><option>Maine-et-Loire</option></select><label>Distance</label><input id="testorgdist" value="10 km"><label>Lien d’inscription</label><input id="testorglink" type="url" placeholder="https://…"><label>Présentation</label><textarea id="testorgdesc" rows="3" placeholder="Présentez votre événement…"></textarea><button class="btn" data-act="testOrganizerPublish">Simuler la publication</button><p class="msg" id="testorgmsg">Aperçu uniquement : aucune donnée ne sera envoyée au serveur.</p></div>';
   return '';
 }
-function render(){setTimeout(arrows,30);MINR=1;
+function render(){window.ELO_ADMIN_MODE=!!S.admin;setTimeout(arrows,30);MINR=1;
   if(S.view==="races"&&!raceCitiesLoaded&&!raceCitiesLoading)ensureRaceCitiesLoaded();
   if(S.view==="ghost"){if(eloCache.all)sendGhostRaceTitles();}
   // Le calcul ELO reste partagé, mais seule la rubrique visible est reconstruite.
