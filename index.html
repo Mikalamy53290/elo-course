@@ -1839,7 +1839,7 @@ async function addRace(){
   var name=$("#cn").value.trim(),txt=$("#ctxt").value,dist=(($("#cdistother").value.trim())||($("#cdist").value==="Autre"?"":$("#cdist").value)).trim().replace(/\s+/g," "),date=$("#cdate").value;
   if(!name){msg.race="Donne un nom à la course.";return render2("races")}
   if(!dist){msg.race="Indique la distance exacte de la course (ex. 11 km).";return render2("races")}
-  txt=txt.normalize("NFC");var ents=parseMamertines(txt);if(!ents.length)ents=parseRaceScore(txt);if(!ents.length)ents=parseBreizhChrono(txt);if(!ents.length)ents=parseKlikego(txt);if(!ents.length)ents=parseIpitos(txt);if(!ents.length)ents=parseDelimitedResults(txt,"excel");
+  txt=txt.normalize("NFC");var ents=parseMamertines(txt);if(!ents.length)ents=parseDelimitedResults(txt,"excel");if(!ents.length)ents=parseRaceScore(txt);if(!ents.length)ents=parseBreizhChrono(txt);if(!ents.length)ents=parseKlikego(txt);if(!ents.length)ents=parseIpitos(txt);
   if(!ents.length)txt.split(/\n/).forEach(function(l){var m=l.match(/\d{1,2}:\d{2}:\d{2}|\d{1,3}:\d{2}/);if(m)ents.push({name:l,time:secs(m[0])})});
   var res=[],pendingResults=[],seen={},seenPending={},anonymousSkipped=0,unmatched=0,autoCreated=0,createdRunnerIds=[],unmatchedNames=[],ambiguousNames=[];
   // Index en mémoire : une seule lecture des fiches, puis accès direct par nom normalisé.
