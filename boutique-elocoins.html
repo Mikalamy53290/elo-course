@@ -924,16 +924,24 @@
         .select('objective').eq('user_id', storeUser.id).maybeSingle();
       if (!profile.error && profile.data) state.goalText = profile.data.objective || '';
 
-      const [wallet, owned, equipment, transactions, daily] = await Promise.all([
+      const [wallet, owned, equipment, transactions, daily, catalog] = await Promise.all([
         storeClient.from('elocoins_wallets').select('balance').eq('user_id', storeUser.id).maybeSingle(),
         storeClient.from('elocoins_owned_items').select('item_id').eq('user_id', storeUser.id),
         storeClient.from('elocoins_equipment').select('category,item_id').eq('user_id', storeUser.id),
         storeClient.from('elocoins_transactions').select('amount,description,created_at').eq('user_id', storeUser.id).order('created_at',{ascending:false}).limit(8),
-        storeClient.rpc('elocoins_daily_summary')
+        storeClient.rpc('elocoins_daily_summary'),
+        storeClient.from('elocoins_catalog').select('id,price,active')
       ]);
-      for (const result of [wallet, owned, equipment, transactions, daily]) {
+      for (const result of [wallet, owned, equipment, transactions, daily, catalog]) {
         if (result.error) throw result.error;
       }
+      const catalogRows = catalog.data || [];
+      const catalogById = new Map(catalogRows.map(x=>[x.id,x]));
+      CATALOG.forEach(item => {
+        const row = catalogById.get(item.id);
+        item.active = !!row && row.active === true;
+        if (row) item.price = Number(row.price);
+      });
       state.balance = Number(wallet.data && wallet.data.balance || 0);
       state.ownedIds = (owned.data || []).map(x=>x.item_id);
       state.equippedFrameId = null; state.equippedBadgeId = null;
@@ -1179,10 +1187,11 @@
     }
 
     function renderShop() {
+      const activeItems = CATALOG.filter(i => i.active !== false);
       const items =
         state.activeCategory === 'Tous'
-          ? CATALOG
-          : CATALOG.filter((i) => i.category === state.activeCategory);
+          ? activeItems
+          : activeItems.filter((i) => i.category === state.activeCategory);
 
       dom.shopGrid.innerHTML = '';
 
@@ -1281,7 +1290,8 @@
       const d = state.dailySummary || {};
       dom.dailySummary.textContent = state.storeReady
         ? 'Aujourd’hui : +' + Number(d.earned_today||0) + ' / -' + Number(d.spent_today||0) +
-          ' ELOCOINS • ' + Number(d.transactions_today||0) + ' mouvement(s)'
+          ' ELOCOINS • net ' + (Number(d.net_today||0)>0?'+':'') + Number(d.net_today||0) +
+          ' • solde ' + Number(d.balance||state.balance) + ' • ' + Number(d.transactions_today||0) + ' mouvement(s)'
         : 'Récapitulatif quotidien indisponible tant que le portefeuille n’est pas connecté.';
       if (!state.transactions.length) {
         const empty = document.createElement('p');
