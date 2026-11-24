@@ -1257,7 +1257,7 @@ function searchTermsMatch(haystack,query){
 function raceResultSearchText(items,title,byId){
   var names=[],raceFields=[];
   items.forEach(function(c){
-    raceFields.push(c.name,c.event,c.race_name,c.dist,c.distance,c.provider,c.department,c.departement,c.dept,c.location,c.city,c.commune,c.town,c.ville,c.place,c.address);
+    raceFields.push(c.name,c.event,c.race_name,c.dist,c.distance,c.provider,c.department,c.departement,c.dept,c.location,c.city,c.commune,c.town,c.ville,c.place,c.address,c.date,c.race_date,c.type,c.discipline,c.organization,c.organizer,c.organization_name,c.venue,c.postal_code);
     (c.results||[]).forEach(function(x){var r=byId[x.id],details=runnerDetails[x.id]||{};if(r)names.push(r.name||'',r.club||'',r.city||'',details.city||'',details.club||'');else names.push(x.pendingName||'',x.pendingCity||'');});
   });
   return norm([title].concat(raceFields,names).filter(Boolean).join(' '));
