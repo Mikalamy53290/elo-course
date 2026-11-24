@@ -18,6 +18,17 @@
     var track=document.createElement("div");track.className="elo-track";var item=document.createElement("span");item.className="elo-item";track.appendChild(item);bar.appendChild(track);
     document.body.insertBefore(bar,document.body.firstChild);
   }
+  function isRunnerProfileVisible(){
+    return !!document.querySelector("#v-me.on, #v-rank.on .pf");
+  }
+  function syncProfileVisibility(){
+    var onProfile=isRunnerProfileVisible();
+    document.body.classList.toggle("elo-profile-view",onProfile);
+    if(bar){
+      if(onProfile)bar.style.setProperty("display","none","important");
+      else{bar.style.removeProperty("display");bar.style.display=lastActive?"block":"none";}
+    }
+  }
   function render(row){
     makeBar();
     var active=!!(row&&row.active&&row.message&&String(row.message).trim());
@@ -27,6 +38,7 @@
       bar.style.display=active?"block":"none";
       lastActive=active;lastMessage=message;
     }
+    syncProfileVisibility();
   }
   async function refresh(){
     try{
@@ -73,6 +85,7 @@
     input.value="";await refresh();
   }
   async function checkAdmin(){
+    syncProfileVisibility();
     try{
       var u=await db.auth.getUser();
       var appAdminMode=window.ELO_ADMIN_MODE===true;
@@ -82,7 +95,8 @@
     }catch(e){}
   }
   async function init(){
-    makeBar();await refresh();await checkAdmin();
+    makeBar();syncProfileVisibility();await refresh();await checkAdmin();
+    if(window.MutationObserver){var profileObserver=new MutationObserver(syncProfileVisibility);profileObserver.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden"]});}
     db.auth.onAuthStateChange(function(){setTimeout(checkAdmin,0);});
     var nav=document.getElementById("nav-admin");
     if(nav&&window.MutationObserver)new MutationObserver(checkAdmin).observe(nav,{attributes:true,attributeFilter:["hidden"]});
