@@ -72,7 +72,7 @@ async function getSections(env) {
     const html = await asset.text();
     const found = [], seen = new Set();
     const buttons = html.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi);
-    const privateViews = new Set(["me","organizer","upcoming"]);
+    const privateViews = new Set(["me","organizer"]);
     for (const match of buttons) {
       const attrs = match[1], inner = match[2];
       if (!/data-act=["']view["']/.test(attrs)) continue;
@@ -91,8 +91,12 @@ async function getSections(env) {
 }
 async function sitemap(data, consentedIds, sections) {
   const runners = consentedRunners(data, consentedIds);
-  const races = (data.races || []).filter(r => r && r.id != null && (r.results || []).some(x => !x.pending));
-  const fixed = ["/"];
+  const today = new Intl.DateTimeFormat("fr-CA",{timeZone:"Europe/Paris"}).format(new Date());
+  const races = (data.races || []).filter(r => r && r.id != null && (
+    (r.results || []).some(x => !x.pending) ||
+    (r.date && String(r.date).slice(0,10) >= today)
+  ));
+  const fixed = ["/","/courses-a-venir"];
   const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
   for (const section of sections) urls.push(`<url><loc>${SITE+section.path}</loc></url>`);
   for (const r of runners) urls.push(`<url><loc>${esc(SITE+profilePath(r))}</loc></url>`);
@@ -101,7 +105,7 @@ async function sitemap(data, consentedIds, sections) {
 }
 async function routeSEO(request, env) {
   const url = new URL(request.url), path = decodeURI(url.pathname);
-  if (path === "/robots.txt") return new Response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /compte\nSitemap: "+SITE+"/sitemap.xml\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
+  if (path === "/robots.txt") return new Response("User-agent: *\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nUser-agent: OAI-SearchBot\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nUser-agent: PerplexityBot\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nUser-agent: ClaudeBot\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nSitemap: "+SITE+"/sitemap.xml\\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
   if (path === "/sitemap.xml") {
     try {
       const data=await getData(env);
@@ -117,6 +121,19 @@ async function routeSEO(request, env) {
       } catch(_) {}
       const minimal='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+SITE+'/</loc></url></urlset>';
       return new Response(minimal,{status:200,headers:{"content-type":"application/xml; charset=utf-8","cache-control":"public, max-age=300"}});
+    }
+  }
+  if (path === "/courses-a-venir") {
+    try {
+      const data = await getData(env);
+      const today = new Intl.DateTimeFormat("fr-CA",{timeZone:"Europe/Paris"}).format(new Date());
+      const upcoming = (data.races || []).filter(r => r && r.id != null && r.date && String(r.date).slice(0,10) >= today)
+        .sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+      const items = upcoming.map(r => `<li><strong><a href="${esc(SITE+racePath(r))}">${esc(r.name||"Course à venir")}</a></strong> · ${esc(dateFR(r.date))} · ${esc(r.dist||"Distance à préciser")} · ${esc(r.department||r.departement||"Sarthe, Mayenne ou Maine-et-Loire")}</li>`).join("");
+      const body = `<h1>Courses à venir en Sarthe, Mayenne et Maine-et-Loire</h1><p>Retrouvez le calendrier des prochaines courses sur route et courses nature référencées par ELO COURSE dans les départements 72, 53 et 49. Les dates, distances et lieux sont ceux enregistrés dans le calendrier du site.</p><section class="panel"><h2>Prochaines épreuves</h2>${upcoming.length ? '<ol class="list">'+items+'</ol>' : '<p>Aucune course future n’est actuellement publiée dans le calendrier. Consultez à nouveau cette page pour les prochaines mises à jour.</p>'}</section><a class="cta" href="/?view=upcoming">Ouvrir le calendrier dans ELO COURSE</a><a href="/">Retour à l’accueil</a>`;
+      return new Response(layout({title:"Courses à venir – Calendrier des courses | ELO COURSE",description:"Calendrier des prochaines courses sur route et courses nature en Sarthe (72), Mayenne (53) et Maine-et-Loire (49). Dates, distances et résultats sur ELO COURSE.",canonical:SITE+"/courses-a-venir",body}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
+    } catch(e) {
+      return new Response(layout({title:"Courses à venir | ELO COURSE",description:"Calendrier des prochaines courses en Sarthe, Mayenne et Maine-et-Loire.",canonical:SITE+"/courses-a-venir",body:"<h1>Courses à venir</h1><p>Le calendrier est momentanément indisponible. Réessayez dans quelques instants.</p>"}),{status:503,headers:{"content-type":"text/html; charset=utf-8","retry-after":"60"}});
     }
   }
   const sections = path.startsWith("/rubrique/") ? await getSections(env) : [];
@@ -153,13 +170,21 @@ async function routeSEO(request, env) {
   }
   const id=parseId(path,"/course/");
   const race=(data.races||[]).find(r=>String(r.id)===id);
-  if (!race || !(race.results||[]).some(x=>!x.pending)) return new Response("Course introuvable",{status:404,headers:{"content-type":"text/plain; charset=utf-8","x-robots-tag":"noindex"}});
+  const today = new Intl.DateTimeFormat("fr-CA",{timeZone:"Europe/Paris"}).format(new Date());
+  const hasResults = !!(race && (race.results||[]).some(x=>!x.pending));
+  const isUpcoming = !!(race && race.date && String(race.date).slice(0,10) >= today);
+  if (!race || (!hasResults && !isUpcoming)) return new Response("Course introuvable",{status:404,headers:{"content-type":"text/plain; charset=utf-8","x-robots-tag":"noindex"}});
   const consentedIds=await getConsentIds();
   const byId=new Map(consentedRunners(data,consentedIds).map(r=>[String(r.id),r]));
   const results=(race.results||[]).filter(x=>!x.pending).slice().sort((a,b)=>(Number(a.rk)||999999)-(Number(b.rk)||999999));
-  const title=(race.name||"Course")+" – Résultats ELO COURSE";
-  const description="Résultats de "+(race.name||"cette course")+" · "+(race.dist||"course à pied")+" · "+dateFR(race.date)+". Consultez le classement sur ELO COURSE.";
-  const body=`<h1>${esc(race.name||"Course")}</h1><p class="muted">${esc(dateFR(race.date))} · ${esc(race.dist||"Distance non précisée")} · ${esc(race.department||race.departement||"Sarthe, Mayenne ou Maine-et-Loire")}</p><div class="stats"><div class="stat"><strong>${results.length}</strong>résultats publiés</div></div><section class="panel"><h2>Classement de la course</h2><ol class="list">${results.slice(0,50).map(x=>{const r=byId.get(String(x.id));return '<li>'+ (x.rk?'<strong>'+esc(x.rk)+'e</strong> · ':'')+(r?'<a href="'+esc(SITE+profilePath(r))+'">'+esc(r.name)+'</a>':"Coureur")+(fmtTime(x.time)?' · '+esc(fmtTime(x.time)):'')+'</li>';}).join("")}</ol>${results.length>50?'<p class="muted">Les 50 premiers résultats sont affichés ici. Tous les résultats sont consultables sur le site.</p>':''}</section><a class="cta" href="/?course=${encodeURIComponent(String(race.id))}">Voir tous les résultats sur ELO COURSE</a><a href="/">Retour au site</a>`;
+  const title=isUpcoming ? (race.name||"Course")+" – Course à venir | ELO COURSE" : (race.name||"Course")+" – Résultats ELO COURSE";
+  const description=isUpcoming
+    ? "Course à venir : "+(race.name||"épreuve")+" · "+(race.dist||"course à pied")+" · "+dateFR(race.date)+". Calendrier des courses en Sarthe, Mayenne et Maine-et-Loire sur ELO COURSE."
+    : "Résultats de "+(race.name||"cette course")+" · "+(race.dist||"course à pied")+" · "+dateFR(race.date)+". Consultez le classement sur ELO COURSE.";
+  const resultList=results.slice(0,50).map(x=>{const r=byId.get(String(x.id));return '<li>'+ (x.rk?'<strong>'+esc(x.rk)+'e</strong> · ':'')+(r?'<a href="'+esc(SITE+profilePath(r))+'">'+esc(r.name)+'</a>':"Coureur")+(fmtTime(x.time)?' · '+esc(fmtTime(x.time)):'')+'</li>';}).join("");
+  const body=isUpcoming
+    ? `<h1>${esc(race.name||"Course à venir")}</h1><p class="muted">${esc(dateFR(race.date))} · ${esc(race.dist||"Distance non précisée")} · ${esc(race.department||race.departement||"Sarthe, Mayenne ou Maine-et-Loire")}</p><p>Cette épreuve figure au calendrier public d’ELO COURSE. Retrouvez les informations disponibles sur sa date, sa distance et son territoire. Les résultats seront affichés lorsqu’ils auront été publiés et intégrés au classement.</p><a class="cta" href="/courses-a-venir">Voir toutes les courses à venir</a><a href="/">Retour au site</a>`
+    : `<h1>${esc(race.name||"Course")}</h1><p class="muted">${esc(dateFR(race.date))} · ${esc(race.dist||"Distance non précisée")} · ${esc(race.department||race.departement||"Sarthe, Mayenne ou Maine-et-Loire")}</p><div class="stats"><div class="stat"><strong>${results.length}</strong>résultats publiés</div></div><section class="panel"><h2>Classement de la course</h2><ol class="list">${resultList}</ol>${results.length>50?'<p class="muted">Les 50 premiers résultats sont affichés ici. Tous les résultats sont consultables sur le site.</p>':''}</section><a class="cta" href="/?course=${encodeURIComponent(String(race.id))}">Voir tous les résultats sur ELO COURSE</a><a href="/">Retour au site</a>`;
   return new Response(layout({title,description,canonical:SITE+racePath(race),body}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
 }
 export default {
