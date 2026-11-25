@@ -3,4 +3,20 @@ Allow: /
 Disallow: /admin
 Disallow: /compte
 
+# Robots de recherche IA : accès aux pages publiques uniquement.
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /compte
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /compte
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /compte
+
 Sitemap: https://elo-course.eu/sitemap.xml
