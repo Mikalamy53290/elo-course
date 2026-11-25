@@ -908,7 +908,7 @@ function runnerProfile(id,isMine){
   var initials=String(r.name||'?').split(/\s+/).filter(Boolean).slice(0,2).map(function(w){return w.charAt(0)}).join('').toUpperCase()||'?';
   var top=isMine?'':'<div class="pf-top"><button class="ghost" data-act="backrank">← Retour au classement</button></div>';
   var avatar=avatarMap[id]||'',profileCat=normalizeCategory(r.cat),profileSex=normalizeSex(r.sex);var hero='<div class="pf-hero"><div class="pf-hero-head"><div class="pf-avatar" aria-hidden="true">'+(avatar?'<img src="'+esc(avatar)+'" alt="Photo de '+esc(r.name)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':esc(initials))+'</div><div class="pf-id"><div class="pf-name">'+esc(r.name)+'</div><div class="pf-badges">'+(profileCat?'<span class="pf-badge">'+esc(profileCat)+'</span>':'<span class="pf-badge">Catégorie d’âge non renseignée</span>')+(profileSex?'<span class="pf-badge">'+(profileSex==='F'?'Femme':'Homme')+'</span>':'<span class="pf-badge">Sexe non renseigné</span>')+'</div></div></div>';
-  var acts='<div class="pf-actions"><button class="ghost" data-act="shareProfile" data-v="'+esc(id)+'">↗ Partager ce profil</button>'+(isMine?'':'<button class="'+(liked?'btn':'ghost')+'" data-act="togglelike" data-v="'+esc(id)+'">'+(liked?'❤️ Profil aimé':'♡ J’aime')+' · '+(S.likes[id]||0)+'</button>')+'</div>';
+  var acts='<div class="pf-actions"><button class="ghost" data-act="shareProfile" data-v="'+esc(id)+'">↗ Partager ce profil</button>'+(isMine?'':'<button class="'+(liked?'btn':'ghost')+'" data-act="togglelike" data-v="'+esc(id)+'" aria-label="Aimer ce profil">'+(liked?'❤️ Profil aimé':'♡ J’aime')+' · '+(S.likes[id]||0)+'</button>')+'</div>';
   var quick='<div class="pf-quick"><div class="pf-q"><b>'+total+'</b><span class="pf-q-label"><i class="pf-q-icon">🏁</i>Courses</span></div><div class="pf-q"><b>'+(medals.gold+medals.silver+medals.bronze)+'</b><span class="pf-q-label"><i class="pf-q-icon">🏅</i>Podiums</span></div><div class="pf-q"><b>'+(p&&p.n?formatElo(eloMax):'–')+'</b><span class="pf-q-label"><i class="pf-q-icon">📊</i>ELO maximum</span></div><div class="pf-q"><b class="'+(since>0?'up':since<0?'down':'')+'">'+(p&&p.n?(since>0?'+':since<0?'−':'')+formatElo(Math.abs(since)):'–')+'</b><span class="pf-q-label"><i class="pf-q-icon">📈</i>Progression</span></div></div>';
   var chronological=mine.slice().sort(function(a,b){return String(a.date||'').localeCompare(String(b.date||''));}),formRows=[],histIndex=1;chronological.forEach(function(c){var validResults=c.results.filter(function(a){return !a.pending&&!!a.id;});if(validResults.length<2||!validResults.some(function(a){return a.id===id}))return;var before=p&&p.hist?Number(p.hist[histIndex-1]):1500,after=p&&p.hist?Number(p.hist[histIndex]):before;histIndex++;var diff=Math.round(after-before);formRows.push({diff:diff,dist:c.dist||'Course',name:c.name||''});});formRows=formRows.slice(-4).reverse();var recentForm='<div class="pf-form-recent"><div class="pf-form-title">📈 Forme récente</div>'+(formRows.length?'<div class="pf-form-list">'+formRows.map(function(x){var barHeight=Math.max(5,Math.min(52,Math.abs(x.diff)*1.25));return '<div class="pf-form-item"><strong class="'+(x.diff>=0?'up':'down')+'">'+(x.diff>0?'+':'')+x.diff+'</strong><i class="pf-form-bar '+(x.diff>=0?'up':'down')+'" style="height:'+barHeight+'px" aria-hidden="true"></i><span>'+esc(x.dist)+'</span></div>';}).join('')+'</div>':'<p class="pf-section-copy">La forme récente apparaîtra après les prochaines courses classées.</p>')+'</div>';
   var thisYear=String(new Date().getFullYear()),yearRaces=mine.filter(function(c){return String(c.date||'').slice(0,4)===thisYear;}),yearKm=0,yearPodiums=0;yearRaces.forEach(function(c){var d=norm(c.dist||''),m=d.match(/([0-9]+(?:[.,][0-9]+)?)\s*km/);if(m)yearKm+=Number(m[1].replace(',','.'));else if(d.indexOf('semi')>=0)yearKm+=21.0975;else if(d.indexOf('marathon')>=0)yearKm+=42.195;var pos=place(c);if(pos<=3)yearPodiums++;});var yearSummary='<div class="card" style="margin-top:10px"><strong>Bilan '+thisYear+'</strong><div class="pf-quick"><div class="pf-q"><b>'+yearRaces.length+'</b><span>Courses</span></div><div class="pf-q"><b>'+yearKm.toFixed(1).replace('.',',')+'</b><span>Km connus</span></div><div class="pf-q"><b>'+yearPodiums+'</b><span>Podiums</span></div></div><p class="meta">Les kilomètres sont calculés uniquement lorsque la distance est renseignée ou reconnue.</p></div>';
@@ -1086,11 +1086,22 @@ async function loadSocial(id){
     // Chaque module social est chargé indépendamment : une table ou une policy
     // manquante ne doit pas bloquer les photos de profil.
     var safeQuery=function(promise,fallback){return promise.then(function(r){return r&& !r.error?r:fallback;}).catch(function(){return fallback;});};
-    var [cr,nx,nt]=await Promise.all([
+    var [cr,nx,nt,likeState]=await Promise.all([
       safeQuery(sb.from('runner_comments').select('id,race_id,race_name,race_distance,race_date,target_runner_id,author_runner_id,parent_id,body,created_at').eq('target_runner_id',id).eq('hidden',false).order('created_at',{ascending:true}).limit(100),{data:[]}),
       safeQuery(sb.from('runner_next_races').select('*').eq('runner_id',id).maybeSingle(),{data:null}),
-      linkedRunner===id?safeQuery(sb.from('runner_notifications').select('id,actor_runner_id,kind,created_at,read_at').eq('recipient_runner_id',id).order('created_at',{ascending:false}).limit(20),{data:[]}):Promise.resolve({data:[]})
+      linkedRunner===id?safeQuery(sb.from('runner_notifications').select('id,actor_runner_id,kind,created_at,read_at').eq('recipient_runner_id',id).order('created_at',{ascending:false}).limit(20),{data:[]}):Promise.resolve({data:[]}),
+      safeQuery(sb.rpc('runner_profile_like_state',{p_target_runner_id:id}),{data:{like_count:0,liked_by_me:false}})
     ]);
+    if(likeState&&likeState.data){
+      var likeButton=document.querySelector('[data-act="togglelike"][data-v="'+CSS.escape(id)+'"]');
+      if(likeButton){
+        likeButton.textContent=(likeState.data.liked_by_me?'❤️ Profil aimé':'♡ J’aime')+' · '+Number(likeState.data.like_count||0);
+        likeButton.className=likeState.data.liked_by_me?'btn':'ghost';
+      }
+      S.likes=S.likes||{};S.liked=S.liked||{};
+      S.likes[id]=Number(likeState.data.like_count||0);
+      S.liked[id]=!!likeState.data.liked_by_me;
+    }
     // Ne charge que les photos utiles au profil affiché et aux auteurs de ses commentaires.
     var commentsForAvatars=cr.data||[],avatarIds=[id],opponentsForAvatar=[(S.profileComparisonOpponentByRunner||{})[id],(S.profileDuelOpponentByRunner||{})[id]];opponentsForAvatar.forEach(function(opponentForAvatar){if(opponentForAvatar&&avatarIds.indexOf(opponentForAvatar)<0)avatarIds.push(opponentForAvatar);});
     commentsForAvatars.forEach(function(c){if(c.author_runner_id&&avatarIds.indexOf(c.author_runner_id)<0)avatarIds.push(c.author_runner_id)});
@@ -2182,10 +2193,18 @@ document.addEventListener("click",function(e){
   else if(a==="profiletab"){if(["overview","records","races","duel","infos"].indexOf(v)>=0){S.profileTab=v;render();}}
   else if(a==="shareProfile"){var runnerToShare=S.runners.filter(function(x){return x.id===v})[0];if(runnerToShare){var profileUrl=window.location.href.split("#")[0]+"#profil="+encodeURIComponent(v),shareText="Découvre le profil de "+runnerToShare.name+" sur ELO COURSE.";if(navigator.share){navigator.share({title:"Profil ELO COURSE — "+runnerToShare.name,text:shareText,url:profileUrl}).catch(function(err){if(err&&err.name!=="AbortError")alert("Le partage n’a pas pu être ouvert. Tu peux copier ce lien : "+profileUrl);});}else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(profileUrl).then(function(){alert("Lien du profil copié. Tu peux le partager !");}).catch(function(){prompt("Copie le lien du profil :",profileUrl);});}else{prompt("Copie le lien du profil :",profileUrl);}}}
   else if(a==="togglelike"){
-    S.likes=S.likes||{};S.liked=S.liked||{};
-    if(S.liked[v]){S.liked[v]=false;S.likes[v]=Math.max(0,(S.likes[v]||0)-1)}
-    else{S.liked[v]=true;S.likes[v]=(S.likes[v]||0)+1}
-    save();render()
+    (async function(){
+      try{
+        if(!authUser||!linkedRunner)throw new Error('Connecte-toi avec un compte coureur validé pour aimer un profil.');
+        var likeResult=await sb.rpc('runner_profile_toggle_like',{p_target_runner_id:v});
+        if(likeResult.error)throw likeResult.error;
+        if(likeResult.data&&likeResult.data.awarded)msg.runnerAccount='❤️ Un J’aime reçu : +1 ELOCOIN ajouté au portefeuille !';
+        var wallet=await sb.from('elocoins_wallets').select('balance').eq('user_id',authUser.id).maybeSingle();
+        if(!wallet.error&&wallet.data)elocoinsBalance=Number(wallet.data.balance)||0;
+        await loadSocial(v);
+        render();
+      }catch(err){alert('Impossible de modifier le J’aime : '+(err.message||'erreur Supabase'));}
+    })();
   }
   else if(a==="dist"){S.publicProfile=null;S.dist=v;S.rankPage=1;savePrefs();render()}
   else if(a==="rankclass"){S.publicProfile=null;S.rankClass=v;S.rankPage=1;S.catSel="";S.q="";savePrefs();render()}
