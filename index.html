@@ -1181,24 +1181,30 @@ function getRunnerByName(){return S.runners.filter(function(r){return r.id===win
 async function refreshRunnerAuth(){var s=await sb.auth.getSession();var session=s.data.session;if(session){var day='';try{day=localStorage.getItem('elo-course-auth-day')||''}catch(e){}if(day&&day!==localDayKey()){await sb.auth.signOut();session=null;}else if(!day){rememberDailyLogin();}}authUser=session?session.user:null;linkedRunner=null;pendingRunner=null;elocoinsBalance=0;referralCode='';referralUsageCount=0;if(authUser){var a=await sb.from('runner_accounts').select('runner_id,status').eq('user_id',authUser.id).maybeSingle();if(a.data&&a.data.status==='approved'){linkedRunner=a.data.runner_id;S.me=linkedRunner;try{var dailyReward=await sb.rpc('elocoins_claim_daily_login_reward');if(!dailyReward.error&&dailyReward.data&&dailyReward.data.awarded){msg.runnerAccount='🎁 Bonus de connexion : +10 ELOCOINS ajoutés à ton portefeuille aujourd’hui !';}}catch(rewardError){console.warn('Bonus de connexion ELOCOINS indisponible :',rewardError);}}else if(a.data&&a.data.status==='pending'){pendingRunner=a.data.runner_id;}var w=await sb.from('elocoins_wallets').select('balance,referral_code').eq('user_id',authUser.id).maybeSingle();if(!w.error&&w.data){elocoinsBalance=Number(w.data.balance)||0;referralCode=String(w.data.referral_code||'').trim().toUpperCase();if(referralCode){var ru=await sb.rpc('elocoins_referral_usage',{p_code:referralCode});if(!ru.error)referralUsageCount=Math.max(0,Math.min(10,Number(ru.data)||0));}}} }
 function publicProfileHTML(id){return runnerProfile(id,false)}
 
-var publicStyleCache={};
+var publicStyleCache={},publicStyleData={};
+function applyPublicRunnerStyle(runnerId){
+  var data=publicStyleData[String(runnerId)];
+  var avatar=document.querySelector("#v-rank .pf-avatar");
+  if(!data||!avatar)return;
+  var frames=["frame-depart-72","frame-depart-53","frame-depart-49","frame-loire-blue","frame-podium-gold","frame-trail-cyan","frame-chrono-flame","frame-sprint-bolt","frame-royal-crown","frame-legend-prism"];
+  frames.forEach(function(c){avatar.classList.remove(c);});
+  var frameMap={frame_depart_72:"frame-depart-72",frame_depart_53:"frame-depart-53",frame_depart_49:"frame-depart-49",frame_loire_blue:"frame-loire-blue",frame_podium_gold:"frame-podium-gold",frame_trail_cyan:"frame-trail-cyan",frame_chrono_flame:"frame-chrono-flame",frame_sprint_bolt:"frame-sprint-bolt",frame_royal_crown:"frame-royal-crown",frame_legend_prism:"frame-legend-prism"};
+  if(frameMap[data.frame_id])avatar.classList.add(frameMap[data.frame_id]);
+  var badgeMap={badge_sarthe_72:"🏃",badge_mayenne_53:"🌿",badge_maine_loire_49:"💧",badge_bitume_route:"⏱️",badge_trail_nature:"⛰️",badge_peloton_100:"💚"};
+  var chip=avatar.querySelector(".pf-equip-badge");
+  if(chip)chip.remove();
+  if(badgeMap[data.badge_id]){chip=document.createElement("span");chip.className="pf-equip-badge";chip.textContent=badgeMap[data.badge_id];chip.title="Badge ELO COURSE";avatar.appendChild(chip);}
+}
 function loadPublicRunnerStyle(runnerId){
-  if(publicStyleCache[runnerId]===true)return;
-  publicStyleCache[runnerId]=true;
-  sb.rpc("elocoins_public_profile_style",{p_runner_id:String(runnerId)}).then(function(res){
-    if(res.error){delete publicStyleCache[runnerId];console.warn("Style public ELOCOINS indisponible",res.error);return;}
-    if(S.view!=="rank"||S.publicProfile!==runnerId)return;
-    var data=res.data||{},avatar=document.querySelector("#v-rank .pf-avatar");
-    if(!avatar)return;
-    var frames=["frame-depart-72","frame-depart-53","frame-depart-49","frame-loire-blue","frame-podium-gold","frame-trail-cyan","frame-chrono-flame","frame-sprint-bolt","frame-royal-crown","frame-legend-prism"];
-    frames.forEach(function(c){avatar.classList.remove(c);});
-    var frameMap={frame_depart_72:"frame-depart-72",frame_depart_53:"frame-depart-53",frame_depart_49:"frame-depart-49",frame_loire_blue:"frame-loire-blue",frame_podium_gold:"frame-podium-gold",frame_trail_cyan:"frame-trail-cyan",frame_chrono_flame:"frame-chrono-flame",frame_sprint_bolt:"frame-sprint-bolt",frame_royal_crown:"frame-royal-crown",frame_legend_prism:"frame-legend-prism"};
-    if(frameMap[data.frame_id])avatar.classList.add(frameMap[data.frame_id]);
-    var badgeMap={badge_sarthe_72:"🏃",badge_mayenne_53:"🌿",badge_maine_loire_49:"💧",badge_bitume_route:"⏱️",badge_trail_nature:"⛰️",badge_peloton_100:"💚"};
-    var chip=avatar.querySelector(".pf-equip-badge");
-    if(chip)chip.remove();
-    if(badgeMap[data.badge_id]){chip=document.createElement("span");chip.className="pf-equip-badge";chip.textContent=badgeMap[data.badge_id];chip.title="Badge ELO COURSE";avatar.appendChild(chip);}
-  }).catch(function(err){delete publicStyleCache[runnerId];console.warn("Style public ELOCOINS",err);});
+  var key=String(runnerId);
+  if(publicStyleData[key]){applyPublicRunnerStyle(key);return;}
+  if(publicStyleCache[key])return;
+  publicStyleCache[key]=true;
+  sb.rpc("elocoins_public_profile_style",{p_runner_id:key}).then(function(res){
+    if(res.error){delete publicStyleCache[key];console.warn("Style public ELOCOINS indisponible",res.error);return;}
+    publicStyleData[key]=res.data||{};
+    if(S.view==="rank"&&String(S.publicProfile)===key)applyPublicRunnerStyle(key);
+  }).catch(function(err){delete publicStyleCache[key];console.warn("Style public ELOCOINS",err);});
 }
 
 function formatTime(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=Math.round(t%60);if(s===60){s=0;m++}return (h? h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
