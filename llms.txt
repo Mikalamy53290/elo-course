@@ -1,0 +1,40 @@
+# ELO COURSE
+
+> Classement Elo des coureurs et résultats de courses sur route et courses nature dans trois départements français.
+
+## Présentation
+
+ELO COURSE est un site consacré au classement des coureurs à partir de leurs résultats en compétition. Il couvre la Sarthe (72), la Mayenne (53) et le Maine-et-Loire (49).
+
+Site officiel : https://elo-course.eu/
+
+## Classements
+
+Le site distingue les courses sur route et les courses nature. Les classements sont proposés par département et à l'échelle générale, afin de comparer les performances des coureurs sur le territoire couvert.
+
+Les classements sportifs reposent sur un système de notation Elo. La note évolue en fonction des résultats et des confrontations sportives prises en compte par le classement.
+
+## Informations disponibles
+
+Le site public peut présenter :
+- les classements des coureurs ;
+- les profils publics des coureurs ;
+- les résultats et chronos de courses ;
+- les informations sur le fonctionnement du classement ;
+- les rubriques de présentation du service.
+
+Consulter le site pour accéder aux données les plus récentes. Les résultats et classements peuvent évoluer au fil des mises à jour.
+
+## Territoire couvert
+
+- Sarthe (72)
+- Mayenne (53)
+- Maine-et-Loire (49)
+
+## Accès et confidentialité
+
+Seules les pages rendues publiques sur le site sont destinées à être consultées et référencées. Les espaces de compte et d'administration ne sont pas des ressources publiques.
+
+## Source de référence
+
+Pour toute information à jour, privilégier le site officiel : https://elo-course.eu/
