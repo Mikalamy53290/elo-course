@@ -79,7 +79,7 @@ async function getSections(env) {
       const viewMatch = attrs.match(/data-v=["']([^"']+)["']/);
       if (!viewMatch) continue;
       const view = viewMatch[1];
-      if (privateViews.has(view) || seen.has(view)) continue;
+      if (privateViews.has(view) || view === "upcoming" || seen.has(view)) continue;
       seen.add(view);
       const fullLabel = inner.match(/<span[^>]*class=["'][^"']*full[^"']*["'][^>]*>([\s\S]*?)<\/span>/i);
       const label = String((fullLabel ? fullLabel[1] : inner).replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/\s+/g," ").trim() || view);
@@ -149,7 +149,12 @@ async function routeSEO(request, env) {
     const known = copyByView[section.view] || ["Rubrique "+section.label,"Retrouvez cette rubrique publique du site ELO COURSE, consacré aux classements et aux résultats de course à pied en Sarthe, Mayenne et Maine-et-Loire."];
     const title = known[0];
     const description = known[1];
-    return new Response(layout({title,description,canonical:SITE+section.path,body:`<h1>${esc(title)}</h1><p>${esc(description)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p><a class="cta" href="/?view=${encodeURIComponent(section.view)}">Ouvrir cette rubrique dans ELO COURSE</a>`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
+    const details = section.view === "rank"
+      ? `<section class="panel"><h2>Les classements disponibles</h2><p>Les classements ELO sont organisés par discipline et par territoire : courses sur route et courses nature, Sarthe (72), Mayenne (53), Maine-et-Loire (49), ainsi que des classements généraux. Les vues par sexe et par catégorie permettent de situer les performances de chaque coureur.</p><a class="cta" href="/?view=rank">Consulter les classements ELO</a></section>`
+      : section.view === "races"
+      ? `<section class="panel"><h2>Résultats et chronos</h2><p>Les fiches de courses présentent les épreuves terminées, les classements d’arrivée et les chronos disponibles. Les résultats publiés alimentent les classements ELO des coureurs.</p><a class="cta" href="/?view=races">Consulter les résultats des courses</a><a class="cta" href="/courses-a-venir">Découvrir les courses à venir</a></section>`
+      : `<a class="cta" href="/?view=${encodeURIComponent(section.view)}">Ouvrir cette rubrique dans ELO COURSE</a>`;
+    return new Response(layout({title,description,canonical:SITE+section.path,body:`<h1>${esc(title)}</h1><p>${esc(description)}</p><p>Le site couvre la Sarthe, la Mayenne et le Maine-et-Loire.</p>${details}`}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   if (!path.startsWith("/coureur/") && !path.startsWith("/course/")) return null;
   let data;
