@@ -80,6 +80,14 @@
       .avatar-stage.size-hero { width: 120px; height: 120px; }
     }
 
+    .avatar-core img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+    }
+
     .avatar-core {
       position: relative;
       z-index: 2;
@@ -844,6 +852,7 @@
       balance: 0,
       runnerName: 'Votre profil coureur',
       initials: '??',
+      avatarUrl: null,
       goalText: '',
       goalEditing: false,
       likes: 0,
@@ -893,6 +902,21 @@
         storeMessage('La boutique est réservée aux comptes coureurs validés. Votre compte doit être validé avant tout achat.', true);
         state.balance = 0; state.ownedIds = []; state.transactions = [];
         return;
+      }
+
+      // La photo est publique en lecture : on la récupère par l'identifiant coureur validé.
+      // En cas d'absence de photo ou de refus de lecture, la boutique conserve les initiales.
+      state.avatarUrl = null;
+      if (account.data.runner_id) {
+        try {
+          const avatarResult = await storeClient.from('runner_avatars')
+            .select('avatar_url').eq('runner_id', account.data.runner_id).maybeSingle();
+          if (!avatarResult.error && avatarResult.data && avatarResult.data.avatar_url) {
+            state.avatarUrl = avatarResult.data.avatar_url;
+          }
+        } catch (avatarError) {
+          console.warn('Photo de profil indisponible dans la boutique :', avatarError);
+        }
       }
 
       const meta = storeUser.user_metadata || {};
@@ -1072,8 +1096,21 @@
     function renderProfileAndDrawer() {
       dom.headerBalance.textContent = String(state.balance);
       dom.heroRunnerName.textContent = state.runnerName;
-      dom.heroAvatarInitials.textContent = state.initials;
-      dom.drawerAvatarInitials.textContent = state.initials;
+      [dom.heroAvatarInitials, dom.drawerAvatarInitials].forEach((avatarEl) => {
+        avatarEl.replaceChildren();
+        if (state.avatarUrl) {
+          const photo = document.createElement('img');
+          photo.src = state.avatarUrl;
+          photo.alt = 'Photo de profil';
+          photo.loading = 'eager';
+          photo.referrerPolicy = 'no-referrer';
+          avatarEl.appendChild(photo);
+          avatarEl.setAttribute('aria-label', 'Photo de profil');
+        } else {
+          avatarEl.textContent = state.initials;
+          avatarEl.removeAttribute('aria-label');
+        }
+      });
       dom.editGoalToggleBtn.hidden = true;
       dom.goalEditorRow.classList.add('hidden');
 
