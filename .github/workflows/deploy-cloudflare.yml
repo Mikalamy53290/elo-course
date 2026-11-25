@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - '.github/workflows/deploy-cloudflare.yml'
+      - '.assetsignore'
       - 'index.html'
       - 'boutique.html'
       - 'worker.js'
