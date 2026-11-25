@@ -1182,23 +1182,28 @@ async function refreshRunnerAuth(){var s=await sb.auth.getSession();var session=
 function publicProfileHTML(id){return runnerProfile(id,false)}
 
 var publicStyleCache={};
+function applyPublicRunnerStyle(runnerId,data){
+  if(!((S.view==="rank"&&S.publicProfile===runnerId)||(S.view==="me"&&S.me===runnerId)))return;
+  var avatar=document.querySelector((S.view==="me"?"#v-me":"#v-rank")+" .pf-avatar");
+  if(!avatar)return;
+  var frames=["frame-depart-72","frame-depart-53","frame-depart-49","frame-loire-blue","frame-podium-gold","frame-trail-cyan","frame-chrono-flame","frame-sprint-bolt","frame-royal-crown","frame-legend-prism"];
+  frames.forEach(function(c){avatar.classList.remove(c);});
+  var frameMap={frame_depart_72:"frame-depart-72",frame_depart_53:"frame-depart-53",frame_depart_49:"frame-depart-49",frame_loire_blue:"frame-loire-blue",frame_podium_gold:"frame-podium-gold",frame_trail_cyan:"frame-trail-cyan",frame_chrono_flame:"frame-chrono-flame",frame_sprint_bolt:"frame-sprint-bolt",frame_royal_crown:"frame-royal-crown",frame_legend_prism:"frame-legend-prism"};
+  if(frameMap[data.frame_id])avatar.classList.add(frameMap[data.frame_id]);
+  var badgeMap={badge_sarthe_72:"🏃",badge_mayenne_53:"🌿",badge_maine_loire_49:"💧",badge_bitume_route:"⏱️",badge_trail_nature:"⛰️",badge_peloton_100:"💚"};
+  var chip=avatar.querySelector(".pf-equip-badge");
+  if(chip)chip.remove();
+  if(badgeMap[data.badge_id]){chip=document.createElement("span");chip.className="pf-equip-badge";chip.textContent=badgeMap[data.badge_id];chip.title="Badge ELO COURSE";avatar.appendChild(chip);}
+}
 function loadPublicRunnerStyle(runnerId){
-  if(publicStyleCache[runnerId]===true)return;
-  publicStyleCache[runnerId]=true;
-  sb.rpc("elocoins_public_profile_style",{p_runner_id:String(runnerId)}).then(function(res){
-    if(res.error){delete publicStyleCache[runnerId];console.warn("Style public ELOCOINS indisponible",res.error);return;}
-    if(!((S.view==="rank"&&S.publicProfile===runnerId)||(S.view==="me"&&S.me===runnerId)))return;
-    var data=res.data||{},avatar=document.querySelector((S.view==="me"?"#v-me":"#v-rank")+" .pf-avatar");
-    if(!avatar)return;
-    var frames=["frame-depart-72","frame-depart-53","frame-depart-49","frame-loire-blue","frame-podium-gold","frame-trail-cyan","frame-chrono-flame","frame-sprint-bolt","frame-royal-crown","frame-legend-prism"];
-    frames.forEach(function(c){avatar.classList.remove(c);});
-    var frameMap={frame_depart_72:"frame-depart-72",frame_depart_53:"frame-depart-53",frame_depart_49:"frame-depart-49",frame_loire_blue:"frame-loire-blue",frame_podium_gold:"frame-podium-gold",frame_trail_cyan:"frame-trail-cyan",frame_chrono_flame:"frame-chrono-flame",frame_sprint_bolt:"frame-sprint-bolt",frame_royal_crown:"frame-royal-crown",frame_legend_prism:"frame-legend-prism"};
-    if(frameMap[data.frame_id])avatar.classList.add(frameMap[data.frame_id]);
-    var badgeMap={badge_sarthe_72:"🏃",badge_mayenne_53:"🌿",badge_maine_loire_49:"💧",badge_bitume_route:"⏱️",badge_trail_nature:"⛰️",badge_peloton_100:"💚"};
-    var chip=avatar.querySelector(".pf-equip-badge");
-    if(chip)chip.remove();
-    if(badgeMap[data.badge_id]){chip=document.createElement("span");chip.className="pf-equip-badge";chip.textContent=badgeMap[data.badge_id];chip.title="Badge ELO COURSE";avatar.appendChild(chip);}
-  }).catch(function(err){delete publicStyleCache[runnerId];console.warn("Style public ELOCOINS",err);});
+  var cached=publicStyleCache[runnerId];
+  if(cached&&typeof cached.then!=="function"){applyPublicRunnerStyle(runnerId,cached);return;}
+  if(cached&&typeof cached.then==="function"){cached.then(function(data){applyPublicRunnerStyle(runnerId,data);});return;}
+  var request=sb.rpc("elocoins_public_profile_style",{p_runner_id:String(runnerId)}).then(function(res){
+    if(res.error)throw res.error;
+    var data=res.data||{};publicStyleCache[runnerId]=data;applyPublicRunnerStyle(runnerId,data);return data;
+  }).catch(function(err){delete publicStyleCache[runnerId];console.warn("Style public ELOCOINS indisponible",err);return null;});
+  publicStyleCache[runnerId]=request;
 }
 
 function formatTime(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=Math.round(t%60);if(s===60){s=0;m++}return (h? h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
