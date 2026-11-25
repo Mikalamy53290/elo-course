@@ -522,6 +522,23 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 .seo-intro h1{font:700 22px/1.15 "Barlow Condensed","Arial Narrow",sans-serif;color:var(--ink);margin:0 0 7px}
 .seo-intro p{font-size:13px;line-height:1.5;margin:5px 0}
 @media(max-width:520px){.seo-intro{padding:10px 12px}.seo-intro h1{font-size:20px}}
+
+/* Cadres ELOCOINS synchronisés sur les fiches publiques */
+.pf-avatar{position:relative;isolation:isolate;overflow:visible}
+.pf-avatar:before{content:"";position:absolute;inset:-7px;border-radius:50%;pointer-events:none;z-index:0}
+.pf-avatar img,.pf-avatar:not(:has(img)){position:relative;z-index:1}
+.pf-avatar.frame-depart-72:before{border:3px solid #278A50;box-shadow:0 0 14px #278a5088}
+.pf-avatar.frame-depart-53:before{border:3px solid #38BDF8;box-shadow:0 0 14px #38bdf888}
+.pf-avatar.frame-depart-49:before{border:3px solid #F59E0B;box-shadow:0 0 14px #f59e0b88}
+.pf-avatar.frame-loire-blue:before{border:4px solid #38BDF8;box-shadow:0 0 12px #38bdf888}
+.pf-avatar.frame-podium-gold:before{border:4px solid #FFD166;box-shadow:0 0 16px #ffd16699}
+.pf-avatar.frame-trail-cyan:before{border:4px solid #22D3EE;box-shadow:0 0 16px #22d3ee99}
+.pf-avatar.frame-chrono-flame:before{border:4px solid #F97316;box-shadow:0 0 16px #f9731699}
+.pf-avatar.frame-sprint-bolt:before{border:4px dashed #FACC15;box-shadow:0 0 14px #facc1588}
+.pf-avatar.frame-royal-crown:before{border:4px double #C084FC;box-shadow:0 0 16px #c084fc99}
+.pf-avatar.frame-legend-prism:before{border:4px solid transparent;background:linear-gradient(#102236,#102236) padding-box,linear-gradient(120deg,#278A50,#38BDF8,#A855F7,#FFD166) border-box}
+.pf-avatar .pf-equip-badge{position:absolute;z-index:3;right:-8px;bottom:-4px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#0b1724;border:2px solid #ffd166;font-size:17px;box-shadow:0 3px 9px #0008}
+
 </style>
 <meta name="elo-course-build" content="2026-11-20-corrections-selection-profil-duel-v2">
 </head>
@@ -1163,6 +1180,27 @@ function accountPanelHTML(){
 function getRunnerByName(){return S.runners.filter(function(r){return r.id===window.selectedRunnerLink})[0]||null;}
 async function refreshRunnerAuth(){var s=await sb.auth.getSession();var session=s.data.session;if(session){var day='';try{day=localStorage.getItem('elo-course-auth-day')||''}catch(e){}if(day&&day!==localDayKey()){await sb.auth.signOut();session=null;}else if(!day){rememberDailyLogin();}}authUser=session?session.user:null;linkedRunner=null;pendingRunner=null;elocoinsBalance=0;referralCode='';referralUsageCount=0;if(authUser){var a=await sb.from('runner_accounts').select('runner_id,status').eq('user_id',authUser.id).maybeSingle();if(a.data&&a.data.status==='approved'){linkedRunner=a.data.runner_id;S.me=linkedRunner;try{var dailyReward=await sb.rpc('elocoins_claim_daily_login_reward');if(!dailyReward.error&&dailyReward.data&&dailyReward.data.awarded){msg.runnerAccount='🎁 Bonus de connexion : +10 ELOCOINS ajoutés à ton portefeuille aujourd’hui !';}}catch(rewardError){console.warn('Bonus de connexion ELOCOINS indisponible :',rewardError);}}else if(a.data&&a.data.status==='pending'){pendingRunner=a.data.runner_id;}var w=await sb.from('elocoins_wallets').select('balance,referral_code').eq('user_id',authUser.id).maybeSingle();if(!w.error&&w.data){elocoinsBalance=Number(w.data.balance)||0;referralCode=String(w.data.referral_code||'').trim().toUpperCase();if(referralCode){var ru=await sb.rpc('elocoins_referral_usage',{p_code:referralCode});if(!ru.error)referralUsageCount=Math.max(0,Math.min(10,Number(ru.data)||0));}}} }
 function publicProfileHTML(id){return runnerProfile(id,false)}
+
+var publicStyleCache={};
+function loadPublicRunnerStyle(runnerId){
+  if(publicStyleCache[runnerId]===true)return;
+  publicStyleCache[runnerId]=true;
+  sb.rpc("elocoins_public_profile_style",{p_runner_id:String(runnerId)}).then(function(res){
+    if(res.error){delete publicStyleCache[runnerId];console.warn("Style public ELOCOINS indisponible",res.error);return;}
+    if(S.view!=="rank"||S.publicProfile!==runnerId)return;
+    var data=res.data||{},avatar=document.querySelector("#v-rank .pf-avatar");
+    if(!avatar)return;
+    var frames=["frame-depart-72","frame-depart-53","frame-depart-49","frame-loire-blue","frame-podium-gold","frame-trail-cyan","frame-chrono-flame","frame-sprint-bolt","frame-royal-crown","frame-legend-prism"];
+    frames.forEach(function(c){avatar.classList.remove(c);});
+    var frameMap={frame_depart_72:"frame-depart-72",frame_depart_53:"frame-depart-53",frame_depart_49:"frame-depart-49",frame_loire_blue:"frame-loire-blue",frame_podium_gold:"frame-podium-gold",frame_trail_cyan:"frame-trail-cyan",frame_chrono_flame:"frame-chrono-flame",frame_sprint_bolt:"frame-sprint-bolt",frame_royal_crown:"frame-royal-crown",frame_legend_prism:"frame-legend-prism"};
+    if(frameMap[data.frame_id])avatar.classList.add(frameMap[data.frame_id]);
+    var badgeMap={badge_sarthe_72:"🏃",badge_mayenne_53:"🌿",badge_maine_loire_49:"💧",badge_bitume_route:"⏱️",badge_trail_nature:"⛰️",badge_peloton_100:"💚"};
+    var chip=avatar.querySelector(".pf-equip-badge");
+    if(chip)chip.remove();
+    if(badgeMap[data.badge_id]){chip=document.createElement("span");chip.className="pf-equip-badge";chip.textContent=badgeMap[data.badge_id];chip.title="Badge ELO COURSE";avatar.appendChild(chip);}
+  }).catch(function(err){delete publicStyleCache[runnerId];console.warn("Style public ELOCOINS",err);});
+}
+
 function formatTime(t){var h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=Math.round(t%60);if(s===60){s=0;m++}return (h? h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
 function rankPager(total,page,pages){
   if(pages<=1)return '';
@@ -1503,6 +1541,7 @@ function render(){window.ELO_ADMIN_MODE=!!S.admin;document.body.classList.toggle
   var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(st);var pop=document.getElementById("accountpopover");if(pop){pop.hidden=!accountPopoverOpen;pop.innerHTML=accountPopoverOpen?accountPanelHTML():"";if(accountPopoverOpen&&accountMode==='signup'){refreshReferralUsage();var referralInput=document.getElementById('signupreferral');if(referralInput&&!referralInput.dataset.usageBound){referralInput.dataset.usageBound='1';referralInput.addEventListener('input',function(){refreshReferralUsage();});}}}
   if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML(st);
   if(S.view==="rank"){if(S.publicProfile&&!eloCache.all){compute(undefined,"all");$("#v-rank").innerHTML='<p class="empty">Préparation du profil…</p>';}else $("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));}
+  if(S.view==="rank"&&S.publicProfile&&!S.testPreview)loadPublicRunnerStyle(S.publicProfile);
   else if(S.view==="races")$("#v-races").innerHTML=racesHTML();
   else if(S.view==="me")$("#v-me").innerHTML=meHTML(st);
   else if(S.view==="help")$("#v-help").innerHTML=helpHTML();
