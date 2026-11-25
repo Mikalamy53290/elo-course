@@ -80,6 +80,14 @@
       .avatar-stage.size-hero { width: 120px; height: 120px; }
     }
 
+    .avatar-core img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 9999px;
+      object-fit: cover;
+    }
+
     .avatar-core {
       position: relative;
       z-index: 2;
@@ -844,6 +852,7 @@
       balance: 0,
       runnerName: 'Votre profil coureur',
       initials: '??',
+      avatarUrl: '',
       goalText: '',
       goalEditing: false,
       likes: 0,
@@ -898,6 +907,14 @@
       const meta = storeUser.user_metadata || {};
       state.runnerName = meta.full_name || meta.name || (storeUser.email ? storeUser.email.split('@')[0] : 'Coureur ELO COURSE');
       state.initials = state.runnerName.trim().split(/\\s+/).slice(0,2).map(x=>x.charAt(0).toUpperCase()).join('') || 'EC';
+      state.avatarUrl = '';
+      if (account.data.runner_id) {
+        const avatarResult = await storeClient.from('runner_avatars')
+          .select('avatar_url').eq('runner_id', account.data.runner_id).maybeSingle();
+        if (!avatarResult.error && avatarResult.data && /^https:\\/\\//i.test(avatarResult.data.avatar_url || '')) {
+          state.avatarUrl = avatarResult.data.avatar_url;
+        }
+      }
 
       const profile = await storeClient.from('runner_profile_details')
         .select('objective').eq('user_id', storeUser.id).maybeSingle();
@@ -1072,8 +1089,19 @@
     function renderProfileAndDrawer() {
       dom.headerBalance.textContent = String(state.balance);
       dom.heroRunnerName.textContent = state.runnerName;
-      dom.heroAvatarInitials.textContent = state.initials;
-      dom.drawerAvatarInitials.textContent = state.initials;
+      [dom.heroAvatarInitials, dom.drawerAvatarInitials].forEach((node) => {
+        node.replaceChildren();
+        if (state.avatarUrl) {
+          const photo = document.createElement('img');
+          photo.src = state.avatarUrl;
+          photo.alt = 'Photo de ' + state.runnerName;
+          photo.loading = 'eager';
+          photo.referrerPolicy = 'no-referrer';
+          node.appendChild(photo);
+        } else {
+          node.textContent = state.initials;
+        }
+      });
       dom.editGoalToggleBtn.hidden = true;
       dom.goalEditorRow.classList.add('hidden');
 
