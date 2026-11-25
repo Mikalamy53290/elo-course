@@ -289,7 +289,7 @@
 </head>
 <body class="min-h-screen bg-[#0B1724] text-slate-100 antialiased">
   <!-- =========================================================================
-       BARRE SUPÉRIEURE : MES BADGES & CADRES + EXPORTER LE CODE + SOLDE
+       BARRE SUPÉRIEURE : NAVIGATION, MES BADGES & CADRES + SOLDE
        ========================================================================= -->
   <header class="sticky top-0 z-40 border-b border-white/10 bg-[#0B1724]/92 backdrop-blur-md">
     <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-3.5 py-2.5 sm:px-6">
@@ -326,15 +326,6 @@
           <span>🏅</span>
           <span>Mes Badges & Cadres</span>
           <span id="drawerChevron" class="text-[10px] text-[#38BDF8] transition-transform">▼</span>
-        </button>
-
-        <button
-          type="button"
-          id="openExportModalBtn"
-          class="inline-flex items-center gap-1.5 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/15 px-3 py-1.5 text-xs font-extrabold text-slate-200 transition cursor-pointer"
-        >
-          <span>📋</span>
-          <span class="hidden xs:inline sm:inline">Exporter le code</span>
         </button>
 
         <div class="inline-flex items-center gap-1.5 rounded-full bg-[#FFD166]/15 border border-[#FFD166]/50 px-3 py-1.5">
@@ -577,60 +568,6 @@
       <div id="transactionsList" class="divide-y divide-white/10 text-xs"></div>
     </section>
   </main>
-
-  <!-- =========================================================================
-       MODALE D'EXPORT DU CODE HTML
-       ========================================================================= -->
-  <div
-    id="exportModalBackdrop"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-3.5 sm:p-6"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="exportModalTitle"
-  >
-    <div class="w-full max-w-3xl rounded-2xl bg-[#172B3D] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
-      <div class="flex items-center justify-between gap-3 px-4 py-3.5 border-b border-white/10 bg-[#0B1724]/70">
-        <div>
-          <h2 id="exportModalTitle" class="text-sm sm:text-base font-black text-white">Exporter le code de la Boutique ELOCOINS</h2>
-          <p class="text-[11px] text-slate-400">Copiez le code HTML complet ou téléchargez le fichier prêt à intégrer à elo-course.eu</p>
-        </div>
-        <button
-          type="button"
-          id="closeExportModalBtn"
-          class="rounded-full bg-white/10 hover:bg-white/15 px-3 py-1 text-xs font-bold text-slate-200 cursor-pointer"
-        >
-          Fermer ✕
-        </button>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-[#0E1E2E] border-b border-white/10">
-        <span class="text-xs font-mono text-[#38BDF8]">boutique_elocoins_elo_course.html</span>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            id="copyCodeBtn"
-            class="rounded-lg bg-[#FFD166] hover:bg-[#ffda85] px-3.5 py-1.5 text-xs font-extrabold text-[#0B1724] cursor-pointer transition"
-          >
-            📋 Copier le code
-          </button>
-          <button
-            type="button"
-            id="downloadHtmlBtn"
-            class="rounded-lg bg-[#278A50] hover:bg-[#2ea35f] px-3.5 py-1.5 text-xs font-extrabold text-white cursor-pointer transition"
-          >
-            ⬇ Télécharger .html
-          </button>
-        </div>
-      </div>
-
-      <textarea
-        id="exportedCodeArea"
-        readonly
-        spellcheck="false"
-        class="flex-1 w-full min-h-[260px] bg-[#0B1724] p-4 font-mono text-[11px] sm:text-xs text-slate-200 outline-none resize-none"
-      ></textarea>
-    </div>
-  </div>
 
   <!-- Toast de notification -->
   <div
@@ -1056,12 +993,6 @@
       categoryTabs: document.querySelectorAll('.cat-btn'),
       shopGrid: document.getElementById('shopGrid'),
       transactionsList: document.getElementById('transactionsList'),
-      openExportModalBtn: document.getElementById('openExportModalBtn'),
-      exportModalBackdrop: document.getElementById('exportModalBackdrop'),
-      closeExportModalBtn: document.getElementById('closeExportModalBtn'),
-      copyCodeBtn: document.getElementById('copyCodeBtn'),
-      downloadHtmlBtn: document.getElementById('downloadHtmlBtn'),
-      exportedCodeArea: document.getElementById('exportedCodeArea'),
       toastBanner: document.getElementById('toastBanner'),
       toastIcon: document.getElementById('toastIcon'),
       toastText: document.getElementById('toastText')
@@ -1424,56 +1355,6 @@
         if (state.ownedIds.includes(item.id) || state.balance < item.price) return;
         btn.disabled = true;
         await buyStoreItem(item);
-      }
-    });
-
-    // Modale d'export du code HTML
-    function getFullHtmlSource() {
-      return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    }
-
-    dom.openExportModalBtn.addEventListener('click', () => {
-      dom.exportedCodeArea.value = getFullHtmlSource();
-      dom.exportModalBackdrop.classList.remove('hidden');
-      dom.exportModalBackdrop.classList.add('flex');
-    });
-
-    dom.closeExportModalBtn.addEventListener('click', () => {
-      dom.exportModalBackdrop.classList.add('hidden');
-      dom.exportModalBackdrop.classList.remove('flex');
-    });
-
-    dom.exportModalBackdrop.addEventListener('click', (e) => {
-      if (e.target === dom.exportModalBackdrop) {
-        dom.exportModalBackdrop.classList.add('hidden');
-        dom.exportModalBackdrop.classList.remove('flex');
-      }
-    });
-
-    dom.copyCodeBtn.addEventListener('click', () => {
-      dom.exportedCodeArea.select();
-      try {
-        document.execCommand('copy');
-        showToast('Code HTML copié dans le presse-papiers !', '📋');
-      } catch (err) {
-        showToast('Sélectionnez le texte puis faites Ctrl+C / Cmd+C', '📋');
-      }
-    });
-
-    dom.downloadHtmlBtn.addEventListener('click', () => {
-      try {
-        const blob = new Blob([getFullHtmlSource()], { type: 'text/html;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'boutique_elocoins_elo_course.html';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        showToast('Fichier .html téléchargé !', '⬇');
-      } catch (err) {
-        showToast('Utilisez « Copier le code » pour coller dans votre éditeur', '📋');
       }
     });
 
