@@ -1,5 +1,6 @@
 .git/
 .wrangler/
+node_modules/
 supabase/
 worker.js
 wrangler.jsonc
