@@ -1,40 +1,47 @@
 # ELO COURSE
 
-> Classement Elo des coureurs et résultats de courses sur route et courses nature dans trois départements français.
+> Classement Elo des coureurs, calendrier et résultats de courses sur route et courses nature en Sarthe, Mayenne et Maine-et-Loire.
 
 ## Présentation
 
-ELO COURSE est un site consacré au classement des coureurs à partir de leurs résultats en compétition. Il couvre la Sarthe (72), la Mayenne (53) et le Maine-et-Loire (49).
+ELO COURSE est un site consacré au classement des coureurs à partir de leurs résultats en compétition. Le territoire couvert comprend la Sarthe (72), la Mayenne (53) et le Maine-et-Loire (49).
 
 Site officiel : https://elo-course.eu/
 
+## Pages publiques principales
+
+- Accueil : https://elo-course.eu/
+- Classement ELO des coureurs : https://elo-course.eu/rubrique/classement
+- Résultats des courses : https://elo-course.eu/rubrique/courses
+- Calendrier des courses à venir : https://elo-course.eu/courses-a-venir
+- Règlement du site : https://elo-course.eu/rubrique/reglement-du-site
+- Chronométreurs : https://elo-course.eu/rubrique/chronometreurs
+- Mode Ghost : https://elo-course.eu/rubrique/mode-ghost
+
 ## Classements
 
-Le site distingue les courses sur route et les courses nature. Les classements sont proposés par département et à l'échelle générale, afin de comparer les performances des coureurs sur le territoire couvert.
+Les classements ELO permettent de comparer les performances des coureurs à partir des résultats de compétition. Le site propose des vues générales et des vues par territoire, par discipline, par sexe et par catégorie. Les disciplines présentées sont les courses sur route et les courses nature.
 
-Les classements sportifs reposent sur un système de notation Elo. La note évolue en fonction des résultats et des confrontations sportives prises en compte par le classement.
-
-## Informations disponibles
-
-Le site public peut présenter :
-- les classements des coureurs ;
-- les profils publics des coureurs ;
-- les résultats et chronos de courses ;
-- les informations sur le fonctionnement du classement ;
-- les rubriques de présentation du service.
-
-Consulter le site pour accéder aux données les plus récentes. Les résultats et classements peuvent évoluer au fil des mises à jour.
-
-## Territoire couvert
-
+Les classements couvrent :
 - Sarthe (72)
 - Mayenne (53)
 - Maine-et-Loire (49)
+- les classements généraux du territoire couvert.
 
-## Accès et confidentialité
+Les notes évoluent en fonction des résultats et des règles du système ELO appliquées par le site. Pour connaître les règles détaillées, consulter le règlement public.
 
-Seules les pages rendues publiques sur le site sont destinées à être consultées et référencées. Les espaces de compte et d'administration ne sont pas des ressources publiques.
+## Calendrier et courses
+
+La page https://elo-course.eu/courses-a-venir présente les prochaines épreuves enregistrées dans le calendrier public. Les fiches individuelles de course peuvent présenter le nom de l'épreuve, sa date, sa distance, son territoire et, lorsqu'ils sont disponibles, ses résultats.
+
+## Résultats
+
+Les pages individuelles de course sont accessibles à partir des liens publiés dans les rubriques de résultats. Elles présentent les classements d'arrivée et les chronos disponibles. Les résultats publiés alimentent les classements ELO.
+
+## Profils coureurs et confidentialité
+
+Certaines fiches coureurs peuvent être publiées lorsqu'un accord explicite d'indexation a été donné. Les pages de compte et d'administration ne sont pas publiques. Ne pas déduire ni reconstituer des informations personnelles à partir de données non publiées.
 
 ## Source de référence
 
-Pour toute information à jour, privilégier le site officiel : https://elo-course.eu/
+Privilégier le site officiel https://elo-course.eu/ pour les informations et classements les plus récents. Les données et résultats évoluent au fil des mises à jour.
