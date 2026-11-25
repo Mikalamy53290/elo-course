@@ -350,6 +350,13 @@
               <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#38BDF8]">Équipement rapide du profil</div>
               <div class="text-sm font-extrabold text-white">Sélectionnez votre cadre, votre badge ou le style de votre objectif</div>
               <div id="drawerEquipStatus" class="text-xs text-slate-400 mt-0.5"></div>
+              <div id="stylePreviewPanel" class="flex flex-wrap items-center gap-2 mt-2">
+                <span id="stylePreviewStatus" class="text-[11px] text-slate-300">Personnalisation enregistrée</span>
+                <button type="button" id="removePreviewFrame" class="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-bold text-slate-200">Aucun cadre</button>
+                <button type="button" id="removePreviewBadge" class="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-bold text-slate-200">Aucun badge</button>
+                <button type="button" id="cancelStylePreview" class="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-bold text-slate-300">Annuler l’aperçu</button>
+                <button type="button" id="validateStylePreview" class="rounded-full bg-[#278A50] px-3 py-1 text-[11px] font-extrabold text-white">Valider ma personnalisation</button>
+              </div>
             </div>
           </div>
 
@@ -541,7 +548,7 @@
             Tous
           </button>
           <button type="button" data-cat="Cadres" class="cat-btn shrink-0 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-300 cursor-pointer transition">
-            Cadres (8)
+            Cadres (10)
           </button>
           <button type="button" data-cat="Badges" class="cat-btn shrink-0 rounded-full bg-[#172B3D] hover:bg-[#213d57] border border-white/10 px-3.5 py-1.5 text-xs font-bold text-slate-300 cursor-pointer transition">
             Badges (6)
@@ -595,6 +602,26 @@
         description: 'Contour vert émeraude net pour vos profils sarthois.',
         price: 30,
         tag: 'Sarthe 72'
+      },
+      {
+        id: 'frame_depart_53',
+        category: 'Cadres',
+        frameClass: 'frame-depart-53',
+        shortLabel: 'Départ 53',
+        name: 'Cadre Départ 53 (Mayenne)',
+        description: 'Contour bleu Mayenne pour afficher votre département sur votre profil.',
+        price: 30,
+        tag: 'Mayenne 53'
+      },
+      {
+        id: 'frame_depart_49',
+        category: 'Cadres',
+        frameClass: 'frame-depart-49',
+        shortLabel: 'Départ 49',
+        name: 'Cadre Départ 49 (Maine-et-Loire)',
+        description: 'Contour bleu et or Maine-et-Loire pour afficher votre département sur votre profil.',
+        price: 30,
+        tag: 'Maine-et-Loire 49'
       },
       {
         id: 'frame_loire_blue',
@@ -820,6 +847,8 @@
       activeCategory: 'Tous',
       equippedFrameId: null,
       equippedBadgeId: null,
+      previewFrameId: null,
+      previewBadgeId: null,
       equippedGoalStyleId: null,
       equippedBannerId: null,
       ownedIds: [],
@@ -897,6 +926,8 @@
         if (x.category === 'Objectifs') state.equippedGoalStyleId = x.item_id;
         if (x.category === 'Bannières') state.equippedBannerId = x.item_id;
       });
+      state.previewFrameId = state.equippedFrameId;
+      state.previewBadgeId = state.equippedBadgeId;
       state.transactions = (transactions.data || []).map(x=>({
         label: x.description || 'Mouvement ELOCOINS',
         delta: Number(x.amount),
@@ -967,6 +998,8 @@
       drawerAvatarStage: document.getElementById('drawerAvatarStage'),
       drawerBadgeChip: document.getElementById('drawerBadgeChip'),
       drawerEquipStatus: document.getElementById('drawerEquipStatus'),
+      stylePreviewStatus: document.getElementById('stylePreviewStatus'),
+      validateStylePreview: document.getElementById('validateStylePreview'),
       ownedBadgesCount: document.getElementById('ownedBadgesCount'),
       ownedFramesCount: document.getElementById('ownedFramesCount'),
       ownedGoalsCount: document.getElementById('ownedGoalsCount'),
@@ -1039,8 +1072,13 @@
       dom.editGoalToggleBtn.hidden = true;
       dom.goalEditorRow.classList.add('hidden');
 
-      const frame = CATALOG.find((i) => i.id === state.equippedFrameId) || null;
-      const badge = CATALOG.find((i) => i.id === state.equippedBadgeId) || null;
+      const frame = CATALOG.find((i) => i.id === state.previewFrameId) || null;
+      const badge = CATALOG.find((i) => i.id === state.previewBadgeId) || null;
+      const styleDirty = state.previewFrameId !== state.equippedFrameId || state.previewBadgeId !== state.equippedBadgeId;
+      dom.stylePreviewStatus.textContent = styleDirty ? 'Aperçu en attente — rien n’est enregistré ni débité.' : 'Personnalisation enregistrée sur votre fiche.';
+      dom.validateStylePreview.disabled = !styleDirty;
+      dom.validateStylePreview.classList.toggle('opacity-40', !styleDirty);
+      dom.validateStylePreview.classList.toggle('cursor-not-allowed', !styleDirty);
       const goalStyle = CATALOG.find((i) => i.id === state.equippedGoalStyleId) || CATALOG.find((i) => i.id === 'goal_sobre');
       const banner = CATALOG.find((i) => i.id === state.equippedBannerId) || CATALOG.find((i) => i.id === 'banner_bleu_elo');
 
@@ -1071,10 +1109,10 @@
       dom.ownedBadgesCount.textContent = `${unlockedBadges.length}/${allBadges.length}`;
       dom.drawerBadgesList.innerHTML = '';
       unlockedBadges.forEach((b) => {
-        const active = state.equippedBadgeId === b.id;
+        const active = state.previewBadgeId === b.id;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.dataset.equipBadge = b.id;
+        btn.dataset.previewBadge = b.id;
         btn.className =
           `inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ` +
           (active
@@ -1090,10 +1128,10 @@
       dom.ownedFramesCount.textContent = `${unlockedFrames.length}/${allFrames.length}`;
       dom.drawerFramesList.innerHTML = '';
       unlockedFrames.forEach((f) => {
-        const active = state.equippedFrameId === f.id;
+        const active = state.previewFrameId === f.id;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.dataset.equipFrame = f.id;
+        btn.dataset.previewFrame = f.id;
         btn.className =
           `inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ` +
           (active
@@ -1172,7 +1210,13 @@
             </button>
           `;
         } else if (owned) {
-          buttonHtml = `
+          const isStylePreview = item.category === 'Cadres' || item.category === 'Badges';
+          const previewActive = (item.category === 'Cadres' && state.previewFrameId === item.id) || (item.category === 'Badges' && state.previewBadgeId === item.id);
+          buttonHtml = isStylePreview ? `
+            <button type="button" data-action="preview" data-id="${item.id}" class="rounded-full ${previewActive ? 'bg-[#38BDF8] text-[#0B1724]' : 'bg-[#278A50] hover:bg-[#2ea35f] text-white'} px-3.5 py-1.5 text-xs font-extrabold cursor-pointer transition">
+              ${previewActive ? 'Aperçu sélectionné' : 'Voir en aperçu'}
+            </button>
+          ` : `
             <button type="button" data-action="equip" data-id="${item.id}" class="rounded-full bg-[#278A50] hover:bg-[#2ea35f] px-3.5 py-1.5 text-xs font-extrabold text-white cursor-pointer transition">
               Équiper
             </button>
@@ -1274,14 +1318,39 @@
     dom.toggleDrawerBtn.addEventListener('click', () => setTopDrawer(!state.drawerOpen));
     dom.closeDrawerBtn.addEventListener('click', () => setTopDrawer(false));
 
-    dom.drawerBadgesList.addEventListener('click', async (e) => {
-      const btn = e.target.closest('[data-equip-badge]'); if (!btn) return;
-      const item = CATALOG.find(x=>x.id===btn.dataset.equipBadge); if (item) await equipStoreItem(item,'Badges');
+    dom.drawerBadgesList.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-preview-badge]'); if (!btn) return;
+      state.previewBadgeId = btn.dataset.previewBadge; renderAll();
     });
 
-    dom.drawerFramesList.addEventListener('click', async (e) => {
-      const btn = e.target.closest('[data-equip-frame]'); if (!btn) return;
-      const item = CATALOG.find(x=>x.id===btn.dataset.equipFrame); if (item) await equipStoreItem(item,'Cadres');
+    dom.drawerFramesList.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-preview-frame]'); if (!btn) return;
+      state.previewFrameId = btn.dataset.previewFrame; renderAll();
+    });
+
+    document.getElementById('removePreviewFrame').addEventListener('click',()=>{state.previewFrameId=null;renderAll();});
+    document.getElementById('removePreviewBadge').addEventListener('click',()=>{state.previewBadgeId=null;renderAll();});
+    document.getElementById('cancelStylePreview').addEventListener('click',()=>{state.previewFrameId=state.equippedFrameId;state.previewBadgeId=state.equippedBadgeId;renderAll();});
+
+    dom.validateStylePreview.addEventListener('click',async()=>{
+      if(!state.storeReady||!storeUser)return;
+      const changes=[];
+      if(state.previewFrameId!==state.equippedFrameId)changes.push(['Cadres',state.previewFrameId]);
+      if(state.previewBadgeId!==state.equippedBadgeId)changes.push(['Badges',state.previewBadgeId]);
+      if(!changes.length)return;
+      dom.validateStylePreview.disabled=true;
+      try{
+        for(const [category,itemId] of changes){
+          const result=await storeClient.rpc('elocoins_equip_item',{p_category:category,p_item_id:itemId});
+          if(result.error)throw result.error;
+        }
+        await refreshStoreAfterAction();
+        showToast('Personnalisation enregistrée sur votre fiche !','✨');
+      }catch(error){
+        console.error('Validation personnalisation',error);
+        await refreshStoreAfterAction().catch(()=>{});
+        showToast(error.message||'Personnalisation non enregistrée. Aucun achat effectué.','⚠️');
+      }
     });
 
     dom.drawerGoalsList.addEventListener('click', async (e) => {
@@ -1347,6 +1416,13 @@
         if (it.category === 'Bannières') state.equippedBannerId = it.id;
       };
 
+      if (action === 'preview') {
+        if(item.category==='Cadres')state.previewFrameId=item.id;
+        if(item.category==='Badges')state.previewBadgeId=item.id;
+        renderAll();
+        setTopDrawer(true);
+        return;
+      }
       if (action === 'equip') {
         await equipStoreItem(item);
         return;
