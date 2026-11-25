@@ -1549,14 +1549,14 @@ function render(){window.ELO_ADMIN_MODE=!!S.admin;document.body.classList.toggle
   var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(st);var pop=document.getElementById("accountpopover");if(pop){pop.hidden=!accountPopoverOpen;pop.innerHTML=accountPopoverOpen?accountPanelHTML():"";if(accountPopoverOpen&&accountMode==='signup'){refreshReferralUsage();var referralInput=document.getElementById('signupreferral');if(referralInput&&!referralInput.dataset.usageBound){referralInput.dataset.usageBound='1';referralInput.addEventListener('input',function(){refreshReferralUsage();});}}}
   if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML(st);
   if(S.view==="rank"){if(S.publicProfile&&!eloCache.all){compute(undefined,"all");$("#v-rank").innerHTML='<p class="empty">Préparation du profil…</p>';}else $("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));}
-  var styleRunnerId=S.publicProfile||(S.view==="me"?S.me:null);
-  if(styleRunnerId&&!S.testPreview&&(S.view==="rank"||S.view==="me"))loadPublicRunnerStyle(styleRunnerId);
-  else if(S.view==="races")$("#v-races").innerHTML=racesHTML();
+  if(S.view==="races")$("#v-races").innerHTML=racesHTML();
   else if(S.view==="me")$("#v-me").innerHTML=meHTML(st);
   else if(S.view==="help")$("#v-help").innerHTML=helpHTML();
   else if(S.view==="chrono")$("#v-chrono").innerHTML=chronoHTML();
   else if(S.view==="organizer")$("#v-organizer").innerHTML=organizerHTML();
   else if(S.view==="upcoming")$("#v-upcoming").innerHTML=upcomingHTML();
+  var styleRunnerId=S.publicProfile||(S.view==="me"?S.me:null);
+  if(styleRunnerId&&!S.testPreview&&(S.view==="rank"||S.view==="me"))loadPublicRunnerStyle(styleRunnerId);
   ["accueil","rank","races","me","help","chrono","organizer","upcoming","ghost"].forEach(function(v){var sec=$("#v-"+v);if(sec)sec.classList.toggle("on",v===S.view)});
   var adminNav=document.getElementById("nav-admin");if(adminNav)adminNav.hidden=!S.admin;var adminEntry=document.getElementById("admin-entry");if(adminEntry){var canEnterAdmin=!!(authUser&&authUser.id===ADMIN_AUTH_USER_ID&&linkedRunner&&!S.admin);adminEntry.hidden=!canEnterAdmin;adminEntry.textContent="Connexion administrateur";adminEntry.setAttribute("aria-label",adminEntry.textContent);}
   document.querySelectorAll(".nav button").forEach(function(b){b.setAttribute("aria-current",b.dataset.v===S.view?"true":"false")});
