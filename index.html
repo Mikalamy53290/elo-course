@@ -1184,7 +1184,8 @@ function publicProfileHTML(id){return runnerProfile(id,false)}
 var publicStyleCache={},publicStyleData={};
 function applyPublicRunnerStyle(runnerId){
   var data=publicStyleData[String(runnerId)];
-  var avatar=document.querySelector("#v-rank .pf-avatar");
+  var profileRoot=S.view==="me"?"#v-me":"#v-rank";
+  var avatar=document.querySelector(profileRoot+" .pf-avatar");
   if(!data||!avatar)return;
   var frames=["frame-depart-72","frame-depart-53","frame-depart-49","frame-loire-blue","frame-podium-gold","frame-trail-cyan","frame-chrono-flame","frame-sprint-bolt","frame-royal-crown","frame-legend-prism"];
   frames.forEach(function(c){avatar.classList.remove(c);});
@@ -1203,7 +1204,8 @@ function loadPublicRunnerStyle(runnerId){
   sb.rpc("elocoins_public_profile_style",{p_runner_id:key}).then(function(res){
     if(res.error){delete publicStyleCache[key];console.warn("Style public ELOCOINS indisponible",res.error);return;}
     publicStyleData[key]=res.data||{};
-    if(S.view==="rank"&&String(S.publicProfile)===key)applyPublicRunnerStyle(key);
+    var activeStyleProfile=S.publicProfile||(S.view==="me"?S.me:null);
+    if((S.view==="rank"||S.view==="me")&&String(activeStyleProfile)===key)applyPublicRunnerStyle(key);
   }).catch(function(err){delete publicStyleCache[key];console.warn("Style public ELOCOINS",err);});
 }
 
@@ -1547,7 +1549,8 @@ function render(){window.ELO_ADMIN_MODE=!!S.admin;document.body.classList.toggle
   var top=document.getElementById("topinfo");if(top)top.innerHTML=topInfoHTML(st);var pop=document.getElementById("accountpopover");if(pop){pop.hidden=!accountPopoverOpen;pop.innerHTML=accountPopoverOpen?accountPanelHTML():"";if(accountPopoverOpen&&accountMode==='signup'){refreshReferralUsage();var referralInput=document.getElementById('signupreferral');if(referralInput&&!referralInput.dataset.usageBound){referralInput.dataset.usageBound='1';referralInput.addEventListener('input',function(){refreshReferralUsage();});}}}
   if(S.view==="accueil")$("#v-accueil").innerHTML=accueilHTML(st);
   if(S.view==="rank"){if(S.publicProfile&&!eloCache.all){compute(undefined,"all");$("#v-rank").innerHTML='<p class="empty">Préparation du profil…</p>';}else $("#v-rank").innerHTML=S.testPreview?testPreviewHTML():(S.publicProfile?publicProfileHTML(S.publicProfile):rankHTML(st));}
-  if(S.view==="rank"&&S.publicProfile&&!S.testPreview)loadPublicRunnerStyle(S.publicProfile);
+  var styleRunnerId=S.publicProfile||(S.view==="me"?S.me:null);
+  if(styleRunnerId&&!S.testPreview&&(S.view==="rank"||S.view==="me"))loadPublicRunnerStyle(styleRunnerId);
   else if(S.view==="races")$("#v-races").innerHTML=racesHTML();
   else if(S.view==="me")$("#v-me").innerHTML=meHTML(st);
   else if(S.view==="help")$("#v-help").innerHTML=helpHTML();
