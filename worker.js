@@ -199,6 +199,14 @@ export default {
     if (request.method!=="GET" && request.method!=="HEAD") return env.ASSETS.fetch(request);
     const response=await routeSEO(request,env);
     if (response) return request.method==="HEAD" ? new Response(null,{status:response.status,statusText:response.statusText,headers:response.headers}) : response;
-    return env.ASSETS.fetch(request);
+    const assetResponse=await env.ASSETS.fetch(request);
+    // Les liens de partage et de parrainage utilisent des paramètres sur l’accueil.
+    // Les pages canoniques propres (/course/..., /coureur/...) restent indexables.
+    if (url.pathname==="/" && url.search) {
+      const headers=new Headers(assetResponse.headers);
+      headers.set("x-robots-tag","noindex, follow");
+      return new Response(assetResponse.body,{status:assetResponse.status,statusText:assetResponse.statusText,headers});
+    }
+    return assetResponse;
   }
 };
