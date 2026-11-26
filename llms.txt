@@ -14,7 +14,7 @@ Site officiel : https://elo-course.eu/
 ## Pages web autonomes
 
 - Accueil et application ELO COURSE : https://elo-course.eu/
-- ELO TRAINING : https://elo-course.eu/training.html
+- Mon entraînement (rubrique ELO COURSE) : https://elo-course.eu/training.html
 
 ## Rubriques de l'application
 
@@ -24,9 +24,9 @@ Le classement, les résultats, les profils, le calendrier des prochaines courses
 
 Le classement Elo compare les performances des coureurs à partir des résultats de compétition enregistrés sur le site. Les vues de classement couvrent les trois départements indiqués ci-dessus, avec des déclinaisons par discipline et catégories disponibles dans l'application.
 
-## ELO TRAINING
+## Mon entraînement — ELO COURSE
 
-ELO TRAINING est une page distincte dédiée à la préparation des courses à pied. Elle propose un outil de construction de plan et un calendrier de séances modulable.
+Mon entraînement est une rubrique de préparation des courses à pied intégrée à ELO COURSE et accessible via une adresse dédiée. Elle propose un outil de construction de plan et un calendrier de séances modulable.
 
 ## Profils et confidentialité
 
