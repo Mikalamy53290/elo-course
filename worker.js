@@ -182,7 +182,8 @@ async function routeSEO(request, env) {
   const consentedIds=await getConsentIds();
   const byId=new Map(consentedRunners(data,consentedIds).map(r=>[String(r.id),r]));
   const results=(race.results||[]).filter(x=>!x.pending).slice().sort((a,b)=>(Number(a.rk)||999999)-(Number(b.rk)||999999));
-  const title=isUpcoming ? (race.name||"Course")+" – Course à venir | ELO COURSE" : (race.name||"Course")+" – Résultats ELO COURSE";
+  const raceYear=race.date?String(race.date).slice(0,4):"";
+  const title=isUpcoming ? (race.name||"Course")+" – Course à venir"+(raceYear?" "+raceYear:"")+" | ELO COURSE" : (race.name||"Course")+" – Résultats"+(raceYear?" "+raceYear:"")+" | ELO COURSE";
   const description=isUpcoming
     ? "Course à venir : "+(race.name||"épreuve")+" · "+(race.dist||"course à pied")+" · "+dateFR(race.date)+". Calendrier des courses en Sarthe, Mayenne et Maine-et-Loire sur ELO COURSE."
     : "Résultats de "+(race.name||"cette course")+" · "+(race.dist||"course à pied")+" · "+dateFR(race.date)+". Consultez le classement sur ELO COURSE.";
