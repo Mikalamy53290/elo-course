@@ -65,6 +65,7 @@ function isAnonymousRunnerName(value){
   var words=n.split(/\s+/).filter(Boolean);
   if(words.some(function(w){return /^x{3,}$/.test(w)}))return true;
   if(/^(?:anonyme|anonymous|inconnu|inconnue|non renseigne|non communique|masque|masked)$/.test(n))return true;
+  if(/^\d+\s+(?:anonyme|anonymous|inconnu|inconnue)$/.test(n))return true;
   // Les chronos ou suites de chiffres importés à la place du nom ne sont pas des identités de coureurs.
   if(/^[0-9\s:.,;\/_-]+$/.test(raw))return true;
   // Certaines anciennes importations ont collé rang, dossard, identité et chrono dans le champ nom.
