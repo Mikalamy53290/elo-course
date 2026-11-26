@@ -48,11 +48,12 @@ function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;
 function norm(t){return" "+t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()+" "}
 // Libellé court pour les sélections : retire rang/dossard et suffixe de chrono si présents dans le nom brut. Aucune donnée source n'est modifiée.
 function runnerDisplayName(r){
- var name=String(r&&r.name||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+ var raw=String(r&&r.name||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+ if(isAnonymousRunnerName(raw))return "Coureur non identifié";
+ var name=raw;
  name=name.replace(/^\d+\s+\d+\s+/,"");
  name=name.replace(/\s+[MF]\s+(?:SEM|SEF|ESM|ESF|JUM|JUF|CAM|CAF|MAM|MAF|VEM|VEF|M\d+[MF]?|EAM|EAF|POF|POM)\s+\d{1,2}:\d{2}(?::\d{2})?$/i,"");
- if(isAnonymousRunnerName(name))return "Coureur non identifié";
- return name.trim()||String(r&&r.name||"").trim();
+ return name.trim()||"Coureur non identifié";
 }
 function runnerSelectionLabel(r){return [runnerDisplayName(r),String(r&&r.cat||"").trim(),String(normalizeSex(r&&r.sex)||"").trim()].filter(Boolean).join(" · ");}
 function isAnonymousRunnerName(value){
