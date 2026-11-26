@@ -19,4 +19,9 @@ Allow: /
 Disallow: /admin
 Disallow: /compte
 
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /compte
+
 Sitemap: https://elo-course.eu/sitemap.xml
