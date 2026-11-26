@@ -1,6 +1,6 @@
 # ELO COURSE
 
-> Classement Elo des coureurs à partir des résultats de courses sur route et courses nature en Sarthe, Mayenne et Maine-et-Loire.
+> Classement Elo des coureurs à partir des résultats de courses sur route et courses nature dans les cinq départements des Pays de la Loire.
 
 ## Présentation
 
