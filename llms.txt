@@ -11,14 +11,22 @@ ELO COURSE est un site consacré aux résultats de course à pied et à l'évolu
 
 Site officiel : https://elo-course.eu/
 
-## Pages web autonomes
+## Pages publiques
 
 - Accueil et application ELO COURSE : https://elo-course.eu/
-- Mon entraînement (rubrique ELO COURSE) : https://elo-course.eu/training.html
+- Courses à venir : https://elo-course.eu/courses-a-venir
+- Boutique ELOCOINS : https://elo-course.eu/boutique.html
+- Mon entraînement, rubrique ELO COURSE : https://elo-course.eu/training.html
 
-## Rubriques de l'application
+## Pages de présentation des rubriques
 
-Le classement, les résultats, les profils, le calendrier des prochaines courses, le règlement, les chronométreurs et le Mode Ghost sont des rubriques intégrées à l'application de la page d'accueil. Elles ne correspondent pas à des adresses web autonomes distinctes.
+- Classement ELO : https://elo-course.eu/rubrique/classement
+- Résultats des courses : https://elo-course.eu/rubrique/courses
+- Règlement du site : https://elo-course.eu/rubrique/reglement-du-site
+- Chronométreurs : https://elo-course.eu/rubrique/chronometreurs
+- Mode Ghost : https://elo-course.eu/rubrique/mode-ghost
+
+Ces pages fournissent une présentation lisible des rubriques et renvoient vers l'application interactive ELO COURSE. Les fiches de courses utilisent des adresses /course/ dédiées. Les profils coureurs utilisent des adresses /coureur/ uniquement lorsque leur indexation a été explicitement autorisée par les personnes concernées.
 
 ## Classement
 
