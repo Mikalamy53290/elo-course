@@ -9,6 +9,7 @@ on:
       - 'index.html'
       - 'app.js'
       - 'training.html'
+      - 'carnet-seances.html'
       - 'boutique.html'
       - 'worker.js'
       - 'wrangler.jsonc'
