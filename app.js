@@ -51,6 +51,7 @@ function runnerDisplayName(r){
  var name=String(r&&r.name||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
  name=name.replace(/^\d+\s+\d+\s+/,"");
  name=name.replace(/\s+[MF]\s+(?:SEM|SEF|ESM|ESF|JUM|JUF|CAM|CAF|MAM|MAF|VEM|VEF|M\d+[MF]?|EAM|EAF|POF|POM)\s+\d{1,2}:\d{2}(?::\d{2})?$/i,"");
+ if(isAnonymousRunnerName(name))return "Coureur non identifié";
  return name.trim()||String(r&&r.name||"").trim();
 }
 function runnerSelectionLabel(r){return [runnerDisplayName(r),String(r&&r.cat||"").trim(),String(normalizeSex(r&&r.sex)||"").trim()].filter(Boolean).join(" · ");}
@@ -63,6 +64,8 @@ function isAnonymousRunnerName(value){
   var words=n.split(/\s+/).filter(Boolean);
   if(words.some(function(w){return /^x{3,}$/.test(w)}))return true;
   if(/^(?:anonyme|anonymous|inconnu|inconnue|non renseigne|non communique|masque|masked)$/.test(n))return true;
+  // Les chronos ou suites de chiffres importés à la place du nom ne sont pas des identités de coureurs.
+  if(/^[0-9\s:.,;_\-/]+$/.test(raw))return true;
   return false;
 }
 function secs(v){var p=v.split(":").map(Number),t=0;p.forEach(function(x){t=t*60+x});return t}
@@ -161,7 +164,7 @@ function compute(pred,scope){
 function board(st,d){
   if(boardCacheState!==st||boardCacheRunners!==S.runners){boardCacheState=st;boardCacheRunners=S.runners;boardCacheValue={};}
   var key=String(d||"all");if(boardCacheValue[key])return boardCacheValue[key];
-  var rows=S.runners.map(function(r){var p=st[r.id+"|"+d];return p&&p.n?{r:r,p:p}:null}).filter(Boolean);
+  var rows=S.runners.map(function(r){var p=st[r.id+"|"+d];return p&&p.n&&!isAnonymousRunnerName(r.name)?{r:r,p:p}:null}).filter(Boolean);
   rows.sort(function(a,b){return b.p.elo-a.p.elo});
   boardCacheValue[key]={ranked:rows.filter(function(x){return x.p.n>=MINR}),prov:rows.filter(function(x){return x.p.n<MINR})};
   return boardCacheValue[key];
@@ -1445,7 +1448,7 @@ document.addEventListener("input",function(e){
   if(e.target.id==="profilelookup"){
     var box=document.getElementById('profilelookupresults');if(!box)return;
     var q=norm(e.target.value).trim();if(q.length<2){box.innerHTML='<p class="meta">Tape au moins 2 lettres.</p>';return;}
-    var terms=q.split(/\s+/).filter(Boolean),found=S.runners.filter(function(r){var n=norm(r.name);return terms.every(function(t){return n.indexOf(t)>=0});});
+    var terms=q.split(/\s+/).filter(Boolean),found=S.runners.filter(function(r){if(isAnonymousRunnerName(r.name))return false;var n=norm(r.name);return terms.every(function(t){return n.indexOf(t)>=0});});
     found.sort(function(a,b){var an=norm(a.name).trim(),bn=norm(b.name).trim(),as=an.indexOf(q)===0?0:1,bs=bn.indexOf(q)===0?0:1;return as-bs||an.localeCompare(bn,'fr');});
     found=found.slice(0,12);
     box.innerHTML=found.length?'<div class="meta">'+found.length+' fiche(s) trouvée(s)'+(found.length===12?' — précise la recherche si besoin':'')+'</div>'+found.map(function(r){return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--line);padding:7px 0;min-width:0"><span style="min-width:0;overflow-wrap:anywhere"><strong>'+esc(runnerDisplayName(r))+'</strong><span class="meta"> · '+esc(r.cat||'Catégorie ?')+' · '+esc(normalizeSex(r.sex)==='F'?'Femme':normalizeSex(r.sex)==='H'?'Homme':'Sexe ?')+'</span></span><button type="button" class="ghost" data-act="publicprofile" data-v="'+esc(r.id)+'">Voir la fiche</button></div>';}).join(''):'<p class="meta">Aucun coureur trouvé. Vérifie l’orthographe.</p>';
@@ -1459,6 +1462,7 @@ document.addEventListener("input",function(e){
     if(q.length<2){box.innerHTML='<p class="meta">Tape au moins 2 lettres pour rechercher ta fiche.</p>';return;}
     var terms=q.split(/\s+/).filter(Boolean);
     var found=S.runners.filter(function(r){
+      if(isAnonymousRunnerName(r.name))return false;
       var name=norm(r.name),parts=name.trim().split(/\s+/).filter(Boolean);
       return terms.every(function(t){return name.indexOf(t)>=0||parts.some(function(part){return part.indexOf(t)===0})});
     });
