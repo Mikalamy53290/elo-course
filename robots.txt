@@ -3,18 +3,23 @@ Allow: /
 Disallow: /admin
 Disallow: /compte
 
-# Robots de recherche IA : accès aux pages publiques uniquement.
+# Refus des robots dédiés à la collecte pour entraînement de modèles.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+# Robots dédiés à la recherche et aux consultations à la demande.
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /admin
 Disallow: /compte
 
 User-agent: PerplexityBot
-Allow: /
-Disallow: /admin
-Disallow: /compte
-
-User-agent: ClaudeBot
 Allow: /
 Disallow: /admin
 Disallow: /compte
