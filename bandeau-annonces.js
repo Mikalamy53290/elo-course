@@ -51,7 +51,15 @@
     }
     if(panel.parentNode!==host)host.insertBefore(panel,host.firstChild);
   }
+  async function hasAdminAccess(){
+    try{
+      var u=await db.auth.getUser();
+      var nav=document.getElementById("nav-admin");
+      return !!(u.data&&u.data.user&&u.data.user.id===ADMIN&&window.ELO_ADMIN_MODE===true&&nav&&!nav.hidden);
+    }catch(e){return false;}
+  }
   async function publishMessage(){
+    if(!await hasAdminAccess()){if(status)status.textContent="Accès réservé à l’espace Administration.";return;}
     var message=(input.value||"").trim();
     if(!message){status.textContent="Écris un message avant de publier.";return;}
     status.textContent="Publication…";
@@ -60,6 +68,7 @@
     await refresh();
   }
   async function stopMessage(){
+    if(!await hasAdminAccess()){if(status)status.textContent="Accès réservé à l’espace Administration.";return;}
     status.textContent="Interruption…";
     var r=await db.from("site_announcements").upsert({id:1,message:"",active:false,updated_at:new Date().toISOString()},{onConflict:"id"});
     if(r.error){status.textContent="Erreur : "+r.error.message;return;}
@@ -67,8 +76,7 @@
   }
   async function checkAdmin(){
     try{
-      var u=await db.auth.getUser();
-      var ok=!!(u.data&&u.data.user&&u.data.user.id===ADMIN);
+      var ok=await hasAdminAccess();
       if(ok)makePanel();
       else if(panel&&panel.parentNode)panel.parentNode.removeChild(panel);
     }catch(e){}
