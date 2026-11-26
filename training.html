@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ELO TRAINING — Plan d’entraînement personnalisé | ELO COURSE</title>
+<meta name="description" content="Prépare ta prochaine course avec ELO TRAINING : plan progressif personnalisé, séances détaillées et calendrier modulable.">
+<link rel="canonical" href="https://elo-course.eu/training.html">
+<meta name="robots" content="index, follow">
+<style>
+:root{--bg:#0b1118;--panel:#121d28;--panel2:#192735;--line:#2a3a49;--text:#f4f7fa;--muted:#9aabba;--gold:#f08a32;--green:#53c58b;--blue:#6fa9ed;--orange:#f0a45b;--red:#ed7777}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0b1118,#101c27 55%,#0b1118);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1120px;margin:auto;padding:22px 16px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:24px}.brand{font-weight:900;letter-spacing:.13em;font-size:13px;color:#6fa9ed}.brand .course{color:#6fa9ed}.brand .training{color:#f08a32}.brand.training-label{color:#f08a32}.tag{border:1px solid #a65c20;color:#ffc18e;border-radius:99px;padding:5px 10px;font-size:11px;font-weight:700}
+h1{font-size:clamp(28px,5vw,43px);line-height:1.05;margin:6px 0 8px;letter-spacing:-.04em}h2{font-size:20px;margin:0 0 5px}h3{font-size:16px;margin:0}.sub{color:var(--muted);max-width:680px;margin:0 0 22px}
+.grid{display:grid;grid-template-columns: minmax(280px,.85fr) minmax(0,1.5fr);gap:16px;align-items:start}.panel{background:rgba(18,29,40,.96);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 14px 35px #0002}.panel+.panel{margin-top:16px}
+label{display:block;color:#c5d0da;font-size:12px;font-weight:700;margin:13px 0 6px}input,select{width:100%;background:#0d1720;border:1px solid #35495a;color:#fff;border-radius:10px;padding:11px 12px;font:inherit;min-height:43px}input:focus,select:focus{outline:2px solid #f08a3270;border-color:var(--gold)}
+.row{display:flex;gap:9px}.row>*{flex:1;min-width:0}.choices{display:flex;gap:7px;flex-wrap:wrap}.choice{border:1px solid #35495a;background:#0d1720;color:#dbe4ec;padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:700}.choice.active{border-color:var(--gold);background:#422815;color:#ffd2ad}
+.btn{border:0;border-radius:11px;background:var(--gold);color:#17130b;font-weight:900;padding:12px 15px;cursor:pointer;font:inherit}.btn.secondary{background:#233444;color:#eaf1f7;border:1px solid #405466}.btn.small{padding:7px 10px;font-size:12px}.btn:disabled{opacity:.45;cursor:not-allowed}.full{width:100%;margin-top:16px}.hint{font-size:12px;color:var(--muted);margin-top:8px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0}.stat{background:#0e1923;border:1px solid var(--line);border-radius:12px;padding:11px}.stat b{display:block;font-size:19px;color:var(--gold)}.stat small{color:var(--muted);font-size:11px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:15px 0}.tabs{display:flex;gap:6px}.tab{background:#0d1720;border:1px solid var(--line);color:#c7d2dc;border-radius:9px;padding:8px 11px;cursor:pointer}.tab.active{background:#422815;color:#ffd2ad;border-color:#a65c20}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.calendar-head strong{font-size:17px}.nav{display:flex;gap:6px}.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:12px}.dow{text-align:center;color:var(--muted);font-size:11px;font-weight:800;padding:5px 0}.day{min-height:112px;background:#0e1923;border:1px solid #293b4b;border-radius:10px;padding:7px;position:relative}.day.out{opacity:.35}.day.today{border-color:var(--gold)}.daynum{font-size:11px;color:#aab8c5}.event{margin-top:6px;border-radius:7px;padding:6px;font-size:11px;line-height:1.3;border-left:3px solid var(--gold);background:#3b301b;color:#ffe4ad;cursor:grab;user-select:none}.event.easy{border-color:var(--green);background:#17372e;color:#b8f1d5}.event.long{border-color:var(--blue);background:#1b3048;color:#c8e0ff}.event.race{border-color:#f08a32;background:#422815;color:#ffd2ad;cursor:default}.session.race .dot{background:#f08a32}.event.done{opacity:.5;text-decoration:line-through}.event strong{display:block;font-size:11px}.event small{display:block;opacity:.85}.day.dragover{outline:2px dashed var(--gold);outline-offset:-3px}
+.list{display:grid;gap:8px;margin-top:12px}.session{display:flex;align-items:center;gap:10px;background:#0e1923;border:1px solid var(--line);border-radius:12px;padding:10px}.session .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:none}.session.easy .dot{background:var(--green)}.session.long .dot{background:var(--blue)}.session .info{flex:1;min-width:0}.session small{display:block;color:var(--muted)}.session .actions{display:flex;gap:5px;flex-wrap:wrap}.session input[type=checkbox]{width:17px;min-height:17px;accent-color:var(--green)}
+.weekly{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:9px}.weekday{background:#0d1720;border:1px solid var(--line);border-radius:9px;padding:8px 3px;text-align:center;color:#cbd6df;font-size:12px;cursor:pointer}.weekday input{display:none}.weekday:has(input:checked){border-color:var(--gold);background:#422815;color:#ffd2ad}
+.notice{border:1px solid #5b4928;background:#2c2417;color:#f4d99e;padding:11px 12px;border-radius:11px;font-size:12px;margin-top:13px}
+.detailgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.detailbox{background:#142331;border:1px solid #2a3a49;border-radius:11px;padding:11px}.detailbox strong{display:block;color:var(--gold);margin-bottom:5px}.detailbox p{margin:0;color:#d6e0e8;font-size:13px}.session{cursor:pointer}.session.selected{border-color:var(--gold)}.hidden{display:none!important}.modalback{position:fixed;inset:0;background:#000a;display:grid;place-items:center;padding:18px;z-index:5}.modal{width:min(440px,100%);background:#14212d;border:1px solid #405365;border-radius:17px;padding:19px}.modal .row{margin-top:15px}
+footer{color:#8293a2;font-size:11px;text-align:center;margin-top:25px}
+@media(max-width:780px){.detailgrid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wrap{padding:16px 11px 40px}.panel{padding:14px}.day{min-height:88px;padding:4px}.event{font-size:10px;padding:4px}.event small{display:none}.calgrid{gap:3px}.dow{font-size:10px}.stats{gap:6px}.stat{padding:9px}.stat b{font-size:17px}}
+@media(max-width:390px){.day{min-height:74px}.event strong{font-size:9px}.event{font-size:9px}.session{align-items:flex-start;flex-wrap:wrap}.session .actions{width:100%;padding-left:27px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="brand" href="/" style="text-decoration:none">ELO <span class="course">COURSE</span><span class="training"> / ELO TRAINING</span></a><a class="tag" href="/" style="text-decoration:none">← Retour à ELO COURSE</a></div>
+  <h1>Ton prochain objectif.<br><span style="color:var(--orange)">Ton plan, à ton rythme.</span></h1>
+  <p class="sub">Choisis ta compétition et tes disponibilités. Le plan se construit autour de ta vie, et tu peux déplacer tes séances dans le calendrier quand tu en as besoin.</p>
+  <div class="grid">
+    <aside>
+      <section class="panel">
+        <h2>1. Mon objectif</h2>
+        <label>Distance</label><div class="choices" id="distanceChoices"><button class="choice" data-value="5 km">5 km</button><button class="choice" data-value="10 km">10 km</button><button class="choice active" data-value="Semi-marathon">Semi</button><button class="choice" data-value="Marathon">Marathon</button></div>
+        <label>Type de course</label><div class="choices" id="terrainChoices"><button class="choice active" data-value="Route">Route</button><button class="choice" data-value="Course nature">Course nature</button></div>
+        <label for="raceName">Nom de la compétition (facultatif)</label><input id="raceName" placeholder="Ex. Semi-marathon de Laval">
+        <label for="raceDate">Date de la compétition</label><input id="raceDate" type="date" value="2027-02-14">
+        <label>Durée calculée automatiquement</label><div class="tag" id="durationAuto" style="display:inline-block">Calculée selon la date</div><div class="notice" id="durationNotice">Choisis ta date de compétition : le calendrier et le nombre de semaines s’adapteront automatiquement.</div>
+      </section>
+      <section class="panel">
+        <h2>2. Mon profil de coureur</h2>
+        <div class="notice">Le niveau sera estimé à partir de tes chronos et de ton entraînement habituel. Pas besoin de te classer toi-même.</div>
+        <label for="runs">Nombre de sorties par semaine</label><select id="runs"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select>
+        <label for="km">Kilométrage actuel par semaine</label><input id="km" type="number" min="0" max="200" value="40" placeholder="Ex. 30">
+        <label for="chronoDistance">Distance de ton dernier chrono</label><select id="chronoDistance"><option value="">Choisir si tu connais un chrono</option><option>5 km</option><option>10 km</option><option>Semi-marathon</option><option>Marathon</option></select><label for="chrono">Dernier chrono (facultatif)</label><input id="chrono" inputmode="text" autocomplete="off" placeholder="Ex. 48,30 · 48:30 · 1h45 · 1 h 45 mn"><p class="hint" id="chronoFormatHint">Formats acceptés : 48,30 · 48:30 · 48 min 30 s · 1h45 · 1 h 45 mn · 1:45:00. Indique aussi la distance juste au-dessus.</p><label for="chronoDate">Date de ce chrono</label><input id="chronoDate" type="date"><label for="vo2">VO₂ max (facultatif)</label><input id="vo2" type="number" min="20" max="90" step="0.1" placeholder="Ex. 48"><div class="row"><div><label for="hrmax">FC maximale (facultatif)</label><input id="hrmax" type="number" min="100" max="230" placeholder="Ex. 185"></div><div><label for="hrrest">FC au repos (facultatif)</label><input id="hrrest" type="number" min="30" max="110" placeholder="Ex. 52"></div></div><p class="hint">Les données VO₂ max et cardiaques sont facultatives. La VO₂ max d’une montre reste une estimation.</p>
+        <label for="target">Objectif chronométrique (facultatif)</label><input id="target" placeholder="Ex. 1 h 40">
+        <label>Mes jours disponibles</label>
+        <div class="weekly" id="weekdays">
+          <label class="weekday"><input type="checkbox" value="1">Lun</label><label class="weekday"><input type="checkbox" value="2" checked>Mar</label><label class="weekday"><input type="checkbox" value="3">Mer</label><label class="weekday"><input type="checkbox" value="4" checked>Jeu</label><label class="weekday"><input type="checkbox" value="5">Ven</label><label class="weekday"><input type="checkbox" value="6">Sam</label><label class="weekday"><input type="checkbox" value="0" checked>Dim</label>
+        </div>
+        <button class="btn full" id="generate">Créer mon plan personnalisé</button>
+        <p class="hint">Le prototype calcule un programme de démonstration à partir des informations saisies. Il ne remplace pas un entraîneur.</p>
+      </section>
+    </aside>
+    <main>
+      <section class="panel">
+        <div class="calendar-head"><div><div class="brand training-label" style="font-size:10px">MON PROGRAMME</div><h2 id="planTitle">Préparation semi-marathon</h2></div><div class="tag" id="weekCount">12 SEMAINES</div></div>
+        <div class="stats"><div class="stat"><b id="statSessions">36</b><small>SÉANCES prévues</small></div><div class="stat"><b id="statDone">0</b><small>RÉALISÉES</small></div><div class="stat"><b id="statKm">—</b><small>KM / SEMAINE</small></div></div>
+        <div class="toolbar"><div class="tabs"><button class="tab active" data-view="month">Mois</button><button class="tab" data-view="list">Liste</button></div><div class="nav"><button class="btn secondary small" id="prev">‹</button><button class="btn secondary small" id="today">Aujourd'hui</button><button class="btn secondary small" id="next">›</button></div></div>
+        <div id="monthView"><div class="calendar-head"><strong id="monthLabel"></strong><span class="hint">Glisse une séance sur un autre jour</span></div><div class="calgrid" id="calendar"></div></div>
+        <div id="listView" class="hidden"><div class="list" id="sessionList"></div></div>
+        <div class="notice">Pour déplacer une séance : fais-la glisser vers un autre jour, ou utilise le bouton « Déplacer ». Les séances déjà réalisées restent identifiées. Appuie sur une séance pour ouvrir ses explications détaillées.</div>
+        <div class="panel" id="sessionAdvice" style="margin-top:14px;background:#0e1923"><h2>Conseils du coach</h2><p class="hint">Sélectionne une séance dans la liste ou le calendrier pour voir son déroulé, les consignes, l’hydratation et la récupération.</p></div>
+      </section>
+      <section class="panel" id="raceAdvicePanel">
+        <h2>Préparer ma compétition</h2><p class="hint">Des repères pratiques à adapter à la distance, à la météo et à tes habitudes.</p>
+        <div class="notice"><strong>Avant la course</strong><br>• Les derniers jours : réduis progressivement la charge et privilégie le sommeil.<br>• La veille : prépare dossard, chaussures, tenue et trajet. Ne teste ni nouvel aliment ni nouveau matériel.<br>• Le matin : prends un petit-déjeuner digeste déjà testé à l’entraînement, suffisamment tôt.<br>• À l’échauffement : adapte la durée à la distance et à la météo, sans te fatiguer.<br>• Au départ : commence de façon maîtrisée, puis ajuste selon tes sensations.</div>
+        <div class="notice"><strong>Après la course</strong><br>• Marche quelques minutes et remets-toi au calme.<br>• Bois régulièrement selon ta soif et la chaleur ; évite de boire de grandes quantités d’un coup.<br>• Prends un repas ou une collation avec glucides et protéines selon ton appétit.<br>• Le lendemain, privilégie le repos ou une activité douce si tu te sens bien.<br>• Reprends progressivement. En cas de douleur inhabituelle, malaise ou symptôme préoccupant, demande un avis médical.</div>
+      </section>
+      <section class="panel">
+        <div class="calendar-head"><div><h2>Mon agenda téléphone</h2><p class="hint">Export des séances en événements sur la journée, sans heure imposée.</p></div><span style="font-size:25px">📅</span></div>
+        <button class="btn full" id="export">Exporter mon plan vers mon agenda (.ics)</button>
+        <p class="hint">Ouvre le fichier téléchargé sur ton téléphone puis importe-le dans Google Agenda, Calendrier ou une application compatible. L'export est une copie : après un déplacement, exporte à nouveau le plan.</p>
+      </section>
+    </main>
+  </div>
+  <footer>ELO TRAINING · Version bêta. Les plans sont calculés dans ton navigateur ; cette version ne synchronise pas encore les plans avec ton compte ELO COURSE.</footer>
+</div>
+<div class="modalback hidden" id="modal"><div class="modal"><h2>Déplacer cette séance</h2><p id="moveDesc" class="hint"></p><label for="moveDate">Nouvelle date</label><input type="date" id="moveDate"><div class="row"><button class="btn secondary" id="cancelMove">Annuler</button><button class="btn" id="confirmMove">Déplacer</button></div></div></div>
+<script>
+const $=id=>document.getElementById(id);
+let selections={distance:"Semi-marathon",terrain:"Route"},sessions=[],view="month",cursor=new Date(),movingId=null,selectedSession=null,planStart=null,raceDay=null;
+const dayNames=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+const fmt=d=>new Intl.DateTimeFormat("fr-FR",{day:"numeric",month:"long",year:"numeric"}).format(d);
+const iso=d=>{let x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`};
+function bindChoices(id,key){$(id).querySelectorAll(".choice").forEach(b=>b.addEventListener("click",()=>{$(id).querySelectorAll(".choice").forEach(x=>x.classList.remove("active"));b.classList.add("active");selections[key]=b.dataset.value;}))}
+bindChoices("distanceChoices","distance");bindChoices("terrainChoices","terrain");
+function addDays(date,n){let d=new Date(date);d.setDate(d.getDate()+n);return d}
+function startMonday(d){let x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+function parseTime(value){
+ if(value==null)return null;
+ const t=String(value).toLowerCase().trim().replace(/[’']/g,"'").replace(/\s+/g," ");
+ if(!t)return null;
+ let h=0,m=0,sec=0,match;
+ // Formats compacts minutes:secondes : 48,30 / 48.30 / 48:30.
+ match=t.match(/^(\d{1,3})\s*([:,.])\s*(\d{1,2})$/);
+ if(match){m=Number(match[1]);sec=Number(match[3]);if(sec>59)return null;return m*60+sec>0?m*60+sec:null;}
+ // Format heures:minutes:secondes.
+ match=t.match(/^(\d{1,2}):(\d{1,2}):(\d{1,2})$/);
+ if(match){h=Number(match[1]);m=Number(match[2]);sec=Number(match[3]);if(m>59||sec>59)return null;return h*3600+m*60+sec>0?h*3600+m*60+sec:null;}
+ // Heures avec ou sans espaces et avec minutes facultatives : 1h45, 1 h 45 mn, 1h.
+ match=t.match(/^(\d+)\s*h(?:eures?)?\s*(?:(\d+)\s*(?:min(?:ute?s?)?|mn|m)?)?\s*(?:(\d+)\s*(?:s|sec(?:onde?s?)?))?$/);
+ if(match){h=Number(match[1]);m=Number(match[2]||0);sec=Number(match[3]||0);if(m>59||sec>59)return null;return h*3600+m*60+sec>0?h*3600+m*60+sec:null;}
+ // Minutes et secondes : 48 min 30 s, 95 min, 48mn30s.
+ match=t.match(/^(\d+)\s*(?:min(?:ute?s?)?|mn|m)\s*(?:(\d+)\s*(?:s|sec(?:onde?s?)?))?$/);
+ if(match){m=Number(match[1]);sec=Number(match[2]||0);if(sec>59)return null;return m*60+sec>0?m*60+sec:null;}
+ // Seconds-only notation, useful for very short test values.
+ match=t.match(/^(\d+)\s*(?:s|sec(?:onde?s?)?)$/);
+ if(match){sec=Number(match[1]);return sec>0?sec:null;}
+ // Plain integer: interpret as minutes, never as decimal minutes.
+ match=t.match(/^\d+$/);
+ if(match){m=Number(t);return m>0?m*60:null;}
+ return null;
+}
+function pace(sec,km){if(!Number.isFinite(sec)||!Number.isFinite(km)||sec<=0||km<=0)return null;const total=Math.round(sec/km),minutes=Math.floor(total/60),seconds=total%60;return `${minutes}'${String(seconds).padStart(2,'0')}"/km`}
+function profile(){let seconds=parseTime($("chrono").value),dist=$("chronoDistance").value,km=dist==="5 km"?5:dist==="10 km"?10:dist==="Semi-marathon"?21.0975:dist==="Marathon"?42.195:null;let paceSec=seconds&&km?seconds/km:null;let level="À préciser";if(paceSec){level=paceSec<270?"Confirmé":paceSec<360?"Intermédiaire":"Débutant / reprise"}return {seconds,dist,km,paceSec,level}}
+function dateWeeks(){let v=$("raceDate").value;if(!v)return null;let r=new Date(v+"T12:00:00"),today=new Date();today.setHours(0,0,0,0);let days=Math.ceil((r-today)/86400000);return {r,days,weeks:Math.max(1,Math.ceil(days/7)),past:days<1}}
+function updateDuration(){let x=dateWeeks();if(!x){$("durationAuto").textContent="En attente de la date";return}$("durationAuto").textContent=x.past?"Date passée":`${x.weeks} semaine${x.weeks>1?"s":""} · ${x.days} jours`;let min=selections.distance==="5 km"?6:selections.distance==="10 km"?8:selections.distance==="Semi-marathon"?10:16;let short=x.weeks<min;$("durationNotice").innerHTML=short?`<strong>Préparation courte détectée.</strong> Il reste ${x.weeks} semaine(s). À titre de repère, un cycle plus progressif est souvent préférable (environ ${min} semaines ou davantage pour cette distance). Le plan sera adapté sans rattraper les semaines manquantes ni augmenter brutalement la charge.`:`La durée est calculée automatiquement jusqu’à la compétition. Le plan commencera aujourd’hui et s’adaptera à cette échéance.`;$("durationNotice").style.borderColor=short?"#a77836":"#5b4928"}
+$("raceDate").addEventListener("change",updateDuration);document.querySelectorAll("#distanceChoices .choice").forEach(b=>b.addEventListener("click",updateDuration));
+function sessionPlan(kind,weekNo,totalWeeks,kmTarget,p,opts={}){
+ const distance=selections.distance, nature=selections.terrain==="Course nature";
+ const phase=opts.taper?"taper":opts.recovery?"recovery":weekNo<=Math.max(2,Math.ceil(totalWeeks*.28))?"base":weekNo<=Math.max(3,Math.ceil(totalWeeks*.68))?"build":"specific";
+ const paceTxt=p.paceSec?`Repère informatif : allure moyenne du chrono de référence ${pace(p.paceSec,1)} (ce n’est pas l’allure cible de cette séance).` :"Sans chrono récent, utilise les sensations : facile = conversation complète ; soutenu = phrases courtes, sans sprint.";
+ const s={title:"",desc:"",km:null,type:"easy",warm:"",main:"",cool:"",fuel:"",effort:""};
+ const recoveryNote=" Semaine d'assimilation : garde de la marge et ne cherche pas à rattraper une séance manquée.";
+ if(kind==="quality"){
+  s.type="quality";
+  if(opts.taper){
+   s.title="Rappel d'allure léger";s.warm="15 à 20 min de footing très facile, quelques mobilisations dynamiques et 3 accélérations souples de 15 secondes.";s.main="2 à 3 × 2 min à effort de compétition contrôlé, avec 2 min de trot lent. Arrête si les jambes ne sont pas fraîches : cette séance doit réveiller, pas fatiguer.";s.cool="10 min de footing facile puis quelques minutes de marche.";s.effort="Facile à modéré, jamais dans le rouge.";
+  } else if(opts.recovery){
+   s.type="easy";s.title="Footing d'assimilation + foulée";s.warm="10 min très faciles.";s.main="25 à 35 min en endurance fondamentale. Si les sensations sont bonnes, ajoute 4 accélérations relâchées de 12 à 15 secondes, récupération complète.";s.cool="5 à 8 min très lentes.";s.effort="Très facile. Cette semaine allégée sert à assimiler le travail précédent.";
+  } else {
+   let sets;
+   if(nature && phase!=="specific"){
+    sets=phase==="base"?[
+     ["Côtes courtes", "8 × 40 secondes en montée régulière, redescente en marchant ou trottinant pour récupérer. Reste tonique, sans sprinter."],
+     ["Fartlek vallonné", "10 × 1 min soutenue sur terrain souple ou vallonné, récupération 1 min facile."],
+     ["Côtes longues", "6 × 1 min 30 en montée à effort régulier, récupération en descente très tranquille."]
+    ]:[
+     ["Côtes au seuil", "5 × 3 min en montée douce à effort soutenu maîtrisé, récupération en descente lente."],
+     ["Fartlek nature", "3 blocs de 5 min alternant 2 min soutenues / 3 min faciles, récupération 3 min entre les blocs."],
+     ["Relances en terrain vallonné", "8 × 90 secondes actives en côte ou faux plat, récupération complète en descente."]
+    ];
+   } else if(distance==="5 km"){
+    sets=phase==="base"?[
+     ["Fartlek 1 min", "10 × 1 min dynamique / 1 min lente, sans sprinter."],
+     ["Côtes courtes", "8 × 40 secondes en montée régulière, récupération en redescendant tranquillement."],
+     ["Intervalles 2 min", "6 × 2 min à effort 5 km contrôlé, récupération 2 min en trot."]
+    ]:phase==="build"?[
+     ["Intervalles 3 min", "5 × 3 min à effort soutenu régulier, récupération 2 min en trot."],
+     ["Fractionné 400 m", "8 × 400 m à effort proche 5 km, récupération 200 m en trot lent. Si tu n'as pas de piste, cours 8 × 90 secondes."],
+     ["Seuil court", "3 × 7 min soutenues mais contrôlées, récupération 2 min 30 en footing."]
+    ]:[
+     ["Spécifique 5 km", "5 × 3 min à effort cible 5 km, récupération 2 min en trot."],
+     ["Répétitions courtes", "10 × 1 min vive / 1 min lente, en gardant une foulée relâchée."],
+     ["Seuil + rythme", "2 × 8 min au seuil, puis 4 × 30 secondes dynamiques, récupération complète."]
+    ];
+   } else if(distance==="10 km"){
+    sets=phase==="base"?[
+     ["Fartlek progressif", "8 × 2 min soutenues / 2 min faciles, en accélérant très progressivement."],
+     ["Côtes et tonicité", "8 × 45 secondes en côte à effort régulier, récupération en descente lente."],
+     ["Seuil d'introduction", "3 × 6 min à effort soutenu confortable, récupération 2 min en trot."]
+    ]:phase==="build"?[
+     ["Intervalles 4 min", "5 × 4 min à effort 10 km contrôlé, récupération 2 min en trot lent."],
+     ["Seuil en blocs", "3 × 8 min au seuil, récupération 2 min 30 en footing facile."],
+     ["Fractionné 1 km", "4 × 1 km à effort proche 10 km, récupération 2 min en trot. Sans repère fiable, reste à l'effort plutôt qu'à une allure chiffrée."]
+    ]:[
+     ["Spécifique 10 km", "3 × 8 min à effort cible 10 km maîtrisé, récupération 3 min en trot."],
+     ["Intervalles longs", "5 × 1 km à effort régulier, récupération 2 min en trot lent."],
+     ["Seuil continu fractionné", "2 × 12 min au seuil, récupération 4 min en footing facile."]
+    ];
+   } else if(distance==="Semi-marathon"){
+    sets=phase==="base"?[
+     ["Fartlek aérobie", "6 × 3 min soutenues / 2 min faciles, sans dépasser un effort contrôlé."],
+     ["Seuil progressif", "3 × 7 min au seuil confortable, récupération 2 min 30 en trot."],
+     ["Côtes longues", "6 × 1 min 30 en montée régulière, récupération en descente lente."]
+    ]:phase==="build"?[
+     ["Seuil en blocs", "3 × 10 min à effort seuil, récupération 3 min en footing lent."],
+     ["Intervalles longs", "4 × 6 min soutenues, récupération 2 min 30 en trot."],
+     ["Tempo progressif", "20 min continues : 10 min confortables puis 10 min soutenues mais maîtrisées."]
+    ]:[
+     ["Allure semi en blocs", "3 × 10 min à effort cible semi-marathon, récupération 3 min en trot."],
+     ["Endurance active", "2 × 15 min à allure soutenue confortable, récupération 4 min en footing."],
+     ["Spécifique semi", "2 × 20 min à effort semi maîtrisé, récupération 5 min en trot lent."]
+    ];
+   } else {
+    sets=phase==="base"?[
+     ["Endurance active", "3 × 8 min à effort marathon confortable, récupération 3 min en trot."],
+     ["Fartlek souple", "8 × 2 min actives / 2 min faciles, sans dépasser un effort modéré."],
+     ["Côtes faciles", "8 × 45 secondes en côte, relâché, récupération complète en descente."]
+    ]:phase==="build"?[
+     ["Blocs allure marathon", "3 × 12 min à effort marathon, récupération 4 min en footing facile."],
+     ["Tempo long", "2 × 18 min soutenues mais confortables, récupération 5 min en trot."],
+     ["Endurance soutenue", "35 min progressives en terminant à effort marathon, sans accélérer davantage."]
+    ]:[
+     ["Spécifique marathon", "2 × 20 min à effort marathon maîtrisé, récupération 5 min en footing."],
+     ["Blocs réguliers", "3 × 15 min à effort marathon, récupération 4 min en trot lent."],
+     ["Allure marathon", "40 min continues à effort marathon confortable, sans chercher à battre un record à l'entraînement."]
+    ];
+   }
+   const v=sets[(weekNo-1)%sets.length];s.title=v[0];s.warm="20 min de footing facile, mobilité dynamique et 3 à 4 accélérations progressives de 15 secondes. Si besoin, prolonge l'échauffement plutôt que de partir vite.";s.main=v[1]+" "+paceTxt;s.cool="10 à 15 min de footing très lent, puis marche quelques minutes.";s.effort="Soutenu mais maîtrisé : tu dois conserver une technique propre et finir avec de la réserve.";
+  }
+  s.fuel="Arrive normalement hydraté. Pour une séance longue ou par forte chaleur, adapte les boissons à ta soif et aux conditions. Après, prends un repas habituel avec glucides et protéines.";
+ } else if(kind==="long"){
+  s.type="long";s.title=opts.taper?"Sortie longue réduite":opts.recovery?"Sortie d'endurance allégée":"Sortie longue progressive";
+  const base=distance==="Marathon"?75:distance==="Semi-marathon"?55:distance==="10 km"?40:35;
+  const cap=distance==="Marathon"?150:distance==="Semi-marathon"?115:distance==="10 km"?80:65;
+  let buildWeeks=Math.max(0,weekNo-1);let mins=Math.min(cap,base+Math.floor(buildWeeks/2)*(distance==="Marathon"?8:6));
+  if(opts.recovery)mins=Math.round(mins*.78);if(opts.taper)mins=Math.round(mins*.68);
+  if(kmTarget>0){const weeklyCap=Math.max(base,Math.round((kmTarget*0+Number($('km').value||0))*.42*6.5));mins=Math.min(mins,weeklyCap||mins)}
+  s.warm="Commence par 10 min très faciles, sans chercher l'allure.";
+  s.title+=` · ${mins} min`;s.main=`${mins} min en endurance confortable, respiration maîtrisée et possibilité de parler en phrases complètes.`+(weekNo%2===0&&!opts.recovery&&!opts.taper?" Si tu es en forme, termine les 8 à 10 dernières minutes un peu plus actives, toujours sans forcer.":" Garde la même aisance du début à la fin.");
+  s.cool="5 à 10 min de marche ou de trot très lent.";s.effort="Facile et régulier. Si la fatigue s'accumule, raccourcis la durée ; ne cherche jamais à compenser une séance manquée.";
+  s.fuel=mins>=75?"Teste à l'entraînement une stratégie personnelle : boire selon la soif, la chaleur et la transpiration ; des glucides peuvent être utiles sur une sortie longue. Ne teste rien de nouveau le jour de course.":"De l'eau selon la soif suffit souvent pour cette durée. Reprends ensuite ton alimentation habituelle.";s.km=Math.round((Number($('km').value||0)>0?Math.min(Number($('km').value)*.42,mins/6.2):mins/6.2)*10)/10;
+ } else {
+  s.type="easy";const baseMins=kmTarget?Math.round(kmTarget*6.2):35;const mins=Math.max(25,Math.min(opts.taper?35:55,baseMins));
+  const variants=[
+   ["Endurance fondamentale",`${mins} min à allure facile, respiration calme et conversation possible.`],
+   ["Footing + lignes droites",`${Math.max(20,mins-8)} min faciles puis 4 × 15 secondes d'accélération relâchée, récupération 45 à 60 secondes très lentes.`],
+   ["Footing de récupération",`${mins} min très souples, sans regarder l'allure. Si les jambes sont lourdes, remplace par du repos.`],
+   ["Endurance progressive douce",`${Math.max(20,mins-10)} min faciles puis 5 à 8 min légèrement plus actives, sans atteindre le seuil.`],
+   [nature?"Footing nature souple":"Endurance relâchée",`${mins} min en aisance respiratoire, sur terrain confortable ; adapte l'effort aux côtes et au sol.`]
+  ];const v=variants[(weekNo+Number(opts.slot||0))%variants.length];s.title=`${v[0]} · ${mins} min`;s.warm="5 à 8 min très faciles, en laissant le corps monter progressivement en température.";s.main=v[1]+" Reste capable de parler en phrases complètes.";s.cool="5 min très lentes puis marche si tu en ressens le besoin.";s.effort="Facile. Cette séance construit l'endurance et ne doit pas te fatiguer.";s.fuel="Hydrate-toi normalement et selon ta soif. Pas besoin de boisson énergétique pour un footing facile et court.";
+ }
+ if(opts.recovery){s.main+=recoveryNote;s.effort="Facile : priorité à l'assimilation et à la fraîcheur."}
+ s.desc=`${s.warm} ${s.main} ${s.cool}`;if(kind!=="long")s.km=kmTarget?Math.max(2,Math.round(kmTarget*10)/10):null;return s;
+}
+function generate(){
+ const dates=dateWeeks();if(!dates||dates.past){alert("Choisis une date de compétition future.");return;}
+ const count=Number($("runs").value),weeklyKm=Math.max(0,Number($("km").value)||0);
+ const available=[...document.querySelectorAll("#weekdays input:checked")].map(x=>Number(x.value)).sort((a,b)=>a-b);
+ if(available.length<count){alert("Sélectionne au moins autant de jours disponibles que de sorties par semaine.");return;}
+ const today=new Date();today.setHours(0,0,0,0);const race=new Date(dates.r);race.setHours(0,0,0,0);raceDay=race;planStart=today;
+ const chronoText=$("chrono").value.trim(),chronoDistance=$("chronoDistance").value;
+ if(chronoText&&!chronoDistance){alert("Choisis la distance correspondant à ton chrono.");$("chronoDistance").focus();return;}
+ if(chronoText&&!parseTime(chronoText)){alert("Chrono non reconnu. Essaie par exemple 48,30, 48:30, 48 min 30 s ou 1h45.");$("chrono").focus();return;}
+ const totalWeeks=Math.max(1,Math.ceil((race-today)/604800000));const p=profile();sessions=[];
+ const firstMonday=startMonday(today);let weekIndex=-1,weekSlots=0;
+ for(let d=new Date(today);d<race;d=addDays(d,1)){
+  const wi=Math.floor((startMonday(d)-firstMonday)/604800000);if(wi!==weekIndex){weekIndex=wi;weekSlots=0;}
+  if(!available.includes(d.getDay())||weekSlots>=count)continue;
+  const daysToRace=Math.ceil((race-d)/86400000);
+  // Deux derniers jours : aucun entraînement programmé. La course reste un événement séparé.
+  if(daysToRace<=2)continue;
+  const weekNo=wi+1;const isRaceWeek=daysToRace<=7;const isTaper=daysToRace<=14&&!isRaceWeek;
+  const isRecovery=weekNo%4===0&&weekNo<totalWeeks-1&&!isTaper;
+  let kind="easy",opts={slot:weekSlots};
+  if(isRaceWeek){
+   // Au plus deux rappels : footing facile à J-5/J-6 et activation à J-3/J-4.
+   const already=sessions.filter(x=>x.week===weekNo&&!x.race).length;
+   if(daysToRace>=5&&already===0){kind="easy";opts.raceEasy=true;}
+   else if(daysToRace>=3&&daysToRace<=4&&!sessions.some(x=>x.week===weekNo&&x.activation)){kind="activation";opts.activation=true;}
+   else continue;
+  }else if(count===1){kind="long";}
+  else if(weekSlots===0){kind=isRecovery?"easy":"quality";}
+  else if(weekSlots===count-1){kind="long";}
+  else {kind="easy";}
+  if(isTaper&&kind==="quality")opts.taper=true;
+  if(isRecovery)opts.recovery=true;
+  let target=weeklyKm?weeklyKm/count*(kind==="long"?1.35:kind==="quality"?1:.78):null;
+  let detail;
+  if(kind==="activation"){
+   detail={type:"easy",title:"Activation avant compétition",warm:"15 à 20 min de footing très facile, quelques mouvements de mobilité.",main:"3 × 15 secondes d'accélération souple, récupération complète en marchant ou trottinant. Arrête tant que tu te sens frais.",cool:"5 à 10 min de trot très lent.",effort:"Très facile : aucune fatigue résiduelle recherchée.",fuel:"Hydrate-toi normalement et conserve tes habitudes alimentaires.",km:weeklyKm?Math.min(4,Math.round(weeklyKm*.08*10)/10):3,desc:"Petit rappel de tonicité à quelques jours de la compétition."};
+  }else{
+   detail=sessionPlan(kind,weekNo,totalWeeks,target,p,opts);
+   if(opts.raceEasy){detail.title="Footing facile pré-course";detail.main="25 à 35 min très faciles, sans accélération obligatoire. Si tu ressens de la fatigue, prends un jour de repos à la place.";detail.km=weeklyKm?Math.min(5,Math.round(weeklyKm*.1*10)/10):4;detail.effort="Très facile : l'objectif est de rester mobile, pas de progresser cette semaine.";}
+  }
+  sessions.push({id:`s${iso(d)}_${weekSlots}`,date:iso(d),...detail,done:false,week:weekNo,activation:!!opts.activation});weekSlots++;
+ }
+ // La date de course n'est JAMAIS une séance : elle est affichée uniquement comme compétition.
+ const raceKm=selections.distance==="5 km"?5:selections.distance==="10 km"?10:selections.distance==="Semi-marathon"?21.1:42.2;
+ sessions.push({id:"race-day",date:iso(race),title:`COMPÉTITION · ${selections.distance}`,type:"race",km:raceKm,done:false,race:true,warm:"Arrive suffisamment tôt pour récupérer ton dossard et te repérer. Échauffe-toi selon la distance, la météo et tes habitudes, sans te fatiguer.",main:"Pars de façon maîtrisée. Ne cherche pas à rattraper du temps dans les premiers kilomètres. Adapte ton effort au parcours, aux conditions et à tes sensations.",cool:"Après l'arrivée, marche quelques minutes, mets-toi au calme et change tes vêtements si nécessaire.",effort:"Jour de compétition : effort adapté à ton objectif et à tes sensations.",fuel:"Prends un repas ou petit-déjeuner déjà testé. Pendant la course, applique uniquement une stratégie d'hydratation et d'apport énergétique déjà expérimentée et adaptée à la durée, à la météo et aux ravitaillements.",desc:"Jour de compétition — aucun entraînement planifié."});
+ sessions.sort((a,b)=>a.date.localeCompare(b.date));cursor=new Date(today.getFullYear(),today.getMonth(),1);
+ $("planTitle").textContent=`Préparation ${selections.distance.toLowerCase()}`;$("weekCount").textContent=`${totalWeeks} SEMAINE${totalWeeks>1?"S":""}`;$("statKm").textContent=weeklyKm?weeklyKm+" km actuels":"À renseigner";
+ const age=$("chronoDate").value?Math.floor((Date.now()-new Date($("chronoDate").value+"T12:00:00"))/86400000):null;
+ const profileTxt=p.paceSec?`Repère indicatif : ${p.level} · allure moyenne de référence ${pace(p.paceSec,1)}${age!==null?` · chrono datant d'environ ${Math.max(0,Math.floor(age/30))} mois`:""}. Les séances sont guidées d'abord par l'effort ressenti.`:"Ajoute un chrono récent pour affiner les repères. Sans chrono, le plan reste guidé par les sensations et ton volume habituel.";
+ $("profileSummary").textContent=profileTxt;render();updateDuration();showRaceAdvice();
+}
+function render(){$("statSessions").textContent=sessions.filter(s=>!s.race).length;$("statDone").textContent=sessions.filter(s=>!s.race&&s.done).length;$("monthView").classList.toggle("hidden",view!=="month");$("listView").classList.toggle("hidden",view!=="list");document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.view===view));if(view==="month")renderMonth();else renderList()}
+function eventHtml(s){return `<div class="event ${s.type} ${s.done?"done":""}" ${s.race?"":"draggable=\"true\""} data-id="${s.id}"><strong>${s.title}</strong><small>${s.km?s.km+" km · ":""}${s.race?"Jour de compétition":s.done?"Réalisée":"À faire"}</small></div>`}
+function renderMonth(){let y=cursor.getFullYear(),m=cursor.getMonth();$("monthLabel").textContent=new Intl.DateTimeFormat("fr-FR",{month:"long",year:"numeric"}).format(cursor);let begin=startMonday(new Date(y,m,1)),html=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].map(x=>`<div class="dow">${x}</div>`).join("");for(let i=0;i<42;i++){let d=addDays(begin,i),key=iso(d),items=sessions.filter(s=>s.date===key);html+=`<div class="day ${d.getMonth()!==m?"out":""}" data-date="${key}"><div class="daynum">${d.getDate()}</div>${items.map(eventHtml).join("")}</div>`}$("calendar").innerHTML=html;$("calendar").querySelectorAll(".event").forEach(el=>{if(el.getAttribute("draggable")==="true")el.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",el.dataset.id));el.addEventListener("click",()=>showSession(el.dataset.id))});$("calendar").querySelectorAll(".day").forEach(el=>{el.addEventListener("dragover",e=>{e.preventDefault();el.classList.add("dragover")});el.addEventListener("dragleave",()=>el.classList.remove("dragover"));el.addEventListener("drop",e=>{e.preventDefault();el.classList.remove("dragover");moveSession(e.dataTransfer.getData("text/plain"),el.dataset.date)})})}
+function renderList(){$("sessionList").innerHTML=sessions.map(s=>`<div class="session ${s.type} ${selectedSession===s.id?"selected":""}" data-open="${s.id}"><span class="dot"></span><div class="info"><strong>${s.title}</strong><small>${fmt(new Date(s.date+"T12:00:00"))} · ${s.km?s.km+" km estimés · ":""}${s.race?"Jour de compétition":s.done?"Réalisée":"À faire"}</small></div><div class="actions">${s.race?"":"<button class=\"btn secondary small\" data-move=\""+s.id+"\">Déplacer</button>"}<label style="margin:0;display:flex;align-items:center;gap:5px;font-size:11px">${s.race?"Course":"<input type=\"checkbox\" data-done=\""+s.id+"\" "+(s.done?"checked":"")+"> Faite"}</label></div></div>`).join("");$("sessionList").querySelectorAll("[data-open]").forEach(el=>el.onclick=e=>{if(e.target.closest("button,label"))return;showSession(el.dataset.open)});$("sessionList").querySelectorAll("[data-move]").forEach(b=>b.onclick=e=>{e.stopPropagation();openMove(b.dataset.move)});$("sessionList").querySelectorAll("[data-done]").forEach(b=>b.onchange=()=>{let s=sessions.find(x=>x.id===b.dataset.done);s.done=b.checked;render()})}
+function showSession(id){let s=sessions.find(x=>x.id===id);if(!s)return;selectedSession=id;let p=profile();$("sessionAdvice").innerHTML=`<h2>${s.title}</h2><p class="hint">${fmt(new Date(s.date+"T12:00:00"))} · ${s.km?s.km+" km estimés":"Volume à adapter"}</p><div class="detailgrid"><div class="detailbox"><strong>Échauffement</strong><p>${s.warm}</p></div><div class="detailbox"><strong>Corps de séance</strong><p>${s.main}</p></div><div class="detailbox"><strong>Retour au calme</strong><p>${s.cool}</p></div><div class="detailbox"><strong>Intensité</strong><p>${s.effort}</p></div><div class="detailbox"><strong>Boire et manger</strong><p>${s.fuel||"Pour cette séance, hydrate-toi normalement et adapte les apports à sa durée, à la météo et à tes habitudes."}</p></div><div class="detailbox"><strong>Après la séance</strong><p>Marche quelques minutes si besoin, bois selon ta soif, prends un repas habituel avec glucides et protéines. Si une douleur inhabituelle apparaît, ne force pas.</p></div></div><p class="hint">${p.paceSec?`Repère chrono indicatif : ${p.level}, allure moyenne de référence ${pace(p.paceSec,1)}. `:""}Les allures exactes ne sont pas imposées dans cette démo : privilégie les sensations et adapte la séance à ta forme du jour.</p>`;render()}
+function showRaceAdvice(){let p=profile();$("raceAdvicePanel").querySelector(".hint").textContent=`Conseils généraux pour ${selections.distance.toLowerCase()} · ${p.paceSec?`profil chrono indicatif : ${p.level}`:"ajoute un chrono si tu souhaites affiner le plan"}. À adapter à ta santé, ta météo et tes habitudes.`}
+function moveSession(id,date){let s=sessions.find(x=>x.id===id);if(!s||!date||s.race)return;let target=new Date(date+"T12:00:00");if(raceDay&&target>=new Date(iso(raceDay)+"T12:00:00")){alert("Le plan se termine le jour de la compétition : aucune séance ne peut être déplacée à cette date ou après.");return}if(target<new Date(iso(new Date())+"T12:00:00")){alert("Choisis une date à venir.");return}s.date=date;render()}
+function openMove(id){let s=sessions.find(x=>x.id===id);if(!s)return;movingId=id;$("moveDesc").textContent=s.title+" · "+fmt(new Date(s.date+"T12:00:00"));$("moveDate").value=s.date;$("modal").classList.remove("hidden")}
+$("cancelMove").onclick=()=>$("modal").classList.add("hidden");$("confirmMove").onclick=()=>{moveSession(movingId,$("moveDate").value);$("modal").classList.add("hidden")};document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{view=b.dataset.view;render()});$("prev").onclick=()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()-1,1);render()};$("next").onclick=()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);render()};$("today").onclick=()=>{cursor=new Date();cursor.setDate(1);render()};$("generate").onclick=generate;
+function exportICS(){if(!sessions.length){alert("Crée d'abord ton plan.");return}const esc=s=>String(s).replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n"),stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");let lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//ELO COURSE//ELO TRAINING//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH"];sessions.forEach(s=>{let next=iso(addDays(new Date(s.date+"T12:00:00"),1)).replace(/-/g,""),day=s.date.replace(/-/g,"");lines.push("BEGIN:VEVENT","UID:"+s.id+"@elo-course.eu","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+day,"DTEND;VALUE=DATE:"+next,"SUMMARY:"+esc("ELO TRAINING - "+s.title),"DESCRIPTION:"+esc(s.desc+(s.km?" · "+s.km+" km":"")),"STATUS:"+(s.done?"COMPLETED":"CONFIRMED"),"END:VEVENT")});lines.push("END:VCALENDAR");let blob=new Blob([lines.join("\r\n")],{type:"text/calendar;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="elo-training.ics";a.click();URL.revokeObjectURL(url)}$("export").onclick=exportICS;
+// Profil summary shown after generation
+let summary=document.createElement("p");summary.id="profileSummary";summary.className="hint";$("generate").insertAdjacentElement("afterend",summary);
+$("raceDate").value=iso(addDays(new Date(),42));$("raceDate").min=iso(new Date());$("raceDate").addEventListener("input",updateDuration);updateDuration();
+</script>
+</body></html>
