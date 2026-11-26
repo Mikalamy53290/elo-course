@@ -191,7 +191,7 @@ function normalizeCategory(value){
 function sexRankInfo(st,runnerId){
   var runner=S.runners.filter(function(r){return r.id===runnerId})[0],sex=runner&&normalizeSex(runner.sex);
   if(!sex)return null;
-  var rows=S.runners.map(function(r){var p=st[r.id+"|X"];return normalizeSex(r.sex)===sex&&p&&p.n>=MINR?{r:r,p:p}:null}).filter(Boolean);
+  var rows=S.runners.map(function(r){var p=st[r.id+"|X"];return !isAnonymousRunnerName(r.name)&&normalizeSex(r.sex)===sex&&p&&p.n>=MINR?{r:r,p:p}:null}).filter(Boolean);
   rows.sort(function(a,b){return b.p.elo-a.p.elo});
   var index=rows.findIndex(function(x){return x.r.id===runnerId});
   return {sex:sex,rank:index>=0?index+1:0,total:rows.length};
@@ -201,7 +201,7 @@ function categoryRankInfo(st,runnerId){
   var category=runner&&normalizeCategory(runner.cat),sex=runner&&normalizeSex(runner.sex);
   // Une valeur comme « M » est un sexe éventuel, jamais une catégorie d'âge.
   if(!category||!sex)return null;
-  var rows=S.runners.map(function(r){var p=st[r.id+"|X"];return normalizeCategory(r.cat)===category&&normalizeSex(r.sex)===sex&&p&&p.n>=MINR?{r:r,p:p}:null}).filter(Boolean);
+  var rows=S.runners.map(function(r){var p=st[r.id+"|X"];return !isAnonymousRunnerName(r.name)&&normalizeCategory(r.cat)===category&&normalizeSex(r.sex)===sex&&p&&p.n>=MINR?{r:r,p:p}:null}).filter(Boolean);
   rows.sort(function(a,b){return b.p.elo-a.p.elo});
   var index=rows.findIndex(function(x){return x.r.id===runnerId});
   return {category:category,sex:sex,rank:index>=0?index+1:0,total:rows.length};
