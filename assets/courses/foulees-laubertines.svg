@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-label="Foulées Laubertines – 06 DÉC. 2026 – LAUBRIÈRES">
+ <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#213b31"/><stop offset="1" stop-color="#0b1724"/></linearGradient><radialGradient id="glow"><stop stop-color="#7ab56b" stop-opacity=".38"/><stop offset="1" stop-color="#7ab56b" stop-opacity="0"/></radialGradient></defs>
+ <rect width="420" height="300" rx="18" fill="url(#g)"/><circle cx="340" cy="55" r="155" fill="url(#glow)"/>
+ <g opacity=".13" stroke="#fff"><path d="M0 70H420M0 140H420M0 210H420"/><path d="M70 0V300M140 0V300M210 0V300M280 0V300M350 0V300"/></g>
+ <path d="M0 245 Q100 210 210 245 T420 230 V340 H0Z" fill="#7ab56b" opacity=".16"/><path d="M20 270 Q110 210 210 250 T400 225" fill="none" stroke="#7ab56b" stroke-width="5" stroke-dasharray="13 10"/>
+ <g transform="translate(270 104)" fill="none" stroke="#f5f4ed" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><circle cx="35" cy="0" r="12" fill="#7ab56b" stroke="none"/><path d="M31 20L12 53 42 65 61 43M16 48L-2 82M42 65L70 88M28 27L58 17"/></g>
+ <rect x="22" y="22" width="146" height="25" rx="12" fill="#7ab56b"/><text x="95" y="39" text-anchor="middle" fill="#101c27" font-family="Arial,sans-serif" font-size="11" font-weight="800" letter-spacing="1.4">ELO COURSE · AGENDA</text>
+ <text x="24" y="103" fill="#fff" font-family="Arial,sans-serif" font-size="27" font-weight="800">Foulées Laubertines</text>
+ <text x="24" y="135" fill="#7ab56b" font-family="Arial,sans-serif" font-size="17" font-weight="800" letter-spacing="1">06 DÉC. 2026</text>
+ <text x="24" y="164" fill="#e5edf3" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="1.2">LAUBRIÈRES</text>
+ <rect x="24" y="250" width="230" height="28" rx="14" fill="#fff" fill-opacity=".1"/><text x="38" y="269" fill="#e8eef4" font-family="Arial,sans-serif" font-size="11" font-weight="700">Mayenne · 10 km</text>
+ </svg>
