@@ -96,7 +96,7 @@ async function sitemap(data, consentedIds, sections) {
     (r.results || []).some(x => !x.pending) ||
     (r.date && String(r.date).slice(0,10) >= today)
   ));
-  const fixed = ["/","/courses-a-venir"];
+  const fixed = ["/","/courses-a-venir","/boutique.html","/training.html"];
   const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
   for (const section of sections) urls.push(`<url><loc>${SITE+section.path}</loc></url>`);
   for (const r of runners) urls.push(`<url><loc>${esc(SITE+profilePath(r))}</loc></url>`);
@@ -105,7 +105,7 @@ async function sitemap(data, consentedIds, sections) {
 }
 async function routeSEO(request, env) {
   const url = new URL(request.url), path = decodeURI(url.pathname);
-  if (path === "/robots.txt") return new Response("User-agent: *\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nUser-agent: OAI-SearchBot\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nUser-agent: PerplexityBot\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nUser-agent: ClaudeBot\\nAllow: /\\nDisallow: /admin\\nDisallow: /compte\\n\\nSitemap: "+SITE+"/sitemap.xml\\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
+  if (path === "/robots.txt") return new Response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: OAI-SearchBot\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: PerplexityBot\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: ClaudeBot\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nSitemap: "+SITE+"/sitemap.xml\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
   if (path === "/sitemap.xml") {
     try {
       const data=await getData(env);
