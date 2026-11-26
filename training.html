@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ELO TRAINING — Plan d’entraînement personnalisé | ELO COURSE</title>
-<meta name="description" content="Prépare ta prochaine course avec ELO TRAINING : plan progressif personnalisé, séances détaillées et calendrier modulable.">
+<title>Mon entraînement | ELO COURSE</title>
+<meta name="description" content="Prépare ta prochaine course avec Mon entraînement, la rubrique de préparation personnalisée intégrée à ELO COURSE.">
 <link rel="canonical" href="https://elo-course.eu/training.html">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ELO COURSE">
-<meta property="og:title" content="ELO TRAINING — Plan d’entraînement personnalisé">
-<meta property="og:description" content="Prépare ta prochaine course avec ELO TRAINING : séances détaillées et calendrier modulable.">
+<meta property="og:title" content="Mon entraînement | ELO COURSE">
+<meta property="og:description" content="Prépare ta prochaine course avec Mon entraînement, la rubrique de préparation personnalisée intégrée à ELO COURSE.">
 <meta property="og:url" content="https://elo-course.eu/training.html">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "ELO TRAINING",
+  "name": "Mon entraînement — ELO COURSE",
   "url": "https://elo-course.eu/training.html",
-  "description": "Outil de préparation à la course à pied avec séances détaillées et calendrier modulable.",
+  "description": "Rubrique ELO COURSE de préparation à la course à pied avec séances détaillées et calendrier modulable.",
   "inLanguage": "fr-FR",
   "isPartOf": {"@id": "https://elo-course.eu/#website"}
 }
@@ -45,7 +45,7 @@ footer{color:#8293a2;font-size:11px;text-align:center;margin-top:25px}
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><a class="brand" href="/" style="text-decoration:none">ELO <span class="course">COURSE</span><span class="training"> / ELO TRAINING</span></a><a class="tag" href="/" style="text-decoration:none">← Retour à ELO COURSE</a></div>
+  <div class="top"><a class="brand" href="/" style="text-decoration:none">ELO <span class="course">COURSE</span><span class="training"> / Mon entraînement</span></a><a class="tag" href="/" style="text-decoration:none">← Retour à ELO COURSE</a></div>
   <h1>Ton prochain objectif.<br><span style="color:var(--orange)">Ton plan, à ton rythme.</span></h1>
   <p class="sub">Choisis ta compétition et tes disponibilités. Le plan se construit autour de ta vie, et tu peux déplacer tes séances dans le calendrier quand tu en as besoin.</p>
   <div class="grid">
@@ -95,7 +95,7 @@ footer{color:#8293a2;font-size:11px;text-align:center;margin-top:25px}
       </section>
     </main>
   </div>
-  <footer>ELO TRAINING · Version bêta. Les plans sont calculés dans ton navigateur ; cette version ne synchronise pas encore les plans avec ton compte ELO COURSE.</footer>
+  <footer>ELO COURSE · Mon entraînement · Version bêta. Les plans sont calculés dans ton navigateur ; cette version ne synchronise pas encore les plans avec ton compte ELO COURSE.</footer>
 </div>
 <div class="modalback hidden" id="modal"><div class="modal"><h2>Déplacer cette séance</h2><p id="moveDesc" class="hint"></p><label for="moveDate">Nouvelle date</label><input type="date" id="moveDate"><div class="row"><button class="btn secondary" id="cancelMove">Annuler</button><button class="btn" id="confirmMove">Déplacer</button></div></div></div>
 <script>
@@ -306,7 +306,7 @@ function showRaceAdvice(){let p=profile();$("raceAdvicePanel").querySelector(".h
 function moveSession(id,date){let s=sessions.find(x=>x.id===id);if(!s||!date||s.race)return;let target=new Date(date+"T12:00:00");if(raceDay&&target>=new Date(iso(raceDay)+"T12:00:00")){alert("Le plan se termine le jour de la compétition : aucune séance ne peut être déplacée à cette date ou après.");return}if(target<new Date(iso(new Date())+"T12:00:00")){alert("Choisis une date à venir.");return}s.date=date;render()}
 function openMove(id){let s=sessions.find(x=>x.id===id);if(!s)return;movingId=id;$("moveDesc").textContent=s.title+" · "+fmt(new Date(s.date+"T12:00:00"));$("moveDate").value=s.date;$("modal").classList.remove("hidden")}
 $("cancelMove").onclick=()=>$("modal").classList.add("hidden");$("confirmMove").onclick=()=>{moveSession(movingId,$("moveDate").value);$("modal").classList.add("hidden")};document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{view=b.dataset.view;render()});$("prev").onclick=()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()-1,1);render()};$("next").onclick=()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);render()};$("today").onclick=()=>{cursor=new Date();cursor.setDate(1);render()};$("generate").onclick=generate;
-function exportICS(){if(!sessions.length){alert("Crée d'abord ton plan.");return}const esc=s=>String(s).replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n"),stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");let lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//ELO COURSE//ELO TRAINING//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH"];sessions.forEach(s=>{let next=iso(addDays(new Date(s.date+"T12:00:00"),1)).replace(/-/g,""),day=s.date.replace(/-/g,"");lines.push("BEGIN:VEVENT","UID:"+s.id+"@elo-course.eu","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+day,"DTEND;VALUE=DATE:"+next,"SUMMARY:"+esc("ELO TRAINING - "+s.title),"DESCRIPTION:"+esc(s.desc+(s.km?" · "+s.km+" km":"")),"STATUS:"+(s.done?"COMPLETED":"CONFIRMED"),"END:VEVENT")});lines.push("END:VCALENDAR");let blob=new Blob([lines.join("\r\n")],{type:"text/calendar;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="elo-training.ics";a.click();URL.revokeObjectURL(url)}$("export").onclick=exportICS;
+function exportICS(){if(!sessions.length){alert("Crée d'abord ton plan.");return}const esc=s=>String(s).replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n"),stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");let lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//ELO COURSE//MON ENTRAINEMENT//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH"];sessions.forEach(s=>{let next=iso(addDays(new Date(s.date+"T12:00:00"),1)).replace(/-/g,""),day=s.date.replace(/-/g,"");lines.push("BEGIN:VEVENT","UID:"+s.id+"@elo-course.eu","DTSTAMP:"+stamp,"DTSTART;VALUE=DATE:"+day,"DTEND;VALUE=DATE:"+next,"SUMMARY:"+esc("Mon entraînement - "+s.title),"DESCRIPTION:"+esc(s.desc+(s.km?" · "+s.km+" km":"")),"STATUS:"+(s.done?"COMPLETED":"CONFIRMED"),"END:VEVENT")});lines.push("END:VCALENDAR");let blob=new Blob([lines.join("\r\n")],{type:"text/calendar;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="elo-training.ics";a.click();URL.revokeObjectURL(url)}$("export").onclick=exportICS;
 // Profil summary shown after generation
 let summary=document.createElement("p");summary.id="profileSummary";summary.className="hint";$("generate").insertAdjacentElement("afterend",summary);
 $("raceDate").value=iso(addDays(new Date(),42));$("raceDate").min=iso(new Date());$("raceDate").addEventListener("input",updateDuration);updateDuration();
