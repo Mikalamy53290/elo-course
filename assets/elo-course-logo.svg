@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 480" role="img" aria-labelledby="title desc">
+<title id="title">ELO COURSE</title><desc id="desc">Logo ELO COURSE, classement des coureurs des Pays de la Loire</desc>
+<defs>
+ <linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8ee000"/><stop offset="1" stop-color="#168a39"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#ffc928"/><stop offset="1" stop-color="#ff8b00"/></linearGradient>
+ <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#001225" flood-opacity=".28"/></filter>
+</defs>
+<g fill="none" stroke-linecap="round">
+ <path d="M75 310 L510 190 L300 300 L650 260" stroke="#159c4a" stroke-width="24" opacity=".95"/>
+ <path d="M40 355 L500 260 L280 355 L610 310" stroke="url(#gold)" stroke-width="19"/>
+ <path d="M115 395 L590 315" stroke="#0b2542" stroke-width="28"/>
+ <path d="M810 90 L1190 25 L1128 92 L1305 55 L1175 185 L1160 117 L840 180Z" fill="url(#green)" stroke="#fff" stroke-width="8" stroke-linejoin="round"/>
+</g>
+<g filter="url(#shadow)">
+ <path d="M165 345 C205 290 215 235 270 194 L340 135 C365 112 411 105 450 120 L486 135 L535 106 C560 91 591 101 598 125 C604 150 587 172 560 181 L510 198 L468 257 L533 295 L490 335 L390 288 L328 360 L287 418 L240 407 L265 335 L300 268 L247 302 L205 385Z" fill="#08254a" stroke="#fff" stroke-width="12" stroke-linejoin="round"/>
+ <circle cx="552" cy="79" r="44" fill="#08254a" stroke="#fff" stroke-width="11"/>
+</g>
+<text x="510" y="295" font-family="Arial,Helvetica,sans-serif" font-size="190" font-style="italic" font-weight="900" letter-spacing="-13" fill="#08254a" stroke="#fff" stroke-width="12" paint-order="stroke">ELO</text>
+<text x="530" y="425" font-family="Arial,Helvetica,sans-serif" font-size="126" font-style="italic" font-weight="900" letter-spacing="2" fill="url(#green)" stroke="#fff" stroke-width="10" paint-order="stroke">COURSE</text>
+<g transform="translate(1260 340) skewX(-20)"><rect width="34" height="34" fill="#08254a"/><rect x="34" width="34" height="34" fill="#fff"/><rect y="34" width="34" height="34" fill="#fff"/><rect x="34" y="34" width="34" height="34" fill="#08254a"/><rect x="68" width="34" height="34" fill="#ffb900"/><rect x="68" y="34" width="34" height="34" fill="#fff"/></g>
+</svg>
