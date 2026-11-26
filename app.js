@@ -66,6 +66,10 @@ function isAnonymousRunnerName(value){
   if(/^(?:anonyme|anonymous|inconnu|inconnue|non renseigne|non communique|masque|masked)$/.test(n))return true;
   // Les chronos ou suites de chiffres importés à la place du nom ne sont pas des identités de coureurs.
   if(/^[0-9\s:.,;\/_-]+$/.test(raw))return true;
+  // Certaines anciennes importations ont collé rang, dossard, identité et chrono dans le champ nom.
+  if(/^\d+\s+\d+\s+.+\d{1,2}:\d{2}/.test(raw))return true;
+  // D'autres lignes ont perdu les colonnes de rang et de nom : il ne reste que sexe, catégorie et chrono.
+  if(/^[MF]\s+(?:CA|JU|ES|SE|M\d{1,2})[MF]?(?:\s+.+)?\s+(?:\d{1,2}:)?\d{1,2}:\d{2}$/.test(raw))return true;
   return false;
 }
 function secs(v){var p=v.split(":").map(Number),t=0;p.forEach(function(x){t=t*60+x});return t}
