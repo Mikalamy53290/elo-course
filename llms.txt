@@ -32,7 +32,7 @@ Ces pages fournissent une présentation lisible des rubriques et renvoient vers 
 
 ## Classement
 
-Le classement Elo compare les performances des coureurs à partir des résultats de compétition enregistrés sur le site. Les vues de classement couvrent les trois départements indiqués ci-dessus, avec des déclinaisons par discipline et catégories disponibles dans l'application.
+Le classement Elo compare les performances des coureurs à partir des résultats de compétition enregistrés sur le site. Les vues de classement couvrent les cinq départements indiqués ci-dessus, avec des déclinaisons par discipline et catégories disponibles dans l'application.
 
 ## Mon entraînement — ELO COURSE
 
