@@ -24,4 +24,19 @@ Allow: /
 Disallow: /admin
 Disallow: /compte
 
+User-agent: Claude-User
+Allow: /
+Disallow: /admin
+Disallow: /compte
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /compte
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /admin
+Disallow: /compte
+
 Sitemap: https://elo-course.eu/sitemap.xml
