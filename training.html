@@ -41,11 +41,11 @@ label{display:block;color:#c5d0da;font-size:12px;font-weight:700;margin:13px 0 6
 footer{color:#8293a2;font-size:11px;text-align:center;margin-top:25px}
 @media(max-width:780px){.detailgrid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wrap{padding:16px 11px 40px}.panel{padding:14px}.day{min-height:88px;padding:4px}.event{font-size:10px;padding:4px}.event small{display:none}.calgrid{gap:3px}.dow{font-size:10px}.stats{gap:6px}.stat{padding:9px}.stat b{font-size:17px}}
 @media(max-width:390px){.day{min-height:74px}.event strong{font-size:9px}.event{font-size:9px}.session{align-items:flex-start;flex-wrap:wrap}.session .actions{width:100%;padding-left:27px}}
-</style>
+.topnav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.topnav a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid #75451f;border-radius:11px;padding:9px 13px;color:#ffc18e;background:#211b17;font-size:12px;font-weight:850;white-space:nowrap}.topnav a.active{background:linear-gradient(135deg,#ffad61,#ef7d20);border-color:#f08a32;color:#21150c;box-shadow:0 5px 16px #f08a3225}@media(max-width:520px){.top{align-items:flex-start;flex-wrap:wrap}.topnav{width:100%;display:grid;grid-template-columns:1fr 1fr}.topnav a{padding:11px 6px;font-size:12px}}</style>
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><a class="brand" href="/" style="text-decoration:none">ELO <span class="course">COURSE</span><span class="training"> / Mon entraînement</span></a><a class="tag" href="/" style="text-decoration:none">← Retour à ELO COURSE</a></div>
+  <div class="top"><a class="brand" href="/" style="text-decoration:none">ELO <span class="course">COURSE</span><span class="training"> / Mon entraînement</span></a><nav class="topnav" aria-label="Navigation entraînement"><a class="active" href="/training.html" aria-current="page">Plan d’entraînement</a><a href="/carnet-seances.html">Mes entraînements</a></nav><a class="tag" href="/" style="text-decoration:none">← Retour à ELO COURSE</a></div>
   <h1>Ton prochain objectif.<br><span style="color:var(--orange)">Ton plan, à ton rythme.</span></h1>
   <p class="sub">Choisis ta compétition et tes disponibilités. Le plan se construit autour de ta vie, et tu peux déplacer tes séances dans le calendrier quand tu en as besoin.</p>
   <div class="grid">
