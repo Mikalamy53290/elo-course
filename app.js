@@ -81,8 +81,10 @@ function classifiedRunnerCount(st){st=st||compute(undefined,"all");var ids=new S
 function totalResultCount(){return S.races.reduce(function(total,c){return total+(Array.isArray(c.results)?c.results.length:0);},0);}
 
 function workerRacePayload(scope){
+  var validRunnerIds={};
+  S.runners.forEach(function(r){if(r&&r.id&&!isAnonymousRunnerName(r.name))validRunnerIds[r.id]=true;});
   return S.races.filter(function(c){return inScope(c,scope);}).map(function(c){
-    return {date:c.date||"",type:c.type||c.discipline||c.category||c.race_type||c.kind||"",discipline:c.discipline||"",category:c.category||"",department:c.department||c.departement||c.dept||"",dist:c.dist||c.distance||"",results:(Array.isArray(c.results)?c.results:[]).map(function(a){return {id:a.id||null,time:a.time,pending:!!a.pending};})};
+    return {date:c.date||"",type:c.type||c.discipline||c.category||c.race_type||c.kind||"",discipline:c.discipline||"",category:c.category||"",department:c.department||c.departement||c.dept||"",dist:c.dist||c.distance||"",results:(Array.isArray(c.results)?c.results:[]).filter(function(a){return a&&validRunnerIds[a.id];}).map(function(a){return {id:a.id||null,time:a.time,pending:!!a.pending};})};
   });
 }
 function computeEloWorker(payload){
@@ -147,11 +149,12 @@ function compute(pred,scope){
   if(cacheable&&eloCache[cacheKey])return eloCache[cacheKey];
   if(cacheable&&requestEloCompute(cacheKey))return {};
   pred=pred||function(){return true};function kd(c){return scope?"X":c.dist}
+  var validRunnerIds={};S.runners.forEach(function(r){if(r&&r.id&&!isAnonymousRunnerName(r.name))validRunnerIds[r.id]=true;});
   var st={};
   function timeSec(v){if(typeof v==="number"&&isFinite(v))return v;var raw=String(v||"").trim();if(/^\d+(?:\.\d+)?$/.test(raw))return Number(raw);if(raw.indexOf(":")>=0){var p=raw.split(":").map(Number);if(p.every(isFinite)){var n=0;p.forEach(function(x){n=n*60+x});return n}}return 0}
   function g(id,d){var k=id+"|"+d;return st[k]||(st[k]={elo:1500,n:0,hist:[1500]})}
   S.races.slice().sort(function(a,b){return String(a.date||"").localeCompare(String(b.date||""));}).filter(function(c){return inScope(c,scope)}).forEach(function(c){
-    var r=c.results.filter(function(a){return !a.pending&&!!a.id&&pred(a.id)}),m=r.length;if(m<2)return;
+    var r=c.results.filter(function(a){return !a.pending&&!!a.id&&validRunnerIds[a.id]&&pred(a.id)}),m=r.length;if(m<2)return;
     var players=new Array(m),times=new Array(m),dl=new Array(m);
     for(var i=0;i<m;i++){players[i]=g(r[i].id,kd(c));times[i]=timeSec(r[i].time);dl[i]=0;}
     for(var i=0;i<m;i++)for(var j=i+1;j<m;j++){
