@@ -4,10 +4,12 @@
 
 ## Présentation
 
-ELO COURSE est un site consacré aux résultats de course à pied et à l'évolution d'un classement Elo régional. Son périmètre géographique est limité à :
-- Sarthe (72), France
-- Mayenne (53), France
+ELO COURSE est un site consacré aux résultats de course à pied et à l'évolution d'un classement Elo régional. Son périmètre géographique couvre les cinq départements des Pays de la Loire :
+- Loire-Atlantique (44), France
 - Maine-et-Loire (49), France
+- Mayenne (53), France
+- Sarthe (72), France
+- Vendée (85), France
 
 Site officiel : https://elo-course.eu/
 
