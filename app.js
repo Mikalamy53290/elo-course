@@ -65,7 +65,7 @@ function isAnonymousRunnerName(value){
   if(words.some(function(w){return /^x{3,}$/.test(w)}))return true;
   if(/^(?:anonyme|anonymous|inconnu|inconnue|non renseigne|non communique|masque|masked)$/.test(n))return true;
   // Les chronos ou suites de chiffres importés à la place du nom ne sont pas des identités de coureurs.
-  if(/^[0-9\s:.,;_\-/]+$/.test(raw))return true;
+  if(/^[0-9\s:.,;\/_-]+$/.test(raw))return true;
   return false;
 }
 function secs(v){var p=v.split(":").map(Number),t=0;p.forEach(function(x){t=t*60+x});return t}
