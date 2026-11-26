@@ -586,6 +586,15 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 .pf-avatar.frame-legend-prism:before{border:4px solid transparent;background:linear-gradient(#102236,#102236) padding-box,linear-gradient(120deg,#278A50,#38BDF8,#A855F7,#FFD166) border-box}
 .pf-avatar .pf-equip-badge{position:absolute;z-index:3;right:-8px;bottom:-4px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#0b1724;border:2px solid #ffd166;font-size:17px;box-shadow:0 3px 9px #0008}
 
+
+/* Visuels des courses du calendrier */
+.upcoming-card{overflow:hidden;padding:0!important}
+.upcoming-poster-link{display:block;margin:-1px -1px 14px;overflow:hidden;background:#102233;aspect-ratio:16/7}
+.upcoming-poster{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.upcoming-poster-link:hover .upcoming-poster{transform:scale(1.025)}
+.upcoming-card>.upcoming-card-top,.upcoming-card>h3,.upcoming-card>.upcoming-date,.upcoming-card>.upcoming-card-details,.upcoming-card>p,.upcoming-card>.upcoming-actions{margin-left:16px;margin-right:16px}
+.upcoming-card>.upcoming-actions{margin-bottom:16px}
+@media(max-width:520px){.upcoming-poster-link{aspect-ratio:16/8}}
 </style>
 <meta name="elo-course-build" content="2026-11-20-corrections-selection-profil-duel-v2">
 </head>
