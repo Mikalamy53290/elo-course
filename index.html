@@ -12,6 +12,33 @@
 <meta property="og:title" content="ELO COURSE — Classement Elo des coureurs">
 <meta property="og:description" content="Classement Elo régional des courses sur route et courses nature en Sarthe, Mayenne et Maine-et-Loire.">
 <meta property="og:url" content="https://elo-course.eu/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://elo-course.eu/#organization",
+      "name": "ELO COURSE",
+      "url": "https://elo-course.eu/",
+      "description": "Classement Elo des coureurs à partir des résultats des courses sur route et courses nature.",
+      "areaServed": [
+        {"@type": "AdministrativeArea", "name": "Sarthe (72), France"},
+        {"@type": "AdministrativeArea", "name": "Mayenne (53), France"},
+        {"@type": "AdministrativeArea", "name": "Maine-et-Loire (49), France"}
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://elo-course.eu/#website",
+      "url": "https://elo-course.eu/",
+      "name": "ELO COURSE",
+      "inLanguage": "fr-FR",
+      "publisher": {"@id": "https://elo-course.eu/#organization"}
+    }
+  ]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0B1724;--surface:#172B3D;--ink:#F3F6FA;--muted:#AAB8C7;--line:#294155;--accent:#278A50;--accent-bg:#203F3A;--accent-ink:#071B14;--gold:#FFD166;--up:#278A50;--down:#F06B72;--route:#278A50;--trail:#F06B72;--general:#B8A2FF;
@@ -553,7 +580,7 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 <div class="topinfo" id="topinfo" aria-live="polite"></div>
 <div class="account-popover" id="accountpopover" hidden></div>
 <main>
-  <section class="view on" id="v-accueil" aria-label="Accueil"></section>
+  <section class="view on" id="v-accueil" aria-label="Accueil"><section class="seo-intro" aria-labelledby="seo-home-title"><h1 id="seo-home-title">Classement Elo des coureurs en Sarthe, Mayenne et Maine-et-Loire</h1><p>ELO COURSE rassemble les résultats des courses à pied sur route et des courses nature en Sarthe (72), en Mayenne (53) et en Maine-et-Loire (49).</p><p>Consultez le classement régional Elo, les chronos, les résultats des épreuves et les profils des coureurs. Les classements sont établis à partir des résultats de course publiés.</p></section></section>
   <section class="view" id="v-rank" aria-label="Classement"></section>
   <section class="view" id="v-races" aria-label="Courses"></section>
   <section class="view" id="v-me" aria-label="Profil"></section>
