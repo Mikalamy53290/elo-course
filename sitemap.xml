@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://elo-course.eu/</loc>
-  </url>
-  <url>
-    <loc>https://elo-course.eu/training.html</loc>
-  </url>
+  <url><loc>https://elo-course.eu/</loc></url>
+  <url><loc>https://elo-course.eu/courses-a-venir</loc></url>
+  <url><loc>https://elo-course.eu/boutique.html</loc></url>
+  <url><loc>https://elo-course.eu/training.html</loc></url>
+  <url><loc>https://elo-course.eu/rubrique/classement</loc></url>
+  <url><loc>https://elo-course.eu/rubrique/courses</loc></url>
+  <url><loc>https://elo-course.eu/rubrique/reglement-du-site</loc></url>
+  <url><loc>https://elo-course.eu/rubrique/chronometreurs</loc></url>
+  <url><loc>https://elo-course.eu/rubrique/mode-ghost</loc></url>
 </urlset>
