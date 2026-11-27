@@ -916,7 +916,7 @@ function upcomingHTML(){
   h+='<div class="upcoming-list">'+items.map(function(c){
     var dateLabel=c.race_date?new Date(String(c.race_date).slice(0,10)+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'Date à préciser';
     var discipline=c.discipline==='route'?'Courses sur route':c.discipline==='nature'?'Courses nature':'Discipline à préciser';
-    var registration=c.registration_url&&/^https:\/\//i.test(c.registration_url)?'<a class="btn gem-primary" href="'+esc(c.registration_url)+'" target="_blank" rel="noopener noreferrer">S’inscrire à cette course ↗</a>':'';
+    var registration=c.registration_url&&/^https:\/\//i.test(c.registration_url)?'<a class="btn gem-primary upcoming-register-link" href="'+esc(c.registration_url)+'" data-upcoming-embed="1">Consulter la page de la course ↗</a>':'';
     var posterSrc=c.poster_url&&/^https:\/\//i.test(c.poster_url)?c.poster_url:null;var poster=posterSrc?'<img class="upcoming-poster" style="display:block;width:100%;max-height:250px;object-fit:contain;border-radius:14px;background:#0B1724;margin:0 0 12px" src="'+esc(posterSrc)+'" alt="Affiche '+esc(c.race_name||'la course')+'" loading="lazy">':'';var adminPoster=S.admin?'<label style="display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border:1px dashed var(--line);border-radius:10px;font-weight:700;cursor:pointer;margin:0 0 10px">＋ Ajouter / changer l’affiche<input type="file" data-upcoming-poster="'+esc(c.id)+'" accept="image/jpeg,image/png,image/webp" style="max-width:180px;font-size:12px"></label>':'';
     var subject=encodeURIComponent('Signalement annonce ELO COURSE : '+(c.race_name||''));
     var body=encodeURIComponent('Bonjour,\n\nJe souhaite signaler une annonce publiée dans ELO COURSE.\nCourse : '+(c.race_name||'')+'\nDate : '+(c.race_date||'')+'\nDépartement : '+(c.department||'')+'\nMotif du signalement :\n\nMerci.');
@@ -983,6 +983,34 @@ async function loadPendingAccounts(force){
     var reportQ=await sb.from('runner_comment_reports').select('id,comment_id,reporter_runner_id,reason,created_at').order('created_at',{ascending:false}).limit(50);var reportHtml=reportQ.data&&reportQ.data.length?'<h4>Commentaires signalés ('+reportQ.data.length+')</h4>'+reportQ.data.map(function(rp){return '<div style="border-top:1px solid var(--line);padding:8px 0"><p>'+esc(rp.reason)+'</p><div class="meta">Signalement : '+esc(rp.reporter_runner_id)+'</div><button class="ghost" data-act="deletecomment" data-v="'+esc(rp.comment_id)+'">Supprimer le commentaire</button></div>'}).join(''):'';pendingAccountsHtml='<strong>Demandes de rattachement ('+rows.length+')</strong>'+(rows.length?rows.map(function(x){return '<div style="border-top:1px solid var(--line);padding:8px 0"><b>'+esc(by[x.runner_id]||'Profil introuvable')+'</b><div class="meta">'+esc(x.user_id)+' · '+new Date(x.requested_at).toLocaleDateString('fr-FR')+'</div><button class="btn" data-act="approveaccount" data-v="'+esc(x.user_id)+'" data-runner="'+esc(x.runner_id)+'">Approuver</button> <button class="ghost" data-act="rejectaccount" data-v="'+esc(x.user_id)+'">Refuser</button></div>'}).join(''):'<p class="meta">Aucune demande en attente.</p>')+reportHtml;pendingAccountsLoaded=true;var currentPendingBox=document.getElementById('pendingaccounts');if(currentPendingBox)currentPendingBox.innerHTML=pendingAccountsHtml;
   }catch(e){pendingAccountsHtml='<p class="meta">Impossible de charger les demandes : '+esc(e&&e.message?e.message:'Erreur inconnue')+'. Les autres fonctions d’administration restent disponibles.</p>';pendingAccountsLoaded=true;if(el)el.innerHTML=pendingAccountsHtml;}finally{pendingAccountsLoading=false;}
 }
+function openUpcomingSiteModal(url,title){
+  if(!/^https:\/\//i.test(String(url||"")))return;
+  var old=document.getElementById("upcoming-site-modal");if(old)old.remove();
+  var overlay=document.createElement("div");overlay.id="upcoming-site-modal";
+  overlay.style.cssText="position:fixed;inset:0;z-index:100500;background:rgba(2,8,18,.88);display:flex;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px);";
+  var panel=document.createElement("section");panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");panel.setAttribute("aria-label",title||"Page de la course");
+  panel.style.cssText="width:min(1200px,100%);height:min(92vh,900px);background:#0f172a;color:#f8fafc;border:1px solid rgba(148,163,184,.35);border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;";
+  var head=document.createElement("div");head.style.cssText="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(148,163,184,.25);";
+  var label=document.createElement("strong");label.textContent=title||"Page de la course";label.style.cssText="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+  var external=document.createElement("a");external.href=url;external.target="_blank";external.rel="noopener noreferrer";external.textContent="Ouvrir dans un nouvel onglet";external.style.cssText="color:#93c5fd;font-size:13px;text-decoration:underline;";
+  var close=document.createElement("button");close.type="button";close.textContent="✕ Fermer";close.setAttribute("aria-label","Fermer et revenir à ELO COURSE");close.style.cssText="border:0;border-radius:9px;padding:9px 12px;background:#2563eb;color:white;font-weight:700;cursor:pointer;";
+  function closeModal(){overlay.remove();document.removeEventListener("keydown",onKey);document.body.style.overflow="";}
+  function onKey(ev){if(ev.key==="Escape")closeModal();}
+  close.addEventListener("click",closeModal);
+  head.append(label,external,close);
+  var note=document.createElement("div");note.textContent="La page s’affiche ici si le site de l’organisateur autorise l’intégration. Sinon, utilise « Ouvrir dans un nouvel onglet ».";note.style.cssText="padding:7px 14px;font-size:12px;color:#cbd5e1;background:#172338;";
+  var frame=document.createElement("iframe");frame.src=url;frame.title=title||"Page de la course";frame.referrerPolicy="strict-origin-when-cross-origin";frame.style.cssText="width:100%;height:100%;flex:1;border:0;background:white;";
+  panel.append(head,note,frame);overlay.appendChild(panel);
+  overlay.addEventListener("click",function(ev){if(ev.target===overlay)closeModal();});
+  document.body.appendChild(overlay);document.body.style.overflow="hidden";document.addEventListener("keydown",onKey);close.focus();
+}
+document.addEventListener("click",function(ev){
+  var link=ev.target&&ev.target.closest?ev.target.closest("a[data-upcoming-embed=\"1\"]"):null;
+  if(!link)return;
+  ev.preventDefault();ev.stopPropagation();
+  openUpcomingSiteModal(link.href,link.closest(".upcoming-card")&&link.closest(".upcoming-card").querySelector("h3")?link.closest(".upcoming-card").querySelector("h3").textContent:"Page de la course");
+},true);
+
 async function loadUpcomingCourses(){
   try{var q=await sb.from('elo_upcoming_courses').select('*').eq('is_published',true).order('race_date',{ascending:true});if(q.error)throw q.error;upcomingCourses=q.data||[];if(S.view==='upcoming')render();}
   catch(e){console.warn('Courses à venir non chargées :',e.message);if(S.view==='upcoming'){upcomingCourses=[];render();}}
