@@ -4,6 +4,14 @@ var SUPABASE_URL="https://gkxsxaeexbxyswlsftsz.supabase.co",SUPABASE_KEY="sb_pub
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY),remoteReady=false,saveTimer=null,siteDataExtra={};
 // Cache ELO : les calculs coûteux sont réutilisés tant que les résultats ne changent pas.
 var eloCache={},eloFingerprint=null,eloVersion=0,eloWorker=null,eloWorkerUrl=null,eloWorkerFailed=false,eloPending={},profileRankCacheState=null,profileRankCacheRunners=null,profileRankCacheValue=null,boardCacheState=null,boardCacheRunners=null,boardCacheValue={},fightMetricCacheState=null,fightMetricCache={},authUser=null,linkedRunner=null,pendingRunner=null,elocoinsBalance=0,referralCode='',referralUsageCount=0,avatarMap={},runnerDetails={},socialBusy=false;
+function invalidateEloCache(){
+  // Invalider tout calcul éventuellement démarré avant la fin du chargement Supabase.
+  eloVersion++;
+  eloCache={};eloPending={};eloFingerprint=null;ALL={};
+  boardCacheState=null;boardCacheRunners=null;boardCacheValue={};
+  profileRankCacheState=null;profileRankCacheRunners=null;profileRankCacheValue=null;
+}
+
 var accountPopoverOpen=false,accountMode="signup",upcomingCourses=[],raceListScrollY=0,raceListScrollOpen=null,privateRunnerDetails={},raceListCache=null,raceListCacheRaces=null,raceListCacheRunners=null,raceCitiesLoaded=false,raceCitiesLoading=null,pendingAccountsHtml=null,pendingAccountsLoaded=false,pendingAccountsLoading=false;
 function localDayKey(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rememberDailyLogin(){try{localStorage.setItem("elo-course-auth-day",localDayKey())}catch(e){}}
@@ -2053,7 +2061,7 @@ sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRu
     var q=await sb.from("site_data").select("data").eq("id",1).maybeSingle();
     if(q.error)throw q.error;
     if(q.data&&q.data.data){var d=q.data.data;if(!Array.isArray(d.runners)||!Array.isArray(d.races))throw new Error("Structure site_data inattendue : les tableaux runners et races sont absents ou invalides. Aucune donnée locale ou distante ne sera remplacée.");siteDataExtra={};Object.keys(d).forEach(function(k){if(["runners","races","chronos","likes","liked","trash"].indexOf(k)===-1)siteDataExtra[k]=d[k];});S.runners=d.runners;S.races=d.races;S.chronos=Array.isArray(d.chronos)?d.chronos:[];S.likes=d.likes||{};S.liked=d.liked||{};S.trash=Array.isArray(d.trash)?d.trash:[];}else{throw new Error("Aucune ligne de données trouvée dans site_data (id=1). Aucune sauvegarde automatique effectuée.");}
-    remoteReady=true;try{localStorage.removeItem(KEY)}catch(ignoreLegacyCache){}loadUpcomingCourses();reconcileStoredRankFilters();render();
+    remoteReady=true;try{localStorage.removeItem(KEY)}catch(ignoreLegacyCache){}loadUpcomingCourses();invalidateEloCache();reconcileStoredRankFilters();render();
   }catch(e){remoteReady=false;console.error("Lecture Supabase impossible :",e);msg.sync="Lecture Supabase impossible : "+(e.message||"erreur inconnue")+". Aucune sauvegarde automatique effectuée.";render();}
 })();
 
