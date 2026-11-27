@@ -219,3 +219,5 @@ export default {
     return assetResponse;
   }
 };
+
+// Redéploiement de la version stable antérieure au chantier SEO.
