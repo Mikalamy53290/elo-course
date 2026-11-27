@@ -96,9 +96,14 @@ async function sitemap(data, consentedIds, sections) {
     (r.results || []).some(x => !x.pending) ||
     (r.date && String(r.date).slice(0,10) >= today)
   ));
-  const fixed = ["/","/courses-a-venir","/boutique.html","/training.html"];
-  const urls = fixed.map(p => `<url><loc>${SITE+p}</loc></url>`);
-  for (const section of sections) urls.push(`<url><loc>${SITE+section.path}</loc></url>`);
+  const fixed = ["/","/courses-a-venir","/boutique.html","/training.html","/rubrique/classement","/rubrique/courses","/rubrique/reglement-du-site"];
+  const urls = [];
+  const included = new Set();
+  for (const p of [...fixed,...sections.map(section=>section.path)]) {
+    if (included.has(p)) continue;
+    included.add(p);
+    urls.push(`<url><loc>${SITE+p}</loc></url>`);
+  }
   for (const r of runners) urls.push(`<url><loc>${esc(SITE+profilePath(r))}</loc></url>`);
   for (const r of races) urls.push(`<url><loc>${esc(SITE+racePath(r))}</loc></url>`);
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}</urlset>`;
@@ -172,7 +177,7 @@ async function routeSEO(request, env) {
     const latest=results.slice(0,30);
     const title=runner.name+" – Profil coureur ELO COURSE";
     const description="Retrouvez les résultats de "+runner.name+" en course à pied en Sarthe, Mayenne et Maine-et-Loire sur ELO COURSE.";
-    const body=`<h1>${esc(runner.name)}</h1><p class="muted">Profil coureur · ELO COURSE</p><div class="stats"><div class="stat"><strong>${results.length}</strong>course(s) classée(s)</div></div><section class="panel"><h2>Résultats de course</h2>${latest.length?'<ol class="list">'+latest.map(({race,item})=>'<li><strong>'+esc(race.name||"Course")+'</strong> · '+esc(dateFR(race.date))+' · '+esc(race.dist||"Distance non précisée")+(item.rk?' · '+esc(item.rk)+'e':'')+(fmtTime(item.time)?' · '+esc(fmtTime(item.time)):'')+'</li>').join("")+'</ol>':'<p>Aucun résultat détaillé disponible.</p>'}${results.length>30?'<p class="muted">Les 30 résultats les plus récents sont affichés sur cette page.</p>':''}</section><a class="cta" href="/#profil=${encodeURIComponent(String(runner.id))}">Ouvrir le profil dans ELO COURSE</a><a href="/">Retour au site</a>`;
+    const body=`<h1>${esc(runner.name)}</h1><p class="muted">Profil coureur · ELO COURSE</p><div class="stats"><div class="stat"><strong>${results.length}</strong>course(s) classée(s)</div></div><section class="panel"><h2>Résultats de course</h2>${latest.length?'<ol class="list">'+latest.map(({race,item})=>'<li><a href="'+esc(SITE+racePath(race))+'"><strong>'+esc(race.name||"Course")+'</strong></a> · '+esc(dateFR(race.date))+' · '+esc(race.dist||"Distance non précisée")+(item.rk?' · '+esc(item.rk)+'e':'')+(fmtTime(item.time)?' · '+esc(fmtTime(item.time)):'')+'</li>').join("")+'</ol>':'<p>Aucun résultat détaillé disponible.</p>'}${results.length>30?'<p class="muted">Les 30 résultats les plus récents sont affichés sur cette page.</p>':''}</section><p>Découvrez également le <a href="/rubrique/classement">classement ELO des coureurs</a> et les <a href="/rubrique/courses">résultats des courses</a> en Sarthe, Mayenne et Maine-et-Loire.</p><a class="cta" href="/#profil=${encodeURIComponent(String(runner.id))}">Ouvrir le profil dans ELO COURSE</a><a href="/">Retour au site</a>`;
     return new Response(layout({title,description,canonical:SITE+profilePath(runner),body,robots:"index,follow"}),{headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=300"}});
   }
   const id=parseId(path,"/course/");
