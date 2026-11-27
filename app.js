@@ -888,7 +888,7 @@ function duplicateRunnerCandidatesHTML(query){
 var manualDuplicateSelection={a:null,b:null};
 function manualDuplicatePickerHTML(target,query){
   var q=norm(query||"").trim();
-  if(q.replace(/\\s/g,"").length<3)return '<p class="meta">Tape au moins 3 caractères.</p>';
+  if(q.replace(/\s/g,"").length<3)return '<p class="meta">Tape au moins 3 caractères.</p>';
   var matches=S.runners.filter(function(r){return r&&r.id!==undefined&&r.id!==null&&!isAnonymousRunnerName(r.name)&&norm(runnerDisplayName(r)).indexOf(q)>=0;}).sort(function(a,b){return runnerDisplayName(a).localeCompare(runnerDisplayName(b),"fr");}).slice(0,8);
   if(!matches.length)return '<p class="meta">Aucun coureur trouvé.</p>';
   return '<div style="display:grid;gap:5px;margin-top:6px">'+matches.map(function(r){var label=runnerDisplayName(r)+' · '+(normalizeCategory(r.cat)||'Catégorie inconnue')+' · '+(r.club||r.cl_name||r.team||'Club non renseigné');return '<button type="button" class="ghost" style="text-align:left" data-act="dupmanualselect" data-target="'+target+'" data-id="'+esc(r.id)+'">'+esc(label)+'</button>';}).join('')+'</div>';
