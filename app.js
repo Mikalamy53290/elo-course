@@ -18,6 +18,37 @@ var s=null; // Les données de référence sont chargées depuis Supabase, pas r
 if(!s)S.dist="all";S.test=false;S.rankMode=S.rankMode||"all";S.rankClass=S.rankClass||"all";S.catSel=S.catSel||"";S.view=sharedCourseParam?"races":"accueil";S.admin=false;S.trash=Array.isArray(S.trash)?S.trash:[];S.q="";S.rankPage=Math.max(1,Number(S.rankPage)||1);S.raceResultsPage=1;S.raceResultsQuery="";S.open=sharedCourseParam||null;S.publicProfile=S.publicProfile||null;S.likes=S.likes||{};S.liked=S.liked||{};try{var sharedProfileParam=new URLSearchParams(String(window.location.hash||'').replace(/^#/,'')).get('profil');if(sharedProfileParam){S.publicProfile=sharedProfileParam;S.view='rank';}}catch(ignoreSharedProfile){}
 if(!S.gsex&&!S.gcat&&S.group&&S.group!=="all"){var oldGroup=S.group.split("|");if(oldGroup.length===1)S.gsex=oldGroup[0];else{S.gsex=oldGroup[0]==="*"?"all":oldGroup[0];S.gcat=oldGroup[1];}}
 try{var savedUi=JSON.parse(localStorage.getItem(UI_KEY)||"null");if(savedUi){if(typeof savedUi.rankClass==="string")S.rankClass=savedUi.rankClass;if(typeof savedUi.rankMode==="string")S.rankMode=savedUi.rankMode;if(typeof savedUi.group==="string")S.group=savedUi.group;if(typeof savedUi.dist==="string")S.dist=savedUi.dist;if(typeof savedUi.catSel==="string")S.catSel=savedUi.catSel;if(typeof savedUi.gsex==="string")S.gsex=savedUi.gsex;if(typeof savedUi.gcat==="string")S.gcat=savedUi.gcat;}}catch(ignoreUiPrefs){}
+function normalizeStoredRankFilters(){
+  var departments=["Maine-et-Loire","Mayenne","Sarthe"],rc=String(S.rankClass||"all");
+  if(["all","route","nature"].indexOf(rc)<0){var rp=rc.split("|");if(rp.length!==2||["route","nature"].indexOf(rp[0])<0||departments.indexOf(rp[1])<0)rc="all";}
+  S.rankClass=rc;
+  S.rankMode=S.rankMode==="cat"?"cat":"all";
+  var sx=S.gsex&&S.gsex!=="all"?normalizeSex(S.gsex):"all";
+  var ct=S.gcat&&S.gcat!=="all"?normalizeCategory(S.gcat):"all";
+  var gp=String(S.group||"all").split("|");
+  if(gp.length===1&&gp[0]!=="all"){var oldSex=normalizeSex(gp[0]);S.group=oldSex||"all";sx=oldSex||"all";ct="all";}
+  else if(gp.length===2){var groupSex=gp[0]==="*"?"*":normalizeSex(gp[0]),groupCat=normalizeCategory(gp[1]);S.group=groupSex&&groupCat?groupSex+"|"+groupCat:"all";sx=groupSex==="*"?"all":(groupSex||"all");ct=groupCat||"all";}
+  else S.group="all";
+  if(S.group==="all"&&(sx!=="all"||ct!=="all"))S.group=ct==="all"?sx:(sx==="all"?"*|"+ct:sx+"|"+ct);
+  S.gsex=sx;S.gcat=ct;
+  if(S.catSel&&!/^[HF]\|(?:CA|JU|ES|SE|M(?:[0-9]|10))$/.test(S.catSel))S.catSel="";
+}
+normalizeStoredRankFilters();
+function reconcileStoredRankFilters(){
+  var scope=S.rankClass||"all",ids=new Set();
+  S.races.forEach(function(race){if(!inScope(race,scope))return;(Array.isArray(race.results)?race.results:[]).forEach(function(result){if(result&&result.id&&!result.pending)ids.add(String(result.id));});});
+  if(!ids.size&&scope!=="all"){S.rankClass="all";scope="all";}
+  if(S.group!=="all"){
+    var p=S.group.split("|"),hasMatch=S.runners.some(function(r){
+      if(!r||!ids.has(String(r.id))||isAnonymousRunnerName(r.name))return false;
+      if(p.length===1)return normalizeSex(r.sex)===p[0];
+      return (p[0]==="*"||normalizeSex(r.sex)===p[0])&&normalizeCategory(r.cat)===p[1];
+    });
+    if(!hasMatch){S.group="all";S.gsex="all";S.gcat="all";}
+  }
+  if(S.rankMode==="cat"&&!S.runners.some(function(r){return normalizeSex(r&&r.sex)&&normalizeCategory(r&&r.cat);})){S.rankMode="all";S.catSel="";}
+  savePrefs();
+}
 function savePrefs(){try{localStorage.setItem(UI_KEY,JSON.stringify({rankClass:S.rankClass||"all",rankMode:S.rankMode||"all",group:S.group||"all",dist:S.dist||"all",catSel:S.catSel||"",gsex:S.gsex||"all",gcat:S.gcat||"all"}));}catch(ignoreUiSave){}}
 function save(dataChanged){
   // Le parcours complet des résultats n'est effectué qu'après une vraie modification
@@ -2022,7 +2053,7 @@ sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRu
     var q=await sb.from("site_data").select("data").eq("id",1).maybeSingle();
     if(q.error)throw q.error;
     if(q.data&&q.data.data){var d=q.data.data;if(!Array.isArray(d.runners)||!Array.isArray(d.races))throw new Error("Structure site_data inattendue : les tableaux runners et races sont absents ou invalides. Aucune donnée locale ou distante ne sera remplacée.");siteDataExtra={};Object.keys(d).forEach(function(k){if(["runners","races","chronos","likes","liked","trash"].indexOf(k)===-1)siteDataExtra[k]=d[k];});S.runners=d.runners;S.races=d.races;S.chronos=Array.isArray(d.chronos)?d.chronos:[];S.likes=d.likes||{};S.liked=d.liked||{};S.trash=Array.isArray(d.trash)?d.trash:[];}else{throw new Error("Aucune ligne de données trouvée dans site_data (id=1). Aucune sauvegarde automatique effectuée.");}
-    remoteReady=true;try{localStorage.removeItem(KEY)}catch(ignoreLegacyCache){}loadUpcomingCourses();render();
+    remoteReady=true;try{localStorage.removeItem(KEY)}catch(ignoreLegacyCache){}loadUpcomingCourses();reconcileStoredRankFilters();render();
   }catch(e){remoteReady=false;console.error("Lecture Supabase impossible :",e);msg.sync="Lecture Supabase impossible : "+(e.message||"erreur inconnue")+". Aucune sauvegarde automatique effectuée.";render();}
 })();
 
