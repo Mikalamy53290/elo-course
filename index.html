@@ -67,7 +67,10 @@
   ]
 }
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=optional" rel="stylesheet"></noscript>
 <style>
 :root{--bg:#0B1724;--surface:#172B3D;--ink:#F3F6FA;--muted:#AAB8C7;--line:#294155;--accent:#278A50;--accent-bg:#203F3A;--accent-ink:#071B14;--gold:#FFD166;--up:#278A50;--down:#F06B72;--route:#278A50;--trail:#F06B72;--general:#B8A2FF;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -670,7 +673,7 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
   <section class="view" id="v-chrono" aria-label="Chronométreurs"></section>
   <section class="view" id="v-organizer" aria-label="Espace organisateur"></section>
   <section class="view" id="v-upcoming" aria-label="Courses à venir"></section>
-  <section class="view" id="v-ghost" aria-label="Mode Ghost"><iframe id="ghost-frame" title="Mode Ghost ELO COURSE" src="about:blank" loading="eager" style="display:block;width:100%;height:760px;min-height:760px;border:0;border-radius:12px;background:#0B1724;overflow:hidden" allow="fullscreen"></iframe></section>
+  <section class="view" id="v-ghost" aria-label="Mode Ghost"><iframe id="ghost-frame" title="Mode Ghost ELO COURSE" src="about:blank" loading="lazy" style="display:block;width:100%;height:760px;min-height:760px;border:0;border-radius:12px;background:#0B1724;overflow:hidden" allow="fullscreen"></iframe></section>
 <p class="sitefoot">Les résultats viennent des classements officiels publiés par les chronométreurs. Pour demander le retrait de ton nom, <a id="rmlink" href="#">écris-nous</a>. · <a href="cgu.html" target="_blank" rel="noopener">Conditions générales d’utilisation (CGU)</a> · <a href="confidentialite.html" target="_blank" rel="noopener">Confidentialité</a> · <a href="mentions-legales.html" target="_blank" rel="noopener">Mentions légales</a></p><p class="sitefoot" style="text-align:center;margin-top:-8px"><button class="ghost" style="display:inline;padding:0 3px;text-decoration:underline" data-act="history">ELO COURSE version 0.9.20</button></p></main>
 <nav class="nav" aria-label="Navigation">
   <button data-act="view" data-v="accueil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span class="full">Accueil</span><span class="short">Accueil</span></button>
@@ -684,9 +687,9 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 </nav>
 <button id="botbtn" aria-label="Aller en bas de la page" title="Aller en bas" onclick="window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})">↓</button>
 <button id="topbtn" aria-label="Remonter en haut" title="Remonter en haut" style="position:fixed;right:16px;bottom:82px;z-index:10;border:0;border-radius:50%;width:46px;height:46px;background:var(--accent);color:white;font-size:24px;box-shadow:0 2px 8px #0003" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.4/qrcode.min.js" referrerpolicy="no-referrer"></script>
-<script src="/app.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.4/qrcode.min.js" referrerpolicy="no-referrer"></script>
+<script defer src="/app.js"></script>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="9bf41cb5-dec1-4e84-a818-77a391ddd341"></script>
 
 <!-- MODE GHOST EMBARQUE : le document Ghost est intégré à ce fichier unique. -->
@@ -696,16 +699,34 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
   var frame = document.getElementById('ghost-frame');
   var payload = document.getElementById('elo-ghost-payload');
   if (!frame || !payload) return;
-  try {
-    var binary = atob(payload.textContent.replace(/\s+/g, ''));
-    var bytes = new Uint8Array(binary.length);
-    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    frame.srcdoc = new TextDecoder('utf-8').decode(bytes);
-    frame.addEventListener('load',function(){try{if(eloCache.all)sendGhostRaceTitles();}catch(e){}},{once:true});
-  } catch (error) {
-    console.error('Chargement du Mode Ghost embarqué impossible :', error);
-    frame.srcdoc = '<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font-family:sans-serif;padding:20px">Impossible de charger le Mode Ghost. Recharge la page.</body></html>';
+  var loaded = false;
+  function loadGhost(){
+    if (loaded) return;
+    loaded = true;
+    try {
+      var binary = atob(payload.textContent.replace(/\s+/g, ''));
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      frame.addEventListener('load',function(){try{if(eloCache.all)sendGhostRaceTitles();}catch(e){}},{once:true});
+      frame.srcdoc = new TextDecoder('utf-8').decode(bytes);
+      payload.textContent = '';
+    } catch (error) {
+      console.error('Chargement du Mode Ghost embarqué impossible :', error);
+      frame.srcdoc = '<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font-family:sans-serif;padding:20px">Impossible de charger le Mode Ghost. Recharge la page.</body></html>';
+    }
   }
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries){
+      if (entries.some(function(entry){return entry.isIntersecting;})) {
+        observer.disconnect();
+        loadGhost();
+      }
+    },{rootMargin:'200px'});
+    observer.observe(frame);
+  } else {
+    window.addEventListener('load',function(){if(document.getElementById('v-ghost').classList.contains('on'))loadGhost();},{once:true});
+  }
+  window.addEventListener('elo:open-ghost',loadGhost);
 })();
 </script>
 
@@ -731,6 +752,6 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 })();
 </script>
 
-<script src="/bandeau-annonces.js"></script>
+<script defer src="/bandeau-annonces.js"></script>
 </body>
 </html>
