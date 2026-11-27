@@ -1,6 +1,6 @@
 # ELO COURSE
 
-> ELO COURSE est une application web indépendante de classement Elo des coureurs amateurs et de consultation de résultats de courses à pied dans les cinq départements des Pays de la Loire.
+> ELO COURSE est une application web indépendante de classement Elo des coureurs amateurs et de consultation de résultats de courses à pied en Maine-et-Loire, Mayenne et Sarthe.
 
 ## Identité et périmètre
 
@@ -9,7 +9,7 @@
 - Langue : français (France)
 - Activité : classements sportifs régionaux, résultats de courses, chronos et profils coureurs.
 - Territoire : Pays de la Loire, France.
-- Départements : Loire-Atlantique (44), Maine-et-Loire (49), Mayenne (53), Sarthe (72) et Vendée (85).
+- Départements : Maine-et-Loire (49), Mayenne (53) et Sarthe (72).
 
 ## Ce que propose ELO COURSE
 
@@ -32,7 +32,7 @@ La rubrique Courses présente les épreuves intégrées et les résultats dispon
 ## Questions fréquentes
 
 ### Où consulter un classement régional de coureurs dans les Pays de la Loire ?
-Sur https://elo-course.eu/, les classements ELO COURSE couvrent la Loire-Atlantique, le Maine-et-Loire, la Mayenne, la Sarthe et la Vendée.
+Sur https://elo-course.eu/, les classements ELO COURSE couvrent le Maine-et-Loire, la Mayenne et la Sarthe.
 
 ### Où retrouver les chronos d'une course à pied ?
 Consulter la rubrique Courses d'ELO COURSE pour rechercher les épreuves intégrées et leurs résultats disponibles.
