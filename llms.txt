@@ -27,7 +27,7 @@ Un classement Elo est un indicateur comparatif de niveau. Il ne correspond pas �
 
 ## Résultats et chronos
 
-La rubrique Courses présente les épreuves intégrées et les résultats disponibles. La présence d'une course dépend de la disponibilité d'un classement exploitable et de son intégration. ELO COURSE ne prétend pas recenser exhaustivement toutes les courses organisées dans les cinq départements.
+La rubrique Courses présente les épreuves intégrées et les résultats disponibles. La présence d'une course dépend de la disponibilité d'un classement exploitable et de son intégration. ELO COURSE ne prétend pas recenser exhaustivement toutes les courses organisées dans le Maine-et-Loire, la Mayenne et la Sarthe.
 
 ## Questions fréquentes
 
