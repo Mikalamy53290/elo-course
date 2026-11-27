@@ -2022,7 +2022,7 @@ sb.auth.onAuthStateChange(function(){setTimeout(async function(){await refreshRu
     var q=await sb.from("site_data").select("data").eq("id",1).maybeSingle();
     if(q.error)throw q.error;
     if(q.data&&q.data.data){var d=q.data.data;if(!Array.isArray(d.runners)||!Array.isArray(d.races))throw new Error("Structure site_data inattendue : les tableaux runners et races sont absents ou invalides. Aucune donnée locale ou distante ne sera remplacée.");siteDataExtra={};Object.keys(d).forEach(function(k){if(["runners","races","chronos","likes","liked","trash"].indexOf(k)===-1)siteDataExtra[k]=d[k];});S.runners=d.runners;S.races=d.races;S.chronos=Array.isArray(d.chronos)?d.chronos:[];S.likes=d.likes||{};S.liked=d.liked||{};S.trash=Array.isArray(d.trash)?d.trash:[];}else{throw new Error("Aucune ligne de données trouvée dans site_data (id=1). Aucune sauvegarde automatique effectuée.");}
-    remoteReady=true;try{localStorage.removeItem(KEY)}catch(ignoreLegacyCache){}loadUpcomingCourses();var promoted=promotePendingProfiles();if(promoted)msg.sync=promoted+" nouvelle(s) fiche(s) créée(s) depuis les résultats déjà importés.";save(true);render();
+    remoteReady=true;try{localStorage.removeItem(KEY)}catch(ignoreLegacyCache){}loadUpcomingCourses();render();
   }catch(e){remoteReady=false;console.error("Lecture Supabase impossible :",e);msg.sync="Lecture Supabase impossible : "+(e.message||"erreur inconnue")+". Aucune sauvegarde automatique effectuée.";render();}
 })();
 
