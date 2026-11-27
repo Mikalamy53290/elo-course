@@ -110,7 +110,58 @@ async function sitemap(data, consentedIds, sections) {
 }
 async function routeSEO(request, env) {
   const url = new URL(request.url), path = decodeURI(url.pathname);
-  if (path === "/robots.txt") return new Response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: OAI-SearchBot\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: PerplexityBot\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: ClaudeBot\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: Claude-SearchBot\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: Claude-User\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: ChatGPT-User\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nUser-agent: Perplexity-User\nAllow: /\nDisallow: /admin\nDisallow: /compte\n\nSitemap: "+SITE+"/sitemap.xml\n",{headers:{"content-type":"text/plain; charset=utf-8","cache-control":"public, max-age=3600"}});
+  if (path === "/robots.txt") {
+    const robots = [
+      "User-agent: *",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "User-agent: OAI-SearchBot",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "User-agent: PerplexityBot",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "User-agent: ClaudeBot",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "User-agent: Claude-SearchBot",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "User-agent: Claude-User",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "User-agent: ChatGPT-User",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "User-agent: Perplexity-User",
+      "Allow: /",
+      "Disallow: /admin",
+      "Disallow: /compte",
+      "",
+      "Sitemap: https://elo-course.eu/sitemap.xml"
+    ].join("\n") + "\n";
+    return new Response(robots, {
+      status: 200,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "public, max-age=3600"
+      }
+    });
+  }
   if (path === "/sitemap.xml") {
     try {
       const data=await getData(env);
