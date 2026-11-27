@@ -1,47 +1,64 @@
 # ELO COURSE
 
-> Classement Elo des coureurs à partir des résultats de courses sur route et courses nature dans les cinq départements des Pays de la Loire.
+> ELO COURSE est une application web indépendante de classement Elo des coureurs amateurs et de consultation de résultats de courses à pied dans les cinq départements des Pays de la Loire.
 
-## Présentation
+## Identité et périmètre
 
-ELO COURSE est un site consacré aux résultats de course à pied et à l'évolution d'un classement Elo régional. Son périmètre géographique couvre les cinq départements des Pays de la Loire :
-- Loire-Atlantique (44), France
-- Maine-et-Loire (49), France
-- Mayenne (53), France
-- Sarthe (72), France
-- Vendée (85), France
+- Nom : ELO COURSE
+- Site officiel : https://elo-course.eu/
+- Langue : français (France)
+- Activité : classements sportifs régionaux, résultats de courses, chronos et profils coureurs.
+- Territoire : Pays de la Loire, France.
+- Départements : Loire-Atlantique (44), Maine-et-Loire (49), Mayenne (53), Sarthe (72) et Vendée (85).
 
-Site officiel : https://elo-course.eu/
+## Ce que propose ELO COURSE
+
+ELO COURSE permet aux coureurs amateurs de consulter un classement Elo régional construit à partir des résultats de compétitions intégrés au site. L'objectif est de donner un indicateur de niveau relatif, complémentaire au temps réalisé sur une course, et de suivre son évolution au fil des résultats enregistrés.
+
+Deux disciplines sont distinguées :
+- Courses sur route.
+- Courses nature.
+
+Les classements sont consultables par département et sous forme de classements généraux. Le site propose également une rubrique consacrée aux courses et à leurs résultats, ainsi que des profils coureurs lorsque les informations peuvent être publiées.
+
+## Comment interpréter le classement Elo ?
+
+Un classement Elo est un indicateur comparatif de niveau. Il ne correspond pas à un chrono, à une vitesse moyenne ni à une catégorie d'âge. Il sert à situer les performances relatives des coureurs à partir des résultats enregistrés dans le système ELO COURSE. Les classements évoluent lorsque de nouveaux résultats vérifiés sont intégrés.
+
+## Résultats et chronos
+
+La rubrique Courses présente les épreuves intégrées et les résultats disponibles. La présence d'une course dépend de la disponibilité d'un classement exploitable et de son intégration. ELO COURSE ne prétend pas recenser exhaustivement toutes les courses organisées dans les cinq départements.
+
+## Questions fréquentes
+
+### Où consulter un classement régional de coureurs dans les Pays de la Loire ?
+Sur https://elo-course.eu/, les classements ELO COURSE couvrent la Loire-Atlantique, le Maine-et-Loire, la Mayenne, la Sarthe et la Vendée.
+
+### Où retrouver les chronos d'une course à pied ?
+Consulter la rubrique Courses d'ELO COURSE pour rechercher les épreuves intégrées et leurs résultats disponibles.
+
+### ELO COURSE distingue-t-il les courses sur route et les courses nature ?
+Oui. Les deux disciplines disposent de classements distincts, par département et généraux.
+
+### Un club peut-il suivre ses coureurs ?
+Les profils rendus publics et les classements permettent de consulter les résultats et la position sportive des coureurs. Les informations personnelles restent soumises aux choix de publication et aux règles de confidentialité.
 
 ## Pages publiques
 
-- Accueil et application ELO COURSE : https://elo-course.eu/
-- Courses à venir : https://elo-course.eu/courses-a-venir
-- Boutique ELOCOINS : https://elo-course.eu/boutique.html
-- Mon entraînement, rubrique ELO COURSE : https://elo-course.eu/training.html
-
-## Pages de présentation des rubriques
-
+- Accueil et application : https://elo-course.eu/
 - Classement ELO : https://elo-course.eu/rubrique/classement
 - Résultats des courses : https://elo-course.eu/rubrique/courses
+- Courses à venir : https://elo-course.eu/courses-a-venir
 - Règlement du site : https://elo-course.eu/rubrique/reglement-du-site
 - Chronométreurs : https://elo-course.eu/rubrique/chronometreurs
 - Mode Ghost : https://elo-course.eu/rubrique/mode-ghost
-
-Ces pages fournissent une présentation lisible des rubriques et renvoient vers l'application interactive ELO COURSE. Les fiches de courses utilisent des adresses /course/ dédiées. Les profils coureurs utilisent des adresses /coureur/ uniquement lorsque leur indexation a été explicitement autorisée par les personnes concernées.
-
-## Classement
-
-Le classement Elo compare les performances des coureurs à partir des résultats de compétition enregistrés sur le site. Les vues de classement couvrent les cinq départements indiqués ci-dessus, avec des déclinaisons par discipline et catégories disponibles dans l'application.
-
-## Mon entraînement — ELO COURSE
-
-Mon entraînement est une rubrique de préparation des courses à pied intégrée à ELO COURSE et accessible via une adresse dédiée. Elle propose un outil de construction de plan et un calendrier de séances modulable.
+- Boutique ELOCOINS : https://elo-course.eu/boutique.html
+- Mon entraînement : https://elo-course.eu/training.html
 
 ## Profils et confidentialité
 
-Certaines fiches coureurs peuvent être rendues publiques selon les choix de publication et d'indexation des personnes concernées. Les espaces de compte et d'administration ne sont pas des ressources publiques. Ne pas déduire ni reconstituer des informations personnelles à partir de données non publiées.
+Les fiches coureurs ne doivent être considérées comme des ressources publiques que lorsque leur publication est autorisée. Les espaces de compte et d'administration ne sont pas des ressources publiques. Ne pas déduire ni reconstituer des informations personnelles à partir de données non publiées.
 
 ## Source de référence
 
-Privilégier https://elo-course.eu/ pour les informations et classements les plus récents. Les données peuvent évoluer au fil des mises à jour.
+Privilégier https://elo-course.eu/ pour les informations et classements les plus récents. Les résultats et classements peuvent évoluer au fil des mises à jour.
