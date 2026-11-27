@@ -1,0 +1,2635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ELO COURSE — Mode Ghost (Sarthe 72, Mayenne 53, Maine-et-Loire 49)</title>
+  <style>
+    /* ==========================================================================
+       1. CHARTE GRAPHIQUE STRICTE ELO COURSE & VARIABLES CSS
+       ========================================================================== */
+    :root {
+      --bg-main: #0B1724;
+      --bg-panel: #172B3D;
+      --bg-card: #1B3348;
+      --border: #294155;
+      --accent-green: #278A50;
+      --accent-green-hover: #2FA35F;
+      --accent-green-bright: #4ADE80;
+      --ghost-cyan: #38BDF8;
+      --ghost-bg: #0F2940;
+      --ghost-border: #1D4E78;
+      --text-primary: #F1F5F9;
+      --text-secondary: #CBD5E1;
+      --text-muted: #94A3B8;
+      --danger: #F87171;
+      --warning: #FBBF24;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: auto;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      line-height: 1.5;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* ==========================================================================
+       2. EN-TÊTE & BADGE DE SIMULATION
+       ========================================================================== */
+    header {
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .header-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-green), #1B663A);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: -0.5px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 0.4px;
+      line-height: 1.1;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .ghost-sim-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background-color: var(--ghost-bg);
+      border: 1px solid var(--ghost-border);
+      color: var(--ghost-cyan);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--ghost-cyan);
+      box-shadow: 0 0 8px var(--ghost-cyan);
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       3. CONTENEUR PRINCIPAL & BARRE DES 3 ONGLETS TACTILES
+       ========================================================================== */
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px 14px 20px;
+    }
+
+    .hero-intro {
+      margin-bottom: 16px;
+    }
+
+    .hero-intro h1 {
+      font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      font-weight: 800;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-intro p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Grille de 4 boutons d'onglets optimisée mobile & desktop */
+    .tabs-nav {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border);
+      padding: 8px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 18px;
+    }
+
+    @media (min-width: 720px) {
+      .tabs-nav {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .tab-btn {
+      appearance: none;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: var(--radius-md);
+      padding: 11px 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      text-align: center;
+      transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+      min-height: 58px;
+    }
+
+    .tab-btn:active {
+      transform: scale(0.98);
+    }
+
+    .tab-btn .tab-title {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn .tab-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(180deg, rgba(39, 138, 80, 0.28), rgba(27, 51, 72, 0.95));
+      border-color: var(--accent-green-bright);
+      box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.25);
+    }
+
+    .tab-btn.active .tab-title {
+      color: var(--accent-green-bright);
+    }
+
+    .tab-btn.active .tab-desc {
+      color: var(--text-secondary);
+    }
+
+    /* Panneaux d'onglets */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: fadeInPanel 0.2s ease-out;
+    }
+
+    @keyframes fadeInPanel {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       4. COMPOSANTS COMMUNS : PANNEAUX, CARTES, FORMULAIRES, BOUTONS
+       ========================================================================== */
+    .panel {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .panel {
+        padding: 20px;
+      }
+    }
+
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-header h2 {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .pill-tag {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .pill-tag.cyan {
+      background-color: var(--ghost-bg);
+      border-color: var(--ghost-border);
+      color: var(--ghost-cyan);
+    }
+
+    .pill-tag.green {
+      background-color: rgba(39, 138, 80, 0.2);
+      border-color: rgba(74, 222, 128, 0.4);
+      color: var(--accent-green-bright);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 680px) {
+      .form-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+      .form-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+      .form-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .field input,
+    .field select {
+      background-color: var(--bg-main);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      width: 100%;
+      min-height: 42px;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--ghost-cyan);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .btn-primary {
+      appearance: none;
+      background-color: var(--accent-green);
+      hover: var(--accent-green-hover);
+      color: #fff;
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-green-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.99);
+    }
+
+    .btn-secondary {
+      appearance: none;
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 38px;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--ghost-cyan);
+      background-color: #213D56;
+    }
+
+    .btn-secondary.active-chip {
+      background-color: var(--ghost-bg);
+      border-color: var(--ghost-cyan);
+      color: var(--ghost-cyan);
+    }
+
+    /* Cartes de statistiques KPI */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 720px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .kpi-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .kpi-value {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-value.pos { color: var(--accent-green-bright); }
+    .kpi-value.neg { color: var(--danger); }
+    .kpi-value.cyan { color: var(--ghost-cyan); }
+
+    .kpi-sub {
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       5. STYLES SPÉCIFIQUES ONGLET 1 : GHOST DUEL
+       ========================================================================== */
+    .duel-neighbors {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 680px) {
+      .duel-neighbors {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .neighbor-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+
+    .neighbor-card.ahead { border-left: 4px solid var(--danger); }
+    .neighbor-card.behind { border-left: 4px solid var(--accent-green-bright); }
+
+    .neighbor-head {
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .neighbor-name {
+      font-weight: 800;
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+    }
+
+    .neighbor-meta {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background-color: var(--bg-card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background-color: rgba(11, 23, 36, 0.55);
+      color: var(--text-muted);
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr.ghost-row {
+      background-color: var(--ghost-bg);
+      outline: 1px solid var(--ghost-cyan);
+    }
+
+    tr.ghost-row td {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* ==========================================================================
+       6. STYLES SPÉCIFIQUES ONGLET 2 : TOI VS TOI (PISTE 2D ANIMÉE)
+       ========================================================================== */
+    .scenarios-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .scenarios-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    #raceCanvas {
+      display: block;
+      width: 100%;
+      height: 230px;
+    }
+
+    @media (min-width: 640px) {
+      #raceCanvas {
+        height: 255px;
+      }
+    }
+
+    /* Bandeau d'arrivée figé (ne se remet pas à zéro à la fin) */
+    .finish-banner {
+      display: none;
+      background: linear-gradient(90deg, rgba(15, 41, 64, 0.95), rgba(39, 138, 80, 0.25));
+      border: 1px solid var(--accent-green-bright);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .finish-banner.visible {
+      display: flex;
+    }
+
+    .finish-banner-title {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--accent-green-bright);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .finish-banner-detail {
+      font-size: 0.84rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Barre de contrôles du lecteur 2D */
+    .player-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .scrubber-wrap {
+      flex: 1 1 220px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scrubber-wrap input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-green-bright);
+      cursor: pointer;
+      height: 6px;
+    }
+
+    .scrubber-time {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--ghost-cyan);
+      font-variant-numeric: tabular-nums;
+      min-width: 68px;
+      text-align: right;
+    }
+
+    /* ==========================================================================
+       8. PIED DE PAGE & UTILITAIRES
+       ========================================================================== */
+    .formula-note {
+      background-color: var(--ghost-bg);
+      border: 1px solid var(--ghost-border);
+      border-radius: var(--radius-md);
+      padding: 11px 14px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 12px;
+    }
+
+    .formula-note strong {
+      color: var(--ghost-cyan);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px 14px;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      border-top: 1px solid var(--border);
+      background-color: var(--bg-panel);
+    }
+  .tab-btn[hidden],.tab-panel[hidden]{display:none!important}
+  
+    /* Rubrique 3 — course virtuelle, styles isolés */
+    .gv{color:#f3f6fa}.gv-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin:0 0 14px}.gv-head h2{margin:3px 0 7px;color:#fff}.gv-head p{margin:0;color:#b8c7d5;font-size:14px;max-width:720px}.gv-kicker{font-size:10px;font-weight:800;letter-spacing:.13em;color:#278A50}.gv-tag,.gv-count,.gv-distance{display:inline-flex;align-items:center;border:1px solid #278a50;background:#203f3a;color:#ffd166;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;white-space:nowrap}.gv-panel{background:#102233;border:1px solid #294155;border-radius:12px;padding:14px;margin:12px 0}.gv-panel label{display:block;color:#dbe5ee;font-size:13px;font-weight:700;margin:0 0 7px}.gv-panel select,.gv-panel input[type=search]{width:100%;background:#0b1724!important;color:#f3f6fa!important;border:1px solid #355269!important;border-radius:8px;padding:11px 12px;margin:0 0 8px}.gv-muted{font-size:12px;color:#aab8c7;margin:5px 0}.gv-results{display:grid;gap:6px;max-height:260px;overflow:auto;margin:9px 0}.gv-runner-option,.gv-selected-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid #294155;border-radius:9px;background:#172b3d}.gv-runner-main{min-width:0;overflow-wrap:anywhere}.gv-runner-main strong{display:block;color:#fff;font-size:13px}.gv-runner-main small{display:block;color:#aab8c7;font-size:11px;margin-top:2px}.gv-add,.gv-remove{flex:none;border:1px solid #278a50;background:#203f3a;color:#ffd166;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:800}.gv-add:disabled{opacity:.4;cursor:not-allowed}.gv-selected-head,.gv-race-title,.gv-time-row,.gv-actions,.gv-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.gv-selected-head strong{font-size:14px;color:#fff}.gv-selected{display:grid;gap:6px;margin:10px 0}.gv-selected-item{border-color:#355269}.gv-selected-item .gv-runner-main{display:flex;align-items:center;gap:9px}.gv-dot{width:11px;height:11px;border-radius:50%;flex:none;border:2px solid #fff}.gv-actions{justify-content:flex-start;margin-top:12px}.gv-status{font-size:12px;color:#ffd166;margin-top:8px;min-height:18px}.gv-race-title{margin-bottom:10px}.gv-race-title h3{margin:3px 0 0;font-size:18px;color:#fff}#gv-canvas{display:block;width:100%;height:auto;min-height:170px;border-radius:10px;background:#0b1724;border:1px solid #294155}.gv-controls{justify-content:flex-start;margin:12px 0 6px}.gv-speeds{display:flex;gap:5px;flex-wrap:wrap}.gv-speeds button{background:#172b3d;color:#dbe5ee;border:1px solid #355269;border-radius:7px;padding:7px 10px;font-size:12px}.gv-speeds button.active{background:#278A50;border-color:#278A50;color:#071B14;font-weight:900}#gv-timeline{width:100%;margin:12px 0 4px;accent-color:#278A50}.gv-time-row{font-size:11px;color:#aab8c7;font-variant-numeric:tabular-nums}.gv-ranking{display:grid;gap:6px;margin-top:10px}.gv-rank-row{display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;align-items:center;gap:9px;background:#172b3d;border:1px solid #294155;border-radius:9px;padding:9px}.gv-rank-no{font:700 20px "Barlow Condensed",sans-serif;color:#ffd166}.gv-rank-name{font-size:13px;font-weight:800;color:#fff;overflow-wrap:anywhere}.gv-rank-meta{font-size:11px;color:#aab8c7}.gv-rank-time{font:700 17px "Barlow Condensed",sans-serif;color:#fff;white-space:nowrap}.gv-empty{padding:12px;color:#aab8c7;text-align:center;font-size:13px}.gv-footnote{font-size:11px;color:#91a4b5;margin:12px 2px}.gv .btn-primary{background:#278A50!important;color:#071B14!important;border-color:#278A50!important;font-weight:900}.gv .btn-secondary{background:#172b3d!important;color:#e5edf4!important;border:1px solid #456176!important;border-radius:8px;padding:9px 13px}@media(max-width:600px){.gv-head{display:block}.gv-tag{margin-top:9px}.gv-rank-row{grid-template-columns:24px minmax(0,1fr) auto}.gv-rank-row .gv-rank-meta{grid-column:2}.gv-rank-time{grid-column:3;grid-row:1/3}.gv-panel{padding:11px}}
+
+  
+/* Course virtuelle — palette ELO COURSE : bleu nuit, vert sportif et or */
+#ghost-virtual{color:#F3F6FA}
+#ghost-virtual .gv-head h2,#ghost-virtual .gv-race-title h3{color:#F3F6FA}
+#ghost-virtual .gv-head p{color:#AAB8C7}
+#ghost-virtual .gv-kicker{color:#4ADE80}
+#ghost-virtual .gv-tag,#ghost-virtual .gv-count,#ghost-virtual .gv-distance{border:1px solid #278A50;background:#203F3A;color:#D9FBE7}
+#ghost-virtual .gv-panel{background:#172B3D;border:1px solid #294155;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+#ghost-virtual .gv-panel label{color:#D5E1EC}
+#ghost-virtual .gv-panel select,#ghost-virtual .gv-panel input[type=search],#ghost-virtual .gv-panel input[type=number]{background:#0B1724!important;color:#F3F6FA!important;border:1px solid #456176!important;border-radius:8px;padding:10px 11px}
+#ghost-virtual .gv-muted,#ghost-virtual .gv-time-row{color:#AAB8C7}
+#ghost-virtual .gv-runner-option,#ghost-virtual .gv-selected-item{background:#1B3348;border:1px solid #294155;border-radius:10px}
+#ghost-virtual .gv-runner-main strong,#ghost-virtual .gv-selected-head strong,#ghost-virtual .gv-rank-name,#ghost-virtual .gv-rank-time{color:#F3F6FA}
+#ghost-virtual .gv-runner-main small,#ghost-virtual .gv-rank-meta{color:#AAB8C7}
+#ghost-virtual .gv-add,#ghost-virtual .gv-remove{border:1px solid #278A50;background:#203F3A;color:#D9FBE7;border-radius:7px}
+#ghost-virtual .gv-dot{border-color:#F3F6FA}
+#ghost-virtual .gv-status{color:#FFD166}
+#ghost-virtual #gv-canvas{height:390px;min-height:390px;background:#0B1724;border:1px solid #294155;border-radius:11px}
+@media(min-width:640px){#ghost-virtual #gv-canvas{height:410px;min-height:410px}}
+@media(min-width:960px){#ghost-virtual #gv-canvas{height:450px;min-height:450px}}
+#ghost-virtual .gv-speeds{background:#102233;border:1px solid #294155;padding:3px;border-radius:8px}
+#ghost-virtual .gv-speeds button{background:transparent;color:#D5E1EC;border:0;border-radius:6px}
+#ghost-virtual .gv-speeds button.active{background:#278A50;color:#071B14}
+#ghost-virtual #gv-timeline{accent-color:#278A50}
+#ghost-virtual .gv-rank-row{background:#1B3348;border:1px solid #294155;border-radius:10px}
+#ghost-virtual .gv-rank-no{color:#FFD166}
+#ghost-virtual .gv-empty,#ghost-virtual .gv-footnote{color:#AAB8C7}
+#ghost-virtual .btn-primary{background:#278A50!important;color:#071B14!important;border-color:#278A50!important}
+#ghost-virtual .btn-secondary{background:#1B3348!important;color:#D5E1EC!important;border:1px solid #456176!important;border-radius:8px;padding:9px 13px}
+
+</style>
+</head>
+<body>
+
+  <!-- EN-TÊTE -->
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">ELO</div>
+        <div class="brand-text">
+          <span class="brand-title">ELO COURSE</span>
+          <span class="brand-sub">Sarthe (72) • Mayenne (53) • Maine-et-Loire (49)</span>
+        </div>
+      </a>
+      <div class="ghost-sim-badge">
+        <span class="pulse-dot"></span>
+        <span>GHOST • SIMULATION (Aucun impact sur l'ELO officiel)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main>
+    <div class="hero-intro">
+      <h1>👻 Mode Ghost — Laboratoire &amp; Simulation ELO V2</h1>
+      <p>Mesure-toi aux courses officielles du 72, 53 et 49, visualise tes duels en 2D ou prépare tes allures sans modifier ton classement officiel.</p>
+    </div>
+
+    <!-- BARRE DES 4 RUBRIQUES (CHARGEMENT LÉGER PAR ONGLET) -->
+    <nav class="tabs-nav" role="tablist" aria-label="Rubriques du Mode Ghost">
+      <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="duel" hidden>
+        <span class="tab-title">⚔️ Ghost Duel</span>
+        <span class="tab-desc">Défi rétroactif ELO V2</span>
+      </button>
+      <button type="button" class="tab-btn active" role="tab" aria-selected="true" data-tab="toivstoi">
+        <span class="tab-title">🏃 Toi vs Toi</span>
+        <span class="tab-desc">Piste 2D animée</span>
+      </button>
+      <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="virtual">
+        <span class="tab-title">🏁 Course virtuelle</span>
+        <span class="tab-desc">Choix des coureurs &amp; simulation</span>
+      </button>
+      <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="allure">
+        <span class="tab-title">⏱️ Calculateur d’allure</span>
+        <span class="tab-desc">Préparation &amp; temps de passage</span>
+      </button>
+    </nav>
+
+    <!-- ========================================================================
+         ONGLET 1 : GHOST DUEL (SIMULATION RÉTROACTIVE ELO V2)
+         ======================================================================== -->
+    <section id="tab-duel" class="tab-panel" role="tabpanel" hidden>
+      <div class="panel">
+        <div class="panel-header">
+          <h2>1. Ghost Duel — Simulation rétroactive ELO V2</h2>
+          <span class="pill-tag cyan">Écart relatif de temps g</span>
+        </div>
+
+        <form id="form-duel" class="form-grid cols-4">
+          <div class="field" style="grid-column: span 2;">
+            <label for="duel-race">Course officielle (72 / 53 / 49)</label>
+            <select id="duel-race"></select>
+          </div>
+          <div class="field" style="grid-column: span 2; min-width: 150px;">
+            <label for="duel-elo">Ton ELO actuel</label>
+            <input type="number" id="duel-elo" min="800" max="2600" value="" placeholder="ELO officiel du compte" required style="width:100%;min-width:0;font-size:1.05rem;padding-left:14px;padding-right:14px;" />
+          </div>
+          <div class="field">
+            <label for="duel-k">Coefficient K</label>
+            <select id="duel-k">
+              <option value="40">K = 40 (5 premières courses)</option>
+              <option value="24" selected>K = 24 (Coureur confirmé)</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="duel-custom-distance">Distance personnalisée (km, facultatif)</label>
+            <input type="number" id="duel-custom-distance" min="0.1" max="500" step="0.01" placeholder="Distance officielle si vide" />
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="duel-time">Ton chrono à simuler (mm:ss ou hh:mm:ss)</label>
+            <input type="text" id="duel-time" value="39:45" placeholder="Ex: 39:45 ou 01:24:10" required />
+          </div>
+          <div class="field" style="grid-column: span 2; justify-content: flex-end;">
+            <button type="submit" class="btn-primary">⚡ Simuler mon Ghost Duel ELO V2</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="duel-results" class="panel">
+        <div class="panel-header">
+          <h2 id="duel-race-title">Résultats de la simulation</h2>
+          <span class="pill-tag green" id="duel-race-meta">Route • 10 km</span>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Rang virtuel</span>
+            <span class="kpi-value cyan" id="kpi-duel-rank">-</span>
+            <span class="kpi-sub" id="kpi-duel-beaten">-</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Variation ELO V2</span>
+            <span class="kpi-value pos" id="kpi-duel-delta">-</span>
+            <span class="kpi-sub" id="kpi-duel-newelo">-</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Multiplicateur moyen</span>
+            <span class="kpi-value" id="kpi-duel-mult">-</span>
+            <span class="kpi-sub">Plafond V2 : ×1,50</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Allure simulée</span>
+            <span class="kpi-value" id="kpi-duel-pace">-</span>
+            <span class="kpi-sub" id="kpi-duel-speed">-</span>
+          </div>
+        </div>
+
+        <div class="duel-neighbors" id="duel-neighbors"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rang</th>
+                <th>Coureur</th>
+                <th>Club / Dép.</th>
+                <th>ELO</th>
+                <th>Chrono</th>
+                <th>Écart relatif g</th>
+                <th>Mult. V2</th>
+                <th>Gain / Perte</th>
+              </tr>
+            </thead>
+            <tbody id="duel-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="formula-note">
+          <strong>Formule ELO V2 appliquée :</strong> écart relatif <code>g = |t_joueur − t_adv| / min(t_joueur, t_adv)</code>, multiplicateur d'intensité <code>m = min(1,5 ; 1 + 0,5 × (g / 0,01))</code>. Plus l'écart de chrono est net, plus la confrontation pèse (jusqu'à ×1,5).
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         ONGLET 2 : TOI VS TOI (PISTE 2D ANIMÉE AVEC COUREURS STYLISÉS)
+         ======================================================================== -->
+    <section id="tab-toivstoi" class="tab-panel active" role="tabpanel">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>2. Toi vs Toi — Duel visuel 2D sur piste nocturne</h2>
+          <span class="pill-tag cyan" id="tvt-status-badge">Prêt au départ</span>
+        </div>
+
+        <!-- Scénarios rapides -->
+        <div class="scenarios-bar">
+          <span class="scenarios-label">Scénarios rapides :</span>
+          <button type="button" class="btn-secondary active-chip" data-scenario="pr">🏆 Record personnel battu</button>
+          <button type="button" class="btn-secondary" data-scenario="sprint">🔥 Arrivée au sprint</button>
+          <button type="button" class="btn-secondary" data-scenario="offday">😮‍💨 Coup de moins bien</button>
+        </div>
+
+        <!-- Paramètres du duel Toi vs Toi -->
+        <div class="form-grid cols-4" style="margin-bottom: 14px;">
+          <div class="field">
+            <label for="tvt-distance">Distance</label>
+            <select id="tvt-distance">
+              <option value="5">5 km (Route)</option>
+              <option value="10" selected>10 km (Route)</option>
+              <option value="15">15 km (Course nature)</option>
+              <option value="21">Semi-Marathon (21 km)</option>
+              <option value="42">Marathon (42 km)</option>
+              <option value="custom">Autre distance</option>
+            </select>
+            <input type="number" id="tvt-custom-distance" min="0.1" max="500" step="0.01" placeholder="Distance personnalisée (km)" aria-label="Distance personnalisée en kilomètres" style="margin-top:6px">
+          </div>
+          <div class="field">
+            <label for="tvt-time-ref">Ghost Réf. (Cyan) — mm:ss</label>
+            <input type="text" id="tvt-time-ref" value="41:30" />
+          </div>
+          <div class="field">
+            <label for="tvt-time-cur">Défi Actuel (Vert) — mm:ss</label>
+            <input type="text" id="tvt-time-cur" value="39:50" />
+          </div>
+          <div class="field" style="grid-column: span 2; min-width: 150px;">
+            <label for="tvt-elo">ELO de référence</label>
+            <input type="number" id="tvt-elo" value="" placeholder="ELO officiel du compte" min="800" max="2600" style="width:100%;min-width:0;font-size:1.05rem;padding-left:14px;padding-right:14px;" />
+          </div>
+        </div>
+
+        <!-- PISTE 2D ANIMÉE -->
+        <div class="canvas-container">
+          <canvas id="raceCanvas"></canvas>
+        </div>
+
+        <!-- BANDEAU D'ARRIVÉE FIGÉ (RESTE AFFICHÉ À LA FIN DE LA COURSE) -->
+        <div id="tvt-finish-banner" class="finish-banner" role="status">
+          <div class="finish-banner-title">🏁 Course terminée — Écarts finaux conservés</div>
+          <div class="finish-banner-detail" id="tvt-finish-summary">-</div>
+        </div>
+
+        <!-- CONTRÔLES LECTURE / PAUSE / RESET / VITESSE / BARRE DE PROGRESSION -->
+        <div class="player-controls">
+          <div class="control-group">
+            <button type="button" id="btn-play-pause" class="btn-secondary" style="background-color: var(--accent-green); border-color: rgba(74,222,128,0.4); color: #fff;">
+              ▶ Lancer
+            </button>
+            <button type="button" id="btn-reset" class="btn-secondary">↺ Recommencer</button>
+          </div>
+
+          <div class="scrubber-wrap">
+            <input type="range" id="tvt-scrubber" min="0" max="1000" value="0" aria-label="Progression de la course" />
+            <span class="scrubber-time" id="tvt-clock">00:00</span>
+          </div>
+
+          <div class="control-group" aria-label="Vitesse de simulation">
+            <button type="button" class="btn-secondary speed-btn active-chip" data-speed="1">1×</button>
+            <button type="button" class="btn-secondary speed-btn" data-speed="2">2×</button>
+            <button type="button" class="btn-secondary speed-btn" data-speed="4">4×</button>
+          </div>
+        </div>
+
+        <!-- COMPTEURS EN DIRECT (RESTENT FIGÉS SUR LES VALEURS FINALES À L'ARRIVÉE) -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Distance parcourue</span>
+            <span class="kpi-value" id="tvt-kpi-dist">0,00 / 0,00 km</span>
+            <span class="kpi-sub">Vert (Défi) vs Cyan (Réf.)</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Écart en mètres</span>
+            <span class="kpi-value pos" id="tvt-kpi-meters">0 m</span>
+            <span class="kpi-sub" id="tvt-kpi-meters-sub">Au passage sur la ligne</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Écart chrono</span>
+            <span class="kpi-value cyan" id="tvt-kpi-seconds">0 s</span>
+            <span class="kpi-sub" id="tvt-kpi-paces">-</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Impact ELO V2 simulé</span>
+            <span class="kpi-value pos" id="tvt-kpi-elo">-</span>
+            <span class="kpi-sub" id="tvt-kpi-v2-detail">-</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         ONGLET 3 : CALCULATEUR D'ALLURE & TEMPS DE PASSAGE
+         ======================================================================== -->
+    <section id="tab-virtual" class="tab-panel" role="tabpanel">
+      <div id="ghost-virtual" class="gv">
+        <div class="gv-head">
+          <div><div class="gv-kicker">ELO COURSE · DONNÉES RÉELLES</div><h2>3. Course virtuelle — choisis tes coureurs</h2>
+          <p>Choisis une course du site, puis les participants réels à faire courir. Les noms et chronos ne sont demandés qu'après le choix de la course.</p></div><span class="gv-tag">Simulation</span>
+        </div>
+        <div class="gv-panel"><label for="gv-race">1. Choisir une course</label><select id="gv-race"><option value="">Clique ici pour charger les courses ELO COURSE…</option></select><div id="gv-race-info" class="gv-muted" aria-live="polite">Aucune course chargée.</div><div id="gv-custom-distance-wrap" hidden><label for="gv-custom-distance">Distance de cette course (km)</label><input id="gv-custom-distance" type="number" min="0.1" max="200" step="0.1" placeholder="Ex. 10,5"></div></div>
+        <div class="gv-panel"><label for="gv-search">2. Rechercher un coureur de cette course</label><input id="gv-search" type="search" placeholder="Tape un nom ou un prénom…" autocomplete="off" disabled><div id="gv-search-info" class="gv-muted">Sélectionne d'abord une course.</div><div id="gv-results" class="gv-results" aria-live="polite"><div class="gv-empty">Les participants apparaîtront ici après le choix d'une course.</div></div><div class="gv-muted">Tu peux sélectionner jusqu'à 5 coureurs présents dans les résultats officiels de la course.</div></div>
+        <div class="gv-panel"><div class="gv-selected-head"><strong>3. Participants sélectionnés</strong><span id="gv-selected-count" class="gv-count">0 / 5</span></div><div id="gv-selected" class="gv-selected"><span class="gv-muted">Aucun coureur sélectionné.</span></div><div class="gv-actions"><button type="button" id="gv-start" class="btn-primary" disabled>Lancer la course virtuelle</button><button type="button" id="gv-clear" class="btn-secondary">Tout effacer</button></div><div id="gv-status" class="gv-status" aria-live="polite">Choisis une course puis au moins un coureur.</div></div>
+        <div class="gv-panel gv-race-panel"><div class="gv-race-title"><div><span class="gv-kicker">PARCOURS DE SIMULATION</span><h3 id="gv-canvas-title">En attente d'une course</h3></div><span id="gv-distance-label" class="gv-distance">— km</span></div><canvas id="gv-canvas" width="900" height="390" aria-label="Circuit schématique de la course virtuelle"></canvas><div class="gv-controls"><button type="button" id="gv-play" class="btn-primary" disabled>▶ Démarrer</button><button type="button" id="gv-reset" class="btn-secondary" disabled>↺ Réinitialiser</button><div class="gv-speeds" aria-label="Vitesse de simulation"><button type="button" data-gv-speed="1" class="active">x1</button><button type="button" data-gv-speed="5">x5</button><button type="button" data-gv-speed="10">x10</button><button type="button" data-gv-speed="25">x25</button><button type="button" data-gv-speed="50">x50</button><button type="button" data-gv-speed="100">x100</button></div></div><input type="range" id="gv-timeline" min="0" max="1" value="0" step="1" disabled aria-label="Chronologie de la simulation"><div class="gv-time-row"><span id="gv-clock">00:00</span><span id="gv-progress">En attente</span><span id="gv-duration">—</span></div></div>
+        <div class="gv-panel"><div class="gv-selected-head"><strong>Classement de la simulation</strong><span class="gv-muted">Chronos réels de la course choisie</span></div><div id="gv-ranking" class="gv-ranking"><div class="gv-empty">Le classement apparaîtra ici.</div></div></div>
+        <p class="gv-footnote">Les participants et leurs chronos proviennent des résultats enregistrés sur ELO COURSE. Le 10 km Maine Libre, le 10 km et le semi-marathon des Ecluses de la Mayenne utilisent leurs traces GPS réelles (109, 45 et 85 points ; semi : 21,20 km et D+ 199 m). Les autres courses utilisent un circuit schématique de simulation. Cette simulation ne modifie jamais les résultats ni les ELO officiels.</p>
+      </div>
+
+    </section>
+
+    <section id="tab-allure" class="tab-panel" role="tabpanel">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Calculateur d’allure — Préparation &amp; temps de passage</h2>
+          <span class="pill-tag green">Route &amp; Course nature (hors trail)</span>
+        </div>
+
+        <form id="form-pace" class="form-grid cols-3">
+          <div class="field">
+            <label for="pace-distance">Distance de l'épreuve</label>
+            <select id="pace-distance">
+              <option value="5">5 km (Route)</option>
+              <option value="10" selected>10 km (Route)</option>
+              <option value="15">15 km (Course nature)</option>
+              <option value="21">Semi-Marathon (21 km)</option>
+              <option value="42">Marathon (42 km)</option>
+              <option value="custom">Autre distance</option>
+            </select>
+            <input type="number" id="pace-custom-distance" min="0.1" max="500" step="0.01" placeholder="Distance personnalisée (km)" aria-label="Distance personnalisée en kilomètres" style="margin-top:6px">
+          </div>
+          <div class="field">
+            <label for="pace-target-time">Temps objectif (mm:ss ou hh:mm:ss)</label>
+            <input type="text" id="pace-target-time" value="42:00" placeholder="Ex: 42:00 ou 01:32:00" required />
+          </div>
+          <div class="field" style="justify-content: flex-end;">
+            <button type="submit" class="btn-primary">⏱️ Générer mon plan de passage</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Feuille de route &amp; Estimation ELO V2</h2>
+          <span class="pill-tag cyan">Allure régulière</span>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Allure cible</span>
+            <span class="kpi-value cyan" id="kpi-pace-minkm">4'12" /km</span>
+            <span class="kpi-sub">Rythme moyen au km</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Vitesse moyenne</span>
+            <span class="kpi-value" id="kpi-pace-kmh">14,29 km/h</span>
+            <span class="kpi-sub">Vitesse de course</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">ELO V2 équivalent</span>
+            <span class="kpi-value pos" id="kpi-pace-elo">~1585 pts</span>
+            <span class="kpi-sub">Base peloton 72 / 53 / 49</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Temps au 5e km</span>
+            <span class="kpi-value" id="kpi-pace-5k">21:00</span>
+            <span class="kpi-sub">Repère intermédiaire</span>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Point de passage</th>
+                <th>Distance</th>
+                <th>Temps cumulé</th>
+                <th>Temps intermédiaire</th>
+              </tr>
+            </thead>
+            <tbody id="pace-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+ion>
+  </main>
+
+  <!-- PIED DE PAGE -->
+  <footer>
+    ELO COURSE — Sarthe (72), Mayenne (53) et Maine-et-Loire (49) • Route &amp; Course Nature (hors trail).<br />
+    Les simulations du Mode Ghost utilisent la formule ELO V2 à titre indicatif et n'impactent jamais les notes officielles.
+  </footer>
+
+  <!-- ==========================================================================
+       SCRIPT AUTONOME : MOTEUR ELO V2, PISTE 2D ANIMÉE, CALCULATEUR & PROFIL
+       ========================================================================== -->
+  <script>
+    (function () {
+      "use strict";
+
+      /* ------------------------------------------------------------------------
+         UTILITAIRES TEMPS, ALLURE & FORMULE ELO V2
+         ------------------------------------------------------------------------ */
+      function parseTimeToSeconds(str) {
+        if (!str) return NaN;
+        const clean = String(str).trim().replace(/[^\d:]/g, "");
+        const parts = clean.split(":").map(Number);
+        if (parts.some(isNaN)) return NaN;
+        if (parts.length === 2) {
+          const [m, s] = parts;
+          if (s >= 60) return NaN;
+          return m * 60 + s;
+        }
+        if (parts.length === 3) {
+          const [h, m, s] = parts;
+          if (m >= 60 || s >= 60) return NaN;
+          return h * 3600 + m * 60 + s;
+        }
+        return NaN;
+      }
+
+      function formatSeconds(totalSec, forceHours = false) {
+        const s = Math.max(0, Math.round(totalSec));
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        const pad = (n) => String(n).padStart(2, "0");
+        if (h > 0 || forceHours) {
+          return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+        }
+        return `${pad(m)}:${pad(sec)}`;
+      }
+
+      function formatPace(seconds, km) {
+        const secPerKm = seconds / km;
+        const m = Math.floor(secPerKm / 60);
+        const s = Math.round(secPerKm % 60);
+        const adjM = s === 60 ? m + 1 : m;
+        const adjS = s === 60 ? 0 : s;
+        return `${adjM}'${String(adjS).padStart(2, "0")}" /km`;
+      }
+
+      function formatSpeed(seconds, km) {
+        const kmh = km / (seconds / 3600);
+        return `${kmh.toFixed(2).replace(".", ",")} km/h`;
+      }
+
+      // Calcul d'une confrontation ELO V2 entre un coureur A et un adversaire B
+      function computeEloV2Match(eloA, timeA, eloB, timeB) {
+        const expectedA = 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
+        let scoreA = 0.5;
+        if (timeA < timeB) scoreA = 1;
+        else if (timeA > timeB) scoreA = 0;
+
+        const fastest = Math.min(timeA, timeB);
+        const g = fastest > 0 ? Math.abs(timeA - timeB) / fastest : 0;
+        const mult = Math.min(1.5, 1 + 0.5 * Math.log(1 + g / 0.01));
+        return { expectedA, scoreA, g, mult };
+      }
+
+      // Estimation d'ELO équivalent à partir d'un chrono et d'une distance (modèle Riegel + barème 72/53/49)
+      function estimateEloFromPerformance(seconds, km) {
+        // Projection équivalente sur 10 km via exposant de Riegel (1.06)
+        const eq10kSec = seconds * Math.pow(10 / km, 1.06);
+        // Base indicative de 1 500 points pour 40:00 sur 10 km.
+        const rawElo = 1500 + (2400 - eq10kSec) * 0.42;
+        return Math.round(Math.max(1050, Math.min(2250, rawElo)));
+      }
+
+      /* ------------------------------------------------------------------------
+         GESTION DES 3 ONGLETS (ARRÊT AUTO DU CANVAS HORS ONGLET "TOI VS TOI")
+         ------------------------------------------------------------------------ */
+      const tabButtons = document.querySelectorAll(".tab-btn");
+      const tabPanels = document.querySelectorAll(".tab-panel");
+      let activeTabId = "toivstoi";
+
+      function switchTab(targetId) {
+        activeTabId = targetId;
+        tabButtons.forEach((btn) => {
+          const isTarget = btn.dataset.tab === targetId;
+          btn.classList.toggle("active", isTarget);
+          btn.setAttribute("aria-selected", String(isTarget));
+        });
+        tabPanels.forEach((panel) => {
+          panel.classList.toggle("active", panel.id === `tab-${targetId}`);
+        });
+
+        if (targetId === "toivstoi") {
+          resizeCanvas();
+          drawTrackScene();
+        } else {
+          pauseRaceAnimation();
+        }
+      }
+
+      tabButtons.forEach((btn) => {
+        btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+      });
+
+      function selectedDistance(selectId, customId, fallback) {
+        const sel = document.getElementById(selectId);
+        const custom = document.getElementById(customId);
+        if (sel && sel.value === "custom") { const v = Number(custom && custom.value); return Number.isFinite(v) && v > 0 ? v : NaN; }
+        return Number(sel && sel.value) || fallback;
+      }
+
+      /* ------------------------------------------------------------------------
+         ONGLET 1 : GHOST DUEL (DONNÉES LOCALES 72, 53, 49 & MOTEUR ELO V2)
+         ------------------------------------------------------------------------ */
+      let RACES_DATA = [];
+      let ghostRealDataReceived = false;
+      let currentRunnerExperience = null;
+      let currentRunnerK = 24;
+      function isPlausibleSpeed(seconds, km) { return Number.isFinite(seconds) && Number.isFinite(km) && seconds > 0 && km > 0 && (km * 3600 / seconds) <= 24; }
+
+      function populateDuelRaces() {
+        const select = document.getElementById("duel-race");
+        if (!select) return;
+        const previous = select.value;
+        select.innerHTML = "";
+        if (!RACES_DATA.length) {
+          const opt = document.createElement("option"); opt.value = "";
+          opt.textContent = ghostRealDataReceived ? "Aucune course personnelle disponible." : "Chargement de tes courses réelles…";
+          select.appendChild(opt); return;
+        }
+        RACES_DATA.forEach((r) => {
+          const opt = document.createElement("option"); opt.value = r.id;
+          opt.textContent = r.name + " · " + r.type + " (" + String(r.distance).replace(".", ",") + " km) · " + (r.participantCount || 0) + " classés";
+          select.appendChild(opt);
+        });
+        if (RACES_DATA.some(r => String(r.id) === String(previous))) select.value = previous;
+        else select.selectedIndex = 0;
+        if (select.value) requestGhostRace(select.value);
+      }
+
+      function requestGhostRace(raceId) {
+        const race = RACES_DATA.find(r => String(r.id) === String(raceId));
+        if (!race) return;
+        if (Array.isArray(race.runners) && race.runners.length >= 1) {
+          document.getElementById("duel-time").value = race.defaultTime || document.getElementById("duel-time").value;
+          runGhostDuel(); return;
+        }
+        document.getElementById("duel-results").textContent = "Chargement des 10 coureurs devant toi et des 10 derrière toi…";
+        if (window.__eloGhostRaceTimer) clearTimeout(window.__eloGhostRaceTimer);
+        window.__eloGhostRaceTimer = setTimeout(() => { const box=document.getElementById("duel-results"); if(box && box.textContent.indexOf("Chargement des 10 coureurs")===0) box.textContent="Le chargement du classement réel n’a pas répondu. Réessaie en sélectionnant à nouveau la course."; }, 12000);
+        window.parent.postMessage({type:"elo-ghost-request-race",raceId:String(race.id)},"*");
+      }
+
+      window.addEventListener("message", (event) => {
+        if (event.source !== window.parent || !event.data) return;if (event.data.type === "elo-ghost-real-races") {
+          const incoming = Array.isArray(event.data.races) ? event.data.races : [];
+          RACES_DATA = incoming.filter(r => r && r.id && Number(r.distance)>0 && Number(r.participantCount)>=2).map(r => ({...r,id:String(r.id)}));
+          ghostRealDataReceived = true;
+          if (!event.data.currentRunnerId) {
+            const box = document.getElementById("duel-results");
+            if (box) box.textContent = "Connecte-toi à ton compte coureur pour afficher tes courses et les 10 coureurs autour de ta position.";
+          }
+          currentRunnerExperience = event.data.currentRunnerN !== null && event.data.currentRunnerN !== undefined && Number.isFinite(Number(event.data.currentRunnerN)) ? Number(event.data.currentRunnerN) : null;
+          currentRunnerK = Number(event.data.currentRunnerK) === 40 ? 40 : 24;
+          if (event.data.currentRunnerElo !== null && event.data.currentRunnerElo !== undefined && Number.isFinite(Number(event.data.currentRunnerElo))) {
+            const e = Math.round(Number(event.data.currentRunnerElo));
+            const duelElo = document.getElementById("duel-elo"); if (duelElo) duelElo.value = String(e);
+            const tvtElo = document.getElementById("tvt-elo"); if (tvtElo) tvtElo.value = String(e);
+            const k = document.getElementById("duel-k"); if (k) k.value = String(currentRunnerK);
+          } else {
+            const duelElo = document.getElementById("duel-elo"); if (duelElo) duelElo.value = "";
+            const tvtElo = document.getElementById("tvt-elo"); if (tvtElo) tvtElo.value = "";}
+          populateDuelRaces();return;
+        }
+        if (event.data.type === "elo-ghost-race-data" && window.__eloGhostRaceTimer) { clearTimeout(window.__eloGhostRaceTimer); window.__eloGhostRaceTimer=null; }
+        if (event.data.type === "elo-ghost-race-data" && event.data.error) {
+          const box = document.getElementById("duel-results");
+          if (box) box.textContent = "Impossible de charger ce classement : " + event.data.error;
+          return;
+        }
+        if (event.data.type === "elo-ghost-race-data" && event.data.race) {
+          const incomingRace = event.data.race;
+          const index = RACES_DATA.findIndex(r => String(r.id) === String(incomingRace.id));
+          if (index < 0) return;
+          RACES_DATA[index] = {...RACES_DATA[index], ...incomingRace, id:String(incomingRace.id)};if (String(duelRaceSelect.value) === String(incomingRace.id)) {
+            document.getElementById("duel-time").value = incomingRace.defaultTime || "00:40:00";
+            try { runGhostDuel(); } catch(error) { const box=document.getElementById("duel-results"); if(box) box.textContent="Erreur pendant le calcul du duel : "+String(error && error.message || error); }
+          }
+        }
+      });
+
+      const duelRaceSelect = document.getElementById("duel-race");
+      populateDuelRaces();
+
+      document.getElementById("duel-custom-distance").addEventListener("change", runGhostDuel);
+      duelRaceSelect.addEventListener("change", () => requestGhostRace(duelRaceSelect.value));
+
+      function runGhostDuel() {
+        const race = RACES_DATA.find((r) => r.id === duelRaceSelect.value);
+        if (!race || !Array.isArray(race.runners) || race.runners.length < 1) { document.getElementById("duel-results").textContent = "Le classement réel est indisponible. Vérifie ta connexion et sélectionne à nouveau la course."; return; }
+        const eloInput = document.getElementById("duel-elo");
+        if (!eloInput || !eloInput.value || !Number.isFinite(Number(eloInput.value))) { document.getElementById("duel-results").textContent = "Connecte-toi à ton compte coureur pour utiliser ton ELO officiel."; return; }
+        const playerElo = Math.round(Number(eloInput.value));
+        const kFactor = Number(document.getElementById("duel-k").value) || currentRunnerK || 24;
+        const playerTime = parseTimeToSeconds(document.getElementById("duel-time").value);
+        const customDist = Number(document.getElementById("duel-custom-distance").value);
+        const simDistance = Number.isFinite(customDist) && customDist > 0 ? customDist : race.distance;
+        const timeScale = Math.pow(simDistance / race.distance, 1.06);
+
+        if (isNaN(playerTime) || playerTime <= 60 || !isPlausibleSpeed(playerTime, simDistance)) {
+          document.getElementById("duel-time").style.borderColor = "var(--danger)";
+          return;
+        }
+        document.getElementById("duel-time").style.borderColor = "var(--border)";
+
+        let sumWeightedDiff = 0;
+        let sumMult = 0;
+        const n = race.runners.length;
+
+        const comparisons = race.runners.map((opp) => {
+          const adjustedOpponentTime = opp.time * timeScale;
+          const res = computeEloV2Match(playerElo, playerTime, opp.elo, adjustedOpponentTime);
+          const pairK = currentRunnerExperience !== null ? ((currentRunnerExperience < 5 || Number(opp.experience) < 5) ? 40 : 24) : kFactor;
+          const contrib = (pairK / n) * res.mult * (res.scoreA - res.expectedA);
+          sumWeightedDiff += contrib;
+          sumMult += res.mult;
+          return {
+            ...opp,
+            time: adjustedOpponentTime,
+            isGhost: false,
+            g: res.g,
+            mult: res.mult,
+            contrib
+          };
+        });
+
+        const ghostEntry = {
+          name: "👻 TOI (Simulation Ghost)",
+          club: "Profil simulé",
+          elo: playerElo,
+          time: playerTime,
+          isGhost: true,
+          g: 0,
+          mult: sumMult / n,
+          contrib: sumWeightedDiff
+        };
+
+        const combined = [...comparisons, ghostEntry].sort((a, b) => a.time - b.time);
+        const ghostIndex = combined.findIndex((item) => item.isGhost);
+        const beatenCount = combined.length - 1 - ghostIndex;
+        const avgMult = sumMult / n;
+        const newElo = Math.round(playerElo + sumWeightedDiff);
+
+        document.getElementById("duel-race-title").textContent = race.name;
+        document.getElementById("duel-race-meta").textContent = `${race.type} • ${String(simDistance).replace(".", ",")} km${simDistance!==race.distance?" · chrono adverses extrapolés": ""}`;
+
+        document.getElementById("kpi-duel-rank").textContent = `${ghostIndex + 1}e / ${combined.length}`;
+        document.getElementById("kpi-duel-beaten").textContent = `${beatenCount} coureur${beatenCount > 1 ? "s" : ""} devancé${beatenCount > 1 ? "s" : ""}`;
+
+        const deltaEl = document.getElementById("kpi-duel-delta");
+        const sign = sumWeightedDiff >= 0 ? "+" : "";
+        deltaEl.textContent = `${sign}${Math.round(sumWeightedDiff)} pts`;
+        deltaEl.className = `kpi-value ${sumWeightedDiff >= 0 ? "pos" : "neg"}`;
+        document.getElementById("kpi-duel-newelo").textContent = `ELO simulé : ${newElo} pts`;
+
+        document.getElementById("kpi-duel-mult").textContent = `×${avgMult.toFixed(2)}`;
+        document.getElementById("kpi-duel-pace").textContent = formatPace(playerTime, simDistance);
+        document.getElementById("kpi-duel-speed").textContent = formatSpeed(playerTime, simDistance);
+
+        // Duel rapproché : coureur juste devant et juste derrière
+        const neighborsEl = document.getElementById("duel-neighbors");
+        neighborsEl.innerHTML = "";
+
+        if (ghostIndex > 0) {
+          const ahead = combined[ghostIndex - 1];
+          const diffSec = playerTime - ahead.time;
+          neighborsEl.innerHTML += `
+            <div class="neighbor-card ahead">
+              <div class="neighbor-head">⬆️ Coureur juste devant (${ghostIndex}e)</div>
+              <div class="neighbor-name">${ahead.name} (${ahead.elo} ELO)</div>
+              <div class="neighbor-meta">
+                <span>Chrono : <strong>${formatSeconds(ahead.time)}</strong></span>
+                <span>Tu es à <strong>+${diffSec}s</strong></span>
+                <span>Mult. V2 : <strong>×${ahead.mult.toFixed(2)}</strong></span>
+              </div>
+            </div>
+          `;
+        } else {
+          neighborsEl.innerHTML += `
+            <div class="neighbor-card behind">
+              <div class="neighbor-head">🥇 En tête de la course</div>
+              <div class="neighbor-name">Tu termines 1er virtuel de cette épreuve !</div>
+              <div class="neighbor-meta"><span>Aucun participant devant toi sur ce classement.</span></div>
+            </div>
+          `;
+        }
+
+        if (ghostIndex < combined.length - 1) {
+          const behind = combined[ghostIndex + 1];
+          const diffSec = behind.time - playerTime;
+          neighborsEl.innerHTML += `
+            <div class="neighbor-card behind">
+              <div class="neighbor-head">⬇️ Coureur juste derrière (${ghostIndex + 2}e)</div>
+              <div class="neighbor-name">${behind.name} (${behind.elo} ELO)</div>
+              <div class="neighbor-meta">
+                <span>Chrono : <strong>${formatSeconds(behind.time)}</strong></span>
+                <span>Tu le devances de <strong>${diffSec}s</strong></span>
+                <span>Mult. V2 : <strong>×${behind.mult.toFixed(2)}</strong></span>
+              </div>
+            </div>
+          `;
+        } else {
+          neighborsEl.innerHTML += `
+            <div class="neighbor-card ahead">
+              <div class="neighbor-head">🏁 Fin de peloton</div>
+              <div class="neighbor-name">Dernier rang virtuel sur ce peloton</div>
+              <div class="neighbor-meta"><span>Baisse ton chrono pour remonter dans le classement.</span></div>
+            </div>
+          `;
+        }
+
+        // Tableau détaillé
+        const tbody = document.getElementById("duel-tbody");
+        tbody.innerHTML = combined.map((row, idx) => {
+          if (row.isGhost) {
+            return `
+              <tr class="ghost-row">
+                <td>${idx + 1}e</td>
+                <td>${row.name}</td>
+                <td>${row.club}</td>
+                <td>${Math.round(Number(row.elo) || 0)}</td>
+                <td>${formatSeconds(row.time)}</td>
+                <td>—</td>
+                <td>Moy. ×${row.mult.toFixed(2)}</td>
+                <td style="color: ${row.contrib >= 0 ? "var(--accent-green-bright)" : "var(--danger)"};">
+                  ${row.contrib >= 0 ? "+" : ""}${Math.round(row.contrib)} pts
+                </td>
+              </tr>
+            `;
+          }
+          const cSign = row.contrib >= 0 ? "+" : "";
+          const cColor = row.contrib >= 0 ? "var(--accent-green-bright)" : "var(--danger)";
+          return `
+            <tr>
+              <td>${idx + 1}e</td>
+              <td>${row.name}</td>
+              <td>${row.club}</td>
+              <td>${Math.round(Number(row.elo) || 0)}</td>
+              <td>${formatSeconds(row.time)}</td>
+              <td>${(row.g * 100).toFixed(2).replace(".", ",")} %</td>
+              <td>×${row.mult.toFixed(2)}</td>
+              <td style="color:${cColor}; font-weight:700;">${cSign}${row.contrib.toFixed(2)} pts</td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      document.getElementById("form-duel").addEventListener("submit", (e) => {
+        e.preventDefault();
+        runGhostDuel();
+      });
+
+      /* ------------------------------------------------------------------------
+         ONGLET 2 : TOI VS TOI — PISTE 2D ANIMÉE AVEC COUREURS STYLISÉS
+         & AFFICHAGES FINAUX CONSERVÉS À L'ARRIVÉE (SANS REMISE À ZÉRO)
+         ------------------------------------------------------------------------ */
+      const canvas = document.getElementById("raceCanvas");
+      const ctx = canvas.getContext("2d");
+      const scrubber = document.getElementById("tvt-scrubber");
+      const btnPlayPause = document.getElementById("btn-play-pause");
+      const btnReset = document.getElementById("btn-reset");
+      const finishBanner = document.getElementById("tvt-finish-banner");
+      const statusBadge = document.getElementById("tvt-status-badge");
+
+      const raceState = {
+        distanceKm: 10,
+        timeRef: 41 * 60 + 30, // Ghost Réf. (Cyan)
+        timeCur: 39 * 60 + 50, // Défi Actuel (Vert)
+        elo: null,
+        simElapsed: 0,         // Temps écoulé dans la simulation (en secondes de course)
+        isPlaying: false,
+        isFinished: false,
+        speedMult: 1,
+        lastFrameTs: null,
+        rafId: null,
+        particles: []
+      };
+
+      function resizeCanvas() {
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      window.addEventListener("resize", () => {
+        if (activeTabId === "toivstoi") {
+          resizeCanvas();
+          drawTrackScene();
+        }
+      });
+
+      function syncTvtInputsToState() {
+        const dist = selectedDistance("tvt-distance", "tvt-custom-distance", 10);
+        const tRef = parseTimeToSeconds(document.getElementById("tvt-time-ref").value);
+        const tCur = parseTimeToSeconds(document.getElementById("tvt-time-cur").value);
+        const elo = Number(document.getElementById("tvt-elo").value);
+
+        if (!isNaN(tRef) && tRef > 30 && isPlausibleSpeed(tRef, dist)) raceState.timeRef = tRef;
+        if (!isNaN(tCur) && tCur > 30 && isPlausibleSpeed(tCur, dist)) raceState.timeCur = tCur;
+        if (Number.isFinite(dist) && dist > 0) raceState.distanceKm = dist;
+        raceState.elo = Number.isFinite(elo) && elo >= 800 && elo <= 2600 ? Math.round(elo) : null;
+      }
+
+      // Mise à jour des compteurs & conservation des écarts finaux quand isFinished === true
+      function updateTvtTelemetry() {
+        const { distanceKm, timeRef, timeCur, simElapsed, elo, isFinished } = raceState;
+        const maxDuration = Math.max(timeRef, timeCur);
+        const minDuration = Math.min(timeRef, timeCur);
+
+        // Progression de chaque coureur (bornée à 1.0 à la ligne d'arrivée)
+        const progRef = Math.min(1, simElapsed / timeRef);
+        const progCur = Math.min(1, simElapsed / timeCur);
+
+        const distRefKm = progRef * distanceKm;
+        const distCurKm = progCur * distanceKm;
+
+        // Calcul de l'écart en mètres et en secondes :
+        // Si la course est terminée, on fige les écarts réels constatés au franchissement de la ligne d'arrivée !
+        let gapMeters = 0;
+        let gapSeconds = 0;
+
+        if (isFinished) {
+          // Au moment où le plus rapide franchit la ligne (t = minDuration), où était le second ?
+          const distRefAtWinnerFinish = Math.min(1, minDuration / timeRef) * distanceKm;
+          const distCurAtWinnerFinish = Math.min(1, minDuration / timeCur) * distanceKm;
+          gapMeters = Math.round((distCurAtWinnerFinish - distRefAtWinnerFinish) * 1000);
+          gapSeconds = Math.round(timeRef - timeCur); // Positif si Défi Actuel (Vert) est plus rapide
+        } else {
+          gapMeters = Math.round((distCurKm - distRefKm) * 1000);
+          // Écart temps instantané projeté selon l'allure
+          const virtualTimeAtSamePoint = (progCur - progRef) * ((timeRef + timeCur) / 2);
+          gapSeconds = Math.round(virtualTimeAtSamePoint);
+        }
+
+        // Horloge & Scrubber
+        document.getElementById("tvt-clock").textContent = formatSeconds(Math.min(simElapsed, maxDuration));
+        scrubber.value = Math.round((Math.min(simElapsed, maxDuration) / maxDuration) * 1000);
+
+        // KPI Distance
+        document.getElementById("tvt-kpi-dist").textContent =
+          `${distCurKm.toFixed(2).replace(".", ",")} / ${distRefKm.toFixed(2).replace(".", ",")} km`;
+
+        // KPI Écart mètres
+        const metersEl = document.getElementById("tvt-kpi-meters");
+        if (gapMeters > 0) {
+          metersEl.textContent = `+${gapMeters} m`;
+          metersEl.className = "kpi-value pos";
+          document.getElementById("tvt-kpi-meters-sub").textContent = isFinished
+            ? `Avance finale de Défi Actuel à la ligne`
+            : `Défi Actuel (Vert) en tête`;
+        } else if (gapMeters < 0) {
+          metersEl.textContent = `${gapMeters} m`;
+          metersEl.className = "kpi-value neg";
+          document.getElementById("tvt-kpi-meters-sub").textContent = isFinished
+            ? `Retard final sur Ghost Réf. à la ligne`
+            : `Ghost Réf. (Cyan) en tête`;
+        } else {
+          metersEl.textContent = `0 m`;
+          metersEl.className = "kpi-value cyan";
+          document.getElementById("tvt-kpi-meters-sub").textContent = `Égalité parfaite`;
+        }
+
+        // KPI Écart chrono
+        const secEl = document.getElementById("tvt-kpi-seconds");
+        if (gapSeconds > 0) {
+          secEl.textContent = `-${formatSeconds(gapSeconds)}`;
+          secEl.className = "kpi-value pos";
+        } else if (gapSeconds < 0) {
+          secEl.textContent = `+${formatSeconds(Math.abs(gapSeconds))}`;
+          secEl.className = "kpi-value neg";
+        } else {
+          secEl.textContent = `00:00`;
+          secEl.className = "kpi-value cyan";
+        }
+        document.getElementById("tvt-kpi-paces").textContent =
+          `Vert ${formatPace(timeCur, distanceKm)} • Cyan ${formatPace(timeRef, distanceKm)}`;
+
+        // KPI Impact ELO V2
+        const v2 = computeEloV2Match(elo, timeCur, elo, timeRef);
+        const deltaElo = currentRunnerK * v2.mult * (v2.scoreA - v2.expectedA);
+        const eloEl = document.getElementById("tvt-kpi-elo");
+        const eloSign = deltaElo >= 0 ? "+" : "";
+        eloEl.textContent = `${eloSign}${Math.round(deltaElo)} pts`;
+        eloEl.className = `kpi-value ${deltaElo >= 0 ? "pos" : "neg"}`;
+        document.getElementById("tvt-kpi-v2-detail").textContent =
+          `Écart g = ${(v2.g * 100).toFixed(2).replace(".", ",")} % • Mult. ×${v2.mult.toFixed(2)}`;
+
+        // Bandeau d'arrivée persistant (ne se remet JAMAIS à zéro tout seul)
+        if (isFinished) {
+          finishBanner.classList.add("visible");
+          statusBadge.textContent = "🏁 Arrivée franchie";
+          statusBadge.className = "pill-tag green";
+
+          const winnerText = timeCur < timeRef
+            ? `Défi Actuel (${formatSeconds(timeCur)}) bat Ghost Réf. (${formatSeconds(timeRef)}) de ${formatSeconds(timeRef - timeCur)} (+${Math.abs(gapMeters)} m)`
+            : timeCur > timeRef
+              ? `Ghost Réf. (${formatSeconds(timeRef)}) devance Défi Actuel (${formatSeconds(timeCur)}) de ${formatSeconds(timeCur - timeRef)} (${Math.abs(gapMeters)} m)`
+              : `Égalité parfaite en ${formatSeconds(timeCur)} !`;
+          document.getElementById("tvt-finish-summary").textContent = winnerText;
+        } else {
+          finishBanner.classList.remove("visible");
+          statusBadge.textContent = raceState.isPlaying ? "⚡ Course en cours..." : "⏸ En pause";
+          statusBadge.className = "pill-tag cyan";
+        }
+      }
+
+      /* ------------------------------------------------------------------------
+         DESSIN D'UN COUREUR ATHLÉTIQUE MODERNE ET SOIGNÉ EN 2D (CANVAS)
+         ------------------------------------------------------------------------ */
+      function drawStylizedRunner(ctx, x, y, options) {
+        const {
+          primaryColor,    // #38BDF8 (cyan) ou #4ADE80 (vert)
+          jerseyColor,     // Couleur du maillot
+          shortsColor,     // Couleur du short
+          skinColor,       // Teint athlète
+          phase,           // Phase du cycle de foulée (radians)
+          isMoving,        // Booléen mouvement actif
+          label,           // Étiquette ("Ghost Réf." / "Défi Actuel")
+          subLabel,        // Chrono ou distance
+          bibNumber        // Numéro de dossard
+        } = options;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(0.72, 0.72); // Silhouette ࠬ飨elle de la piste
+
+        // 1. Ombre portée au sol (varie légèrement avec le rebond de foulée)
+        const bounce = isMoving ? Math.abs(Math.sin(phase)) * 3.5 : 0;
+        const shadowScale = 1 - bounce * 0.04;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+        ctx.beginPath();
+        ctx.ellipse(0, 26, 16 * shadowScale, 4.5 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Halo subtil sous les baskets
+        const glowGrad = ctx.createRadialGradient(0, 22, 2, 0, 22, 26);
+        glowGrad.addColorStop(0, primaryColor + "44");
+        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.arc(0, 22, 26, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Légère élévation verticale pendant la phase aérienne de course
+        ctx.translate(0, -bounce);
+
+        // Angles articulaires fluides
+        const strideA = isMoving ? Math.sin(phase) * 0.65 : 0.15;
+        const strideB = isMoving ? Math.sin(phase + Math.PI) * 0.65 : -0.15;
+        const kneeBendA = isMoving ? Math.max(0, Math.cos(phase)) * 0.85 + 0.15 : 0.1;
+        const kneeBendB = isMoving ? Math.max(0, Math.cos(phase + Math.PI)) * 0.85 + 0.15 : 0.1;
+
+        // Helper pour dessiner une jambe complète (cuisse -> genou -> mollet -> basket)
+        function drawLeg(hipAngle, kneeAngle, isBackLeg) {
+          ctx.save();
+          ctx.translate(0, 4); // Position de la hanche
+          ctx.rotate(hipAngle);
+
+          // Cuisse
+          ctx.strokeStyle = isBackLeg ? "#CBD5E1" : skinColor;
+          ctx.lineWidth = 5.2;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 10);
+          ctx.stroke();
+
+          // Short athlétique
+          ctx.fillStyle = shortsColor;
+          ctx.beginPath();
+          ctx.roundRect(-3.5, -1, 7, 7, 2.5);
+          ctx.fill();
+
+          // Articulation genou -> mollet
+          ctx.translate(0, 10);
+          ctx.rotate(-kneeAngle);
+          ctx.strokeStyle = isBackLeg ? "#94A3B8" : skinColor;
+          ctx.lineWidth = 4.4;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 10);
+          ctx.stroke();
+
+          // Basket moderne avec semelle blanche et accent couleur
+          ctx.translate(0, 10);
+          ctx.fillStyle = primaryColor;
+          ctx.beginPath();
+          ctx.roundRect(-3, -2, 10, 4.5, 2);
+          ctx.fill();
+          ctx.fillStyle = "#F8FAFC";
+          ctx.fillRect(-3, 1.5, 10, 1.8);
+
+          ctx.restore();
+        }
+
+        // Helper pour dessiner un bras articulé (épaule -> coude -> avant-bras)
+        function drawArm(shoulderAngle, isBackArm) {
+          ctx.save();
+          ctx.translate(1, -11); // Épaule
+          ctx.rotate(shoulderAngle);
+
+          ctx.strokeStyle = isBackArm ? "#94A3B8" : skinColor;
+          ctx.lineWidth = 3.8;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 7.5);
+          ctx.stroke();
+
+          // Avant-bras replié dynamiquement vers l'avant
+          ctx.translate(0, 7.5);
+          ctx.rotate(1.15);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 7);
+          ctx.stroke();
+
+          ctx.restore();
+        }
+
+        // 2. Membre arrière (jambe + bras opposés)
+        drawLeg(strideB, kneeBendB, true);
+        drawArm(-strideA * 0.85, true);
+
+        // 3. Buste incliné vers l'avant (posture de coureur dynamique)
+        ctx.save();
+        ctx.rotate(0.18); // Inclinaison dynamique vers la droite
+
+        // Débardeur / Maillot de course
+        ctx.fillStyle = jerseyColor;
+        ctx.beginPath();
+        ctx.roundRect(-5.5, -14, 11, 19, 4);
+        ctx.fill();
+
+        // Bande latérale lumineuse sur le maillot
+        ctx.fillStyle = primaryColor;
+        ctx.fillRect(2, -13, 2.5, 17);
+
+        // Mini dossard blanc sur le torse
+        ctx.fillStyle = "#F1F5F9";
+        ctx.fillRect(-2.5, -8, 6.5, 5.5);
+        ctx.fillStyle = "#0B1724";
+        ctx.font = "bold 4.5px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(bibNumber, 0.8, -4);
+
+        // 4. Tête + Casquette de running moderne
+        ctx.translate(1.5, -20);
+        ctx.fillStyle = skinColor;
+        ctx.beginPath();
+        ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Casquette technique avec visière vers l'avant
+        ctx.fillStyle = primaryColor;
+        ctx.beginPath();
+        ctx.arc(0, -1, 5.7, Math.PI, 0);
+        ctx.fill();
+        // Visière aérodynamique
+        ctx.beginPath();
+        ctx.moveTo(2, -2);
+        ctx.lineTo(10.5, -1.2);
+        ctx.lineTo(4, 0.3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+
+        // 5. Membre avant (jambe + bras au premier plan)
+        drawLeg(strideA, kneeBendA, false);
+        drawArm(-strideB * 0.85, false);
+
+        // 6. Étiquette badge flottante au-dessus du coureur
+        ctx.translate(0, bounce); // Stabilise l'étiquette pour une lecture parfaite
+        const badgeText = `${label} • ${subLabel}`;
+        ctx.font = "700 11px -apple-system, BlinkMacSystemFont, sans-serif";
+        const textW = ctx.measureText(badgeText).width;
+        const padX = 8;
+        const boxW = textW + padX * 2;
+        const boxH = 20;
+        const boxY = -48;
+
+        ctx.fillStyle = "rgba(11, 23, 36, 0.9)";
+        ctx.strokeStyle = primaryColor;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(-boxW / 2, boxY, boxW, boxH, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = primaryColor;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(badgeText, 0, boxY + boxH / 2);
+
+        ctx.restore();
+      }
+
+      /* ------------------------------------------------------------------------
+         RENDU COMPLET DE LA PISTE 2D (DÉCOR NOCTURNE, COULOIRS, DAMIER, PARTICULES)
+         ------------------------------------------------------------------------ */
+      function drawTrackScene() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = canvas.width / dpr;
+        const h = canvas.height / dpr;
+        if (w <= 0 || h <= 0) return;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // 1. Fond ciel nocturne & horizon stade / campagne (Sarthe / Mayenne / Anjou)
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+        skyGrad.addColorStop(0, "#08121D");
+        skyGrad.addColorStop(0.45, "#0F2235");
+        skyGrad.addColorStop(1, "#0B1724");
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Halo de projecteurs de stade en arrière-plan
+        const spot1 = ctx.createRadialGradient(w * 0.25, 18, 4, w * 0.25, 30, 140);
+        spot1.addColorStop(0, "rgba(56, 189, 248, 0.14)");
+        spot1.addColorStop(1, "rgba(11, 23, 36, 0)");
+        ctx.fillStyle = spot1;
+        ctx.fillRect(0, 0, w, h * 0.5);
+
+        const spot2 = ctx.createRadialGradient(w * 0.78, 18, 4, w * 0.78, 30, 150);
+        spot2.addColorStop(0, "rgba(74, 222, 128, 0.14)");
+        spot2.addColorStop(1, "rgba(11, 23, 36, 0)");
+        ctx.fillStyle = spot2;
+        ctx.fillRect(0, 0, w, h * 0.5);
+
+        // Silhouette douce de collines / bocage à l'horizon
+        ctx.fillStyle = "#12263A";
+        ctx.beginPath();
+        ctx.moveTo(0, h * 0.36);
+        ctx.quadraticCurveTo(w * 0.22, h * 0.27, w * 0.48, h * 0.34);
+        ctx.quadraticCurveTo(w * 0.75, h * 0.40, w, h * 0.30);
+        ctx.lineTo(w, h * 0.45);
+        ctx.lineTo(0, h * 0.45);
+        ctx.closePath();
+        ctx.fill();
+
+        // 2. Piste d'athlétisme à 2 couloirs
+        const padLeft = 42;
+        const padRight = 46;
+        const trackStart = padLeft;
+        const trackEnd = w - padRight;
+        const trackLen = Math.max(80, trackEnd - trackStart);
+
+        const trackTop = Math.round(h * 0.38);
+        const trackBottom = Math.round(h * 0.87);
+        const trackHeight = trackBottom - trackTop;
+        const midLaneY = trackTop + trackHeight / 2;
+
+        // Surface bitume / tartan sombre
+        const trackGrad = ctx.createLinearGradient(0, trackTop, 0, trackBottom);
+        trackGrad.addColorStop(0, "#15293C");
+        trackGrad.addColorStop(0.5, "#1B3348");
+        trackGrad.addColorStop(1, "#132536");
+        ctx.fillStyle = trackGrad;
+        ctx.fillRect(0, trackTop, w, trackHeight);
+
+        // Lignes blanches de bordure de piste
+        ctx.strokeStyle = "#3B5975";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, trackTop);
+        ctx.lineTo(w, trackTop);
+        ctx.moveTo(0, trackBottom);
+        ctx.lineTo(w, trackBottom);
+        ctx.stroke();
+
+        // Ligne centrale pointillée séparant les deux couloirs
+        ctx.strokeStyle = "rgba(203, 213, 225, 0.35)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([10, 8]);
+        ctx.beginPath();
+        ctx.moveTo(0, midLaneY);
+        ctx.lineTo(w, midLaneY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Repères de distance (0 %, 25 %, 50 %, 75 %, 100 %)
+        const markers = [0, 0.25, 0.5, 0.75, 1];
+        ctx.font = "700 10px -apple-system, sans-serif";
+        ctx.textAlign = "center";
+
+        markers.forEach((pct) => {
+          const mx = trackStart + pct * trackLen;
+          ctx.strokeStyle = pct === 0 || pct === 1 ? "rgba(241, 245, 249, 0.45)" : "rgba(148, 163, 184, 0.22)";
+          ctx.lineWidth = pct === 0 || pct === 1 ? 2 : 1;
+          ctx.beginPath();
+          ctx.moveTo(mx, trackTop);
+          ctx.lineTo(mx, trackBottom);
+          ctx.stroke();
+
+          const kmVal = (pct * raceState.distanceKm).toFixed(pct === 0 || pct === 1 ? 0 : 1).replace(".", ",");
+          ctx.fillStyle = pct === 1 ? "#4ADE80" : "#94A3B8";
+          ctx.fillText(pct === 1 ? `🏁 ${kmVal} km` : `${kmVal} km`, mx, trackBottom + 15);
+        });
+
+        // Ligne d'arrivée à damier (à trackEnd)
+        const sqSize = 5;
+        const rows = Math.floor(trackHeight / sqSize);
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < 2; c++) {
+            ctx.fillStyle = (r + c) % 2 === 0 ? "#F1F5F9" : "#0B1724";
+            ctx.fillRect(trackEnd - sqSize + c * sqSize, trackTop + r * sqSize, sqSize, sqSize);
+          }
+        }
+
+        // 3. Particules d'énergie derrière les coureurs en mouvement
+        raceState.particles.forEach((p) => {
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        // 4. Calcul des positions exactes des 2 coureurs
+        const progRef = Math.min(1, raceState.simElapsed / raceState.timeRef);
+        const progCur = Math.min(1, raceState.simElapsed / raceState.timeCur);
+
+        const xRef = trackStart + progRef * trackLen;
+        const xCur = trackStart + progCur * trackLen;
+
+        const laneRefY = trackTop + trackHeight * 0.26;
+        const laneCurY = trackTop + trackHeight * 0.74;
+
+        const movingRef = raceState.isPlaying && progRef < 1;
+        const movingCur = raceState.isPlaying && progCur < 1;
+
+        // Dessin Coureur 1 : Ghost Réf. (Cyan #38BDF8)
+        drawStylizedRunner(ctx, xRef, laneRefY, {
+          primaryColor: "#38BDF8",
+          jerseyColor: "#0F3A5E",
+          shortsColor: "#0B1724",
+          skinColor: "#F1C29B",
+          phase: progRef * raceState.distanceKm * 28,
+          isMoving: movingRef,
+          label: "Ghost Réf.",
+          subLabel: progRef >= 1 ? formatSeconds(raceState.timeRef) : `${(progRef * raceState.distanceKm).toFixed(2).replace(".", ",")} km`,
+          bibNumber: "REF"
+        });
+
+        // Dessin Coureur 2 : Défi Actuel (Vert #4ADE80 / #278A50)
+        drawStylizedRunner(ctx, xCur, laneCurY, {
+          primaryColor: "#4ADE80",
+          jerseyColor: "#1D6B3E",
+          shortsColor: "#0B1724",
+          skinColor: "#E8B48A",
+          phase: progCur * raceState.distanceKm * 28,
+          isMoving: movingCur,
+          label: "Défi Actuel",
+          subLabel: progCur >= 1 ? formatSeconds(raceState.timeCur) : `${(progCur * raceState.distanceKm).toFixed(2).replace(".", ",")} km`,
+          bibNumber: "GO"
+        });
+      }
+
+      /* ------------------------------------------------------------------------
+         BOUCLE D'ANIMATION TEMPS RÉEL (SANS REMISE À ZÉRO À L'ARRIVÉE)
+         ------------------------------------------------------------------------ */
+      function animationTick(timestamp) {
+        if (!raceState.isPlaying) return;
+
+        if (raceState.lastFrameTs === null) {
+          raceState.lastFrameTs = timestamp;
+        }
+        const dtSec = Math.min(0.1, (timestamp - raceState.lastFrameTs) / 1000);
+        raceState.lastFrameTs = timestamp;
+
+        const maxDuration = Math.max(raceState.timeRef, raceState.timeCur);
+        // Échelle de lecture fluide : une course complète dure ~11 secondes en 1x
+        const timeScale = (maxDuration / 11) * raceState.speedMult;
+        raceState.simElapsed += dtSec * timeScale;
+
+        // Génération de micro-particules de vitesse
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = canvas.width / dpr;
+        const h = canvas.height / dpr;
+        const trackStart = 42;
+        const trackLen = Math.max(80, w - 46 - trackStart);
+        const trackTop = Math.round(h * 0.38);
+        const trackHeight = Math.round(h * 0.87) - trackTop;
+
+        const progRef = Math.min(1, raceState.simElapsed / raceState.timeRef);
+        const progCur = Math.min(1, raceState.simElapsed / raceState.timeCur);
+
+        if (progRef < 1 && Math.random() < 0.55) {
+          raceState.particles.push({
+            x: trackStart + progRef * trackLen - 8,
+            y: trackTop + trackHeight * 0.26 + 20 + (Math.random() - 0.5) * 6,
+            vx: -25 - Math.random() * 20,
+            size: 1.5 + Math.random() * 1.5,
+            life: 0.7,
+            color: "#38BDF8"
+          });
+        }
+        if (progCur < 1 && Math.random() < 0.55) {
+          raceState.particles.push({
+            x: trackStart + progCur * trackLen - 8,
+            y: trackTop + trackHeight * 0.74 + 20 + (Math.random() - 0.5) * 6,
+            vx: -25 - Math.random() * 20,
+            size: 1.5 + Math.random() * 1.5,
+            life: 0.7,
+            color: "#4ADE80"
+          });
+        }
+
+        raceState.particles.forEach((p) => {
+          p.x += p.vx * dtSec;
+          p.life -= dtSec * 1.6;
+        });
+        raceState.particles = raceState.particles.filter((p) => p.life > 0);
+
+        // CONDITION D'ARRIVÉE : Quand les DEUX coureurs ont franchi la ligne (simElapsed >= maxDuration)
+        // On arrête la course sur la ligne d'arrivée SANS remettre à zéro !
+        if (raceState.simElapsed >= maxDuration) {
+          raceState.simElapsed = maxDuration;
+          raceState.isPlaying = false;
+          raceState.isFinished = true;
+          raceState.lastFrameTs = null;
+          btnPlayPause.textContent = "▶ Revoir";
+          updateTvtTelemetry();
+          drawTrackScene();
+          return;
+        }
+
+        updateTvtTelemetry();
+        drawTrackScene();
+        raceState.rafId = requestAnimationFrame(animationTick);
+      }
+
+      function startRaceAnimation() {
+        syncTvtInputsToState();
+        const maxDuration = Math.max(raceState.timeRef, raceState.timeCur);
+        // Si la course était déjà terminée, "Revoir" relance depuis le départ
+        if (raceState.isFinished || raceState.simElapsed >= maxDuration) {
+          raceState.simElapsed = 0;
+          raceState.isFinished = false;
+          raceState.particles = [];
+        }
+        raceState.isPlaying = true;
+        raceState.lastFrameTs = null;
+        btnPlayPause.textContent = "⏸ Pause";
+        updateTvtTelemetry();
+        raceState.rafId = requestAnimationFrame(animationTick);
+      }
+
+      function pauseRaceAnimation() {
+        raceState.isPlaying = false;
+        raceState.lastFrameTs = null;
+        if (raceState.rafId) {
+          cancelAnimationFrame(raceState.rafId);
+          raceState.rafId = null;
+        }
+        if (!raceState.isFinished) {
+          btnPlayPause.textContent = "▶ Reprendre";
+        }
+        updateTvtTelemetry();
+      }
+
+      function resetRaceAnimation() {
+        pauseRaceAnimation();
+        syncTvtInputsToState();
+        raceState.simElapsed = 0;
+        raceState.isFinished = false;
+        raceState.particles = [];
+        btnPlayPause.textContent = "▶ Lancer";
+        updateTvtTelemetry();
+        drawTrackScene();
+      }
+
+      btnPlayPause.addEventListener("click", () => {
+        if (raceState.isPlaying) {
+          pauseRaceAnimation();
+        } else {
+          startRaceAnimation();
+        }
+      });
+
+      btnReset.addEventListener("click", resetRaceAnimation);
+
+      // Barre de progression interactive (Scrubber)
+      scrubber.addEventListener("input", () => {
+        pauseRaceAnimation();
+        syncTvtInputsToState();
+        const maxDuration = Math.max(raceState.timeRef, raceState.timeCur);
+        const ratio = Number(scrubber.value) / 1000;
+        raceState.simElapsed = ratio * maxDuration;
+        raceState.isFinished = ratio >= 0.999;
+        btnPlayPause.textContent = raceState.isFinished ? "▶ Revoir" : "▶ Reprendre";
+        updateTvtTelemetry();
+        drawTrackScene();
+      });
+
+      // Boutons de vitesse 1x / 2x / 4x
+      document.querySelectorAll(".speed-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".speed-btn").forEach((b) => b.classList.remove("active-chip"));
+          btn.classList.add("active-chip");
+          raceState.speedMult = Number(btn.dataset.speed) || 1;
+        });
+      });
+
+      // Scénarios rapides en 1 clic
+      const SCENARIOS = {
+        pr: { dist: "10", ref: "41:30", cur: "39:50" },
+        sprint: { dist: "10", ref: "40:12", cur: "40:06" },
+        offday: { dist: "10", ref: "39:20", cur: "41:05" }
+      };
+
+      document.querySelectorAll("[data-scenario]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("[data-scenario]").forEach((b) => b.classList.remove("active-chip"));
+          btn.classList.add("active-chip");
+          const sc = SCENARIOS[btn.dataset.scenario];
+          if (sc) {
+            document.getElementById("tvt-distance").value = sc.dist;
+            document.getElementById("tvt-time-ref").value = sc.ref;
+            document.getElementById("tvt-time-cur").value = sc.cur;
+            resetRaceAnimation();
+            startRaceAnimation();
+          }
+        });
+      });
+
+      // Mise à jour en direct si l'utilisateur modifie manuellement les inputs Toi vs Toi
+      ["tvt-distance", "tvt-custom-distance", "tvt-time-ref", "tvt-time-cur", "tvt-elo"].forEach((id) => {
+        document.getElementById(id).addEventListener("change", () => {
+          resetRaceAnimation();
+        });
+      });
+
+      /* ------------------------------------------------------------------------
+         ONGLET 3 : CALCULATEUR D'ALLURE & FEUILLE DE PASSAGE
+         ------------------------------------------------------------------------ */
+      function runPaceCalculator() {
+        const dist = selectedDistance("pace-distance", "pace-custom-distance", 10);
+        const targetSec = parseTimeToSeconds(document.getElementById("pace-target-time").value);
+        const inputEl = document.getElementById("pace-target-time");
+
+        if (!Number.isFinite(dist) || dist <= 0 || isNaN(targetSec) || targetSec <= 60 || !isPlausibleSpeed(targetSec, dist)) {
+          inputEl.style.borderColor = "var(--danger)";
+          return;
+        }
+        inputEl.style.borderColor = "var(--border)";
+
+        const secPerKm = targetSec / dist;
+        const eqElo = estimateEloFromPerformance(targetSec, dist);
+        const split5k = secPerKm * Math.min(5, dist);
+
+        document.getElementById("kpi-pace-minkm").textContent = formatPace(targetSec, dist);
+        document.getElementById("kpi-pace-kmh").textContent = formatSpeed(targetSec, dist);
+        document.getElementById("kpi-pace-elo").textContent = `~${eqElo} pts`;
+        document.getElementById("kpi-pace-5k").textContent = formatSeconds(split5k);
+
+        // Construction des points de passage (tous les km jusqu'à 15 km, puis tous les 2/5 km sur Semi/Marathon)
+        const checkpoints = [];
+        if (dist <= 15) {
+          for (let km = 1; km <= dist; km++) {
+            checkpoints.push(km);
+          }
+        } else if (dist <= 22) {
+          [5, 10, 15, 20].forEach((km) => checkpoints.push(km));
+        } else {
+          [5, 10, 15, 20, 25, 30, 35, 40, 42].forEach((km) => checkpoints.push(km));
+        }
+
+        if (!checkpoints.some(km => Math.abs(km - dist) < 0.001)) checkpoints.push(dist);
+        checkpoints.sort((a, b) => a - b);
+        const tbody = document.getElementById("pace-tbody");
+        let prevKm = 0;
+        tbody.innerHTML = checkpoints.map((km, index) => {
+          const cumSec = secPerKm * km;
+          const segSec = secPerKm * (km - prevKm);
+          prevKm = km;
+          const isFinish = index === checkpoints.length - 1;
+          const label = isFinish
+            ? "🏁 Arrivée"
+            : Math.abs(km - dist / 2) < 0.2
+              ? "⚡ Mi-course"
+              : `Passage ${index + 1}`;
+          return `
+            <tr class="${isFinish ? "ghost-row" : ""}">
+              <td>${label}</td>
+              <td>${String(Number(km.toFixed(2))).replace(".", ",")} km</td>
+              <td><strong>${formatSeconds(cumSec, dist > 20)}</strong></td>
+              <td>+${formatSeconds(segSec)}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      ["pace-distance", "pace-custom-distance"].forEach(id => document.getElementById(id).addEventListener("change", runPaceCalculator));
+      document.getElementById("form-pace").addEventListener("submit", (e) => {
+        e.preventDefault();
+        runPaceCalculator();
+      });
+
+      /* ------------------------------------------------------------------------
+         INITIALISATION AU CHARGEMENT
+         ------------------------------------------------------------------------ */
+      runGhostDuel();
+      syncTvtInputsToState();
+      updateTvtTelemetry();
+      runPaceCalculator();})();
+  </script>
+  <script>
+    (function(){
+      var lastHeight=0,queued=false,observer=null;
+      function measure(){
+        var header=document.querySelector("header"),main=document.querySelector("main"),active=document.querySelector(".tab-panel.active");
+        var headerBottom=header?header.offsetTop+header.offsetHeight:0;
+        var mainTop=main?main.offsetTop:0;
+        var panelBottom=active?active.offsetTop+active.offsetHeight:0;
+        return Math.ceil(Math.max(headerBottom,mainTop+panelBottom,main?main.offsetTop+main.offsetHeight:0)+24);
+      }
+      function report(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;try{var h=Math.max(320,Math.min(12000,measure()));if(Math.abs(h-lastHeight)>4){lastHeight=h;window.parent.postMessage({type:"elo-ghost-height",height:h},"*");}}catch(e){}});}
+      function observeActive(){if(observer){observer.disconnect();observer=null;}var active=document.querySelector(".tab-panel.active");if(active&&window.ResizeObserver){observer=new ResizeObserver(report);observer.observe(active);}report();}
+      window.addEventListener("load",observeActive);window.addEventListener("resize",report);
+      document.querySelectorAll("[data-tab]").forEach(function(btn){btn.addEventListener("click",function(){setTimeout(observeActive,80);});});
+      if(window.MutationObserver){new MutationObserver(report).observe(document.querySelector("main")||document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style"]});}
+      setTimeout(observeActive,250);setTimeout(observeActive,900);
+    })();
+  </script>
+
+<script>
+function initGhostVirtual(){
+"use strict";
+var root=document.getElementById("ghost-virtual");if(!root)return;
+var raceSelect=document.getElementById("gv-race"),search=document.getElementById("gv-search"),resultsBox=document.getElementById("gv-results"),searchInfo=document.getElementById("gv-search-info"),raceInfo=document.getElementById("gv-race-info"),selectedBox=document.getElementById("gv-selected"),selectedCount=document.getElementById("gv-selected-count"),startBtn=document.getElementById("gv-start"),clearBtn=document.getElementById("gv-clear"),status=document.getElementById("gv-status"),canvas=document.getElementById("gv-canvas"),ctx=canvas.getContext("2d"),timeline=document.getElementById("gv-timeline"),playBtn=document.getElementById("gv-play"),resetBtn=document.getElementById("gv-reset");
+var customWrap=document.getElementById("gv-custom-distance-wrap"),customDistance=document.getElementById("gv-custom-distance");
+var speed=1,elapsed=0,duration=0,running=false,lastFrame=0,raf=0,searchTimer=0,races=[],currentRace=null,participants=[],selected=[],requestSerial=0,colors=["#278A50","#38bdf8","#a78bfa","#4ade80","#fb7185"];
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function timeText(sec){sec=Math.max(0,Math.round(Number(sec)||0));var h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;return(h?String(h).padStart(2,"0")+":":"")+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");}
+function requestRaces(){status.textContent="Chargement des courses ELO COURSE…";window.parent.postMessage({type:"elo-ghost-request-virtual-races"},"*");}
+function requestParticipants(query){if(!currentRace)return;var serial=++requestSerial;resultsBox.innerHTML='<div class="gv-empty">Recherche des participants dans cette course…</div>';window.parent.postMessage({type:"elo-ghost-request-virtual-race",raceId:String(currentRace.id),query:String(query||""),requestId:serial},"*");}
+function populateRaces(list){races=Array.isArray(list)?list:[];var previous=raceSelect.value;raceSelect.innerHTML='<option value="">— Choisir une course —</option>';races.forEach(function(r){var o=document.createElement("option");o.value=String(r.id);var d=Number(r.distance)>0?String(r.distance).replace(".",",")+" km":"distance à préciser";o.textContent=(r.name||"Course")+" · "+(r.date||"date inconnue")+" · "+d+" · "+(r.participantCount||0)+" résultats";raceSelect.appendChild(o);});if(previous&&races.some(function(r){return String(r.id)===previous;}))raceSelect.value=previous;raceInfo.textContent=races.length?races.length+" courses disponibles. Aucun nom de coureur n'a encore été chargé.":"Aucune course avec résultats n'est disponible.";status.textContent=races.length?"Choisis une course pour charger uniquement ses participants.":"Aucune course à simuler.";}
+function renderSearchResults(list,total,query){participants=Array.isArray(list)?list:[];resultsBox.innerHTML="";if(!participants.length){resultsBox.innerHTML='<div class="gv-empty">Aucun coureur correspondant dans les résultats de cette course.</div>';searchInfo.textContent=query?"0 résultat pour « "+esc(query)+" ».":"Aucun participant avec un profil ELO COURSE et un chrono exploitable.";return;}participants.forEach(function(r){var already=selected.some(function(x){return String(x.id)===String(r.id);});var row=document.createElement("div");row.className="gv-runner-option";row.innerHTML='<div class="gv-runner-main"><strong>'+esc(r.name)+'</strong><small>'+esc(r.club||"Club non renseigné")+' · '+esc(r.rank?("#"+r.rank):"classement non renseigné")+' · '+esc(r.timeText)+'</small></div><button type="button" class="gv-add" data-gv-add="'+esc(r.id)+'" '+(already||selected.length>=5?"disabled":"")+'>'+(already?"Ajouté":"Ajouter")+'</button>';resultsBox.appendChild(row);});searchInfo.textContent=(query?participants.length+" correspondance(s)":"Affichage des "+participants.length+" premiers participants")+" sur "+(total||participants.length)+" coureurs de cette course. Utilise la recherche pour trouver les autres.";}
+function renderSelected(){selectedCount.textContent=selected.length+" / 5";selectedBox.innerHTML="";if(!selected.length)selectedBox.innerHTML='<span class="gv-muted">Aucun coureur sélectionné.</span>';selected.forEach(function(r,i){var row=document.createElement("div");row.className="gv-selected-item";row.innerHTML='<div class="gv-runner-main"><span class="gv-dot" style="background:'+colors[i]+'"></span><div><strong>'+esc(r.name)+'</strong><small>'+esc(r.timeText)+' · '+esc(r.club||"")+'</small></div></div><button type="button" class="gv-remove" data-gv-remove="'+esc(r.id)+'">Retirer</button>';selectedBox.appendChild(row);});startBtn.disabled=selected.length<1||!currentRace;}
+function getDistance(){return currentRace?(Number(currentRace.distance)>0?Number(currentRace.distance):(/marathon/i.test(String(currentRace.dist||""))?42.195:(/semi/i.test(String(currentRace.dist||""))?21.2:Number(String(customDistance.value||"").replace(",","."))))):0;}
+function progressOf(r){return Math.min(1,elapsed/(Number(r.time)||1));}
+function drawStylizedRunner(ctx, x, y, options) {
+        const {
+          primaryColor,    // #38BDF8 (cyan) ou #4ADE80 (vert)
+          jerseyColor,     // Couleur du maillot
+          shortsColor,     // Couleur du short
+          skinColor,       // Teint athlète
+          phase,           // Phase du cycle de foulée (radians)
+          isMoving,        // Booléen mouvement actif
+          label,           // Étiquette ("Ghost Réf." / "Défi Actuel")
+          subLabel,        // Chrono ou distance
+          bibNumber        // Numéro de dossard
+        } = options;
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        // 1. Ombre portée au sol (varie légèrement avec le rebond de foulée)
+        const bounce = isMoving ? Math.abs(Math.sin(phase)) * 3.5 : 0;
+        const shadowScale = 1 - bounce * 0.04;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+        ctx.beginPath();
+        ctx.ellipse(0, 26, 16 * shadowScale, 4.5 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Halo subtil sous les baskets
+        const glowGrad = ctx.createRadialGradient(0, 22, 2, 0, 22, 26);
+        glowGrad.addColorStop(0, primaryColor + "44");
+        glowGrad.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.arc(0, 22, 26, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Légère élévation verticale pendant la phase aérienne de course
+        ctx.translate(0, -bounce);
+
+        // Angles articulaires fluides
+        const strideA = isMoving ? Math.sin(phase) * 0.65 : 0.15;
+        const strideB = isMoving ? Math.sin(phase + Math.PI) * 0.65 : -0.15;
+        const kneeBendA = isMoving ? Math.max(0, Math.cos(phase)) * 0.85 + 0.15 : 0.1;
+        const kneeBendB = isMoving ? Math.max(0, Math.cos(phase + Math.PI)) * 0.85 + 0.15 : 0.1;
+
+        // Helper pour dessiner une jambe complète (cuisse -> genou -> mollet -> basket)
+        function drawLeg(hipAngle, kneeAngle, isBackLeg) {
+          ctx.save();
+          ctx.translate(0, 4); // Position de la hanche
+          ctx.rotate(hipAngle);
+
+          // Cuisse
+          ctx.strokeStyle = isBackLeg ? "#CBD5E1" : skinColor;
+          ctx.lineWidth = 5.2;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 10);
+          ctx.stroke();
+
+          // Short athlétique
+          ctx.fillStyle = shortsColor;
+          ctx.beginPath();
+          ctx.roundRect(-3.5, -1, 7, 7, 2.5);
+          ctx.fill();
+
+          // Articulation genou -> mollet
+          ctx.translate(0, 10);
+          ctx.rotate(-kneeAngle);
+          ctx.strokeStyle = isBackLeg ? "#94A3B8" : skinColor;
+          ctx.lineWidth = 4.4;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 10);
+          ctx.stroke();
+
+          // Basket moderne avec semelle blanche et accent couleur
+          ctx.translate(0, 10);
+          ctx.fillStyle = primaryColor;
+          ctx.beginPath();
+          ctx.roundRect(-3, -2, 10, 4.5, 2);
+          ctx.fill();
+          ctx.fillStyle = "#F8FAFC";
+          ctx.fillRect(-3, 1.5, 10, 1.8);
+
+          ctx.restore();
+        }
+
+        // Helper pour dessiner un bras articulé (épaule -> coude -> avant-bras)
+        function drawArm(shoulderAngle, isBackArm) {
+          ctx.save();
+          ctx.translate(1, -11); // Épaule
+          ctx.rotate(shoulderAngle);
+
+          ctx.strokeStyle = isBackArm ? "#94A3B8" : skinColor;
+          ctx.lineWidth = 3.8;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 7.5);
+          ctx.stroke();
+
+          // Avant-bras replié dynamiquement vers l'avant
+          ctx.translate(0, 7.5);
+          ctx.rotate(1.15);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, 7);
+          ctx.stroke();
+
+          ctx.restore();
+        }
+
+        // 2. Membre arrière (jambe + bras opposés)
+        drawLeg(strideB, kneeBendB, true);
+        drawArm(-strideA * 0.85, true);
+
+        // 3. Buste incliné vers l'avant (posture de coureur dynamique)
+        ctx.save();
+        ctx.rotate(0.18); // Inclinaison dynamique vers la droite
+
+        // Débardeur / Maillot de course
+        ctx.fillStyle = jerseyColor;
+        ctx.beginPath();
+        ctx.roundRect(-5.5, -14, 11, 19, 4);
+        ctx.fill();
+
+        // Bande latérale lumineuse sur le maillot
+        ctx.fillStyle = primaryColor;
+        ctx.fillRect(2, -13, 2.5, 17);
+
+        // Mini dossard blanc sur le torse
+        ctx.fillStyle = "#F1F5F9";
+        ctx.fillRect(-2.5, -8, 6.5, 5.5);
+        ctx.fillStyle = "#0B1724";
+        ctx.font = "bold 4.5px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(bibNumber, 0.8, -4);
+
+        // 4. Tête + Casquette de running moderne
+        ctx.translate(1.5, -20);
+        ctx.fillStyle = skinColor;
+        ctx.beginPath();
+        ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Casquette technique avec visière vers l'avant
+        ctx.fillStyle = primaryColor;
+        ctx.beginPath();
+        ctx.arc(0, -1, 5.7, Math.PI, 0);
+        ctx.fill();
+        // Visière aérodynamique
+        ctx.beginPath();
+        ctx.moveTo(2, -2);
+        ctx.lineTo(10.5, -1.2);
+        ctx.lineTo(4, 0.3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+
+        // 5. Membre avant (jambe + bras au premier plan)
+        drawLeg(strideA, kneeBendA, false);
+        drawArm(-strideB * 0.85, false);
+
+        // 6. Étiquette badge flottante au-dessus du coureur
+        ctx.translate(0, bounce); // Stabilise l'étiquette pour une lecture parfaite
+        const badgeText = `${label} • ${subLabel}`;
+        ctx.font = "700 11px -apple-system, BlinkMacSystemFont, sans-serif";
+        const textW = ctx.measureText(badgeText).width;
+        const padX = 8;
+        const boxW = textW + padX * 2;
+        const boxH = 20;
+        const boxY = -48;
+
+        ctx.fillStyle = "rgba(11, 23, 36, 0.9)";
+        ctx.strokeStyle = primaryColor;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(-boxW / 2, boxY, boxW, boxH, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = primaryColor;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(badgeText, 0, boxY + boxH / 2);
+
+        ctx.restore();
+      }
+
+      /* ------------------------------------------------------------------------
+         RENDU COMPLET DE LA PISTE 2D (DÉCOR NOCTURNE, COULOIRS, DAMIER, PARTICULES)
+         ------------------------------------------------------------------------ */
+
+
+/* Trace GPX simplifiée — Course nature de Meslay-du-Maine (11 km).
+   Les autres courses conservent leur parcours virtuel générique. */
+var MESLAY_TRACE_SIMPLIFIED=[[47.95145,-0.55359],[47.95287,-0.55334],[47.95362,-0.55362],[47.9542,-0.55315],[47.95488,-0.55308],[47.95503,-0.55477],[47.95671,-0.55501],[47.9561,-0.55554],[47.95669,-0.55874],[47.95543,-0.55944],[47.95568,-0.56093],[47.95535,-0.56079],[47.95484,-0.56076],[47.95488,-0.56209],[47.95621,-0.56313],[47.957,-0.56361],[47.95858,-0.56452],[47.95967,-0.56553],[47.9623,-0.56815],[47.96269,-0.56809],[47.96258,-0.56426],[47.96137,-0.5612],[47.96022,-0.55709],[47.9588,-0.55637],[47.95835,-0.55407],[47.95721,-0.55055],[47.95596,-0.54818],[47.95516,-0.54597],[47.95601,-0.54366],[47.95591,-0.54323],[47.95611,-0.54195],[47.95552,-0.53572],[47.95683,-0.53406],[47.95767,-0.53242],[47.95776,-0.53161],[47.95692,-0.53151],[47.95603,-0.52963],[47.9558,-0.52673],[47.95515,-0.52653],[47.9544,-0.52709],[47.95458,-0.52551],[47.95603,-0.52305],[47.95734,-0.52374],[47.95997,-0.52489],[47.96227,-0.52572],[47.96285,-0.52707],[47.96416,-0.52612],[47.9651,-0.52597],[47.96508,-0.52709],[47.96408,-0.52766],[47.96434,-0.52861],[47.96378,-0.53001],[47.96235,-0.5308],[47.96283,-0.53414],[47.96326,-0.53594],[47.96216,-0.53669],[47.96136,-0.53725],[47.96054,-0.53785],[47.9591,-0.53797],[47.95863,-0.53823],[47.95819,-0.53851],[47.95771,-0.53888],[47.95747,-0.54071],[47.95716,-0.54136],[47.95698,-0.54274],[47.95632,-0.54297],[47.95559,-0.54381],[47.9552,-0.54474],[47.95481,-0.54579],[47.95622,-0.54916],[47.95537,-0.55049],[47.95447,-0.55256],[47.95386,-0.55227],[47.9518,-0.55119],[47.9515,-0.55212],[47.95129,-0.55283],[47.95136,-0.5533]];
+function buildMeslayCourseLoop(width,height,distanceKm){
+ var coords=MESLAY_TRACE_SIMPLIFIED,lat0=coords.reduce(function(a,p){return a+p[0];},0)/coords.length,cos=Math.cos(lat0*Math.PI/180);
+ var minLat=Math.min.apply(null,coords.map(function(p){return p[0];})),maxLat=Math.max.apply(null,coords.map(function(p){return p[0];}));
+ var minLon=Math.min.apply(null,coords.map(function(p){return p[1];})),maxLon=Math.max.apply(null,coords.map(function(p){return p[1];}));
+ // Orientation portrait : rotation 90Рdu seul parcours 11 km, sans toucher au semi.
+ var padX=Math.max(30,width*.09),padY=Math.max(24,height*.07);
+ var sx=(width-2*padX)/Math.max(1e-8,(maxLat-minLat)),sy=(height-2*padY)/Math.max(1e-8,(maxLon-minLon)*cos),scale=Math.min(sx,sy);
+ var raw=coords.map(function(p){return{x:padX+(p[0]-minLat)*scale,y:padY+(maxLon-p[1])*cos*scale};});
+ var xs=raw.map(function(p){return p.x;}),ys=raw.map(function(p){return p.y;}),minX=Math.min.apply(null,xs),maxX=Math.max.apply(null,xs),minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
+ var dx=(width-(maxX-minX))/2-minX,dy=(height-(maxY-minY))/2-minY;raw.forEach(function(p){p.x+=dx;p.y+=dy;});
+ var cum=[0],total=0,R=6371000;
+ for(var i=1;i<coords.length;i++){var a=coords[i-1],b=coords[i],dLat=(b[0]-a[0])*Math.PI/180,dLon=(b[1]-a[1])*Math.PI/180,la=a[0]*Math.PI/180,h=Math.sin(dLat/2)**2+Math.cos(la)*Math.cos(b[0]*Math.PI/180)*Math.sin(dLon/2)**2,meters=2*R*Math.asin(Math.sqrt(h));total+=meters;cum.push(total);}
+ var first=coords[0],last=coords[coords.length-1],dlat=(first[0]-last[0])*Math.PI/180,dlon=(first[1]-last[1])*Math.PI/180,la=last[0]*Math.PI/180,hh=Math.sin(dlat/2)**2+Math.cos(la)*Math.cos(first[0]*Math.PI/180)*Math.sin(dlon/2)**2;total+=2*R*Math.asin(Math.sqrt(hh));
+ var pts=raw.map(function(p,i){return{x:p.x,y:p.y,t:"nature",km:cum[i]*distanceKm/total};});pts.push({x:raw[0].x,y:raw[0].y,t:"nature",km:distanceKm});
+ return{points:pts,distanceKm:distanceKm,cx:width/2,cy:height/2,isMeslay:true};
+}
+
+/* GPS semi de Meslay: 21.10 km, denivele positif 119 m. */
+var SEMI_MESLAY_TRACE_SIMPLIFIED=[[47.95197,-0.55366],[47.95404,-0.55305],[47.95189,-0.55118],[47.95127,-0.55274],[47.95389,-0.55322],[47.95602,-0.54846],[47.95153,-0.54196],[47.95466,-0.5361],[47.96066,-0.52969],[47.96544,-0.52686],[47.96659,-0.53268],[47.96271,-0.53048],[47.9633,-0.53605],[47.95985,-0.5378],[47.95773,-0.539],[47.9563,-0.54318],[47.95498,-0.55192],[47.95167,-0.55136],[47.95178,-0.55368],[47.95674,-0.55486],[47.96931,-0.5589],[47.97914,-0.56471],[47.98692,-0.56969],[47.98739,-0.55999],[47.98113,-0.54357],[47.97181,-0.52769],[47.96714,-0.53069],[47.96454,-0.53034],[47.96305,-0.5354],[47.96157,-0.53703],[47.95887,-0.53795],[47.95767,-0.53959],[47.95713,-0.5416],[47.95535,-0.54455],[47.95549,-0.55021],[47.9526,-0.55081],[47.95139,-0.55332],[47.95142,-0.55347]];
+function buildSemiMeslayCourseLoop(width,height,distanceKm){
+ var coords=SEMI_MESLAY_TRACE_SIMPLIFIED,lat0=coords.reduce(function(a,p){return a+p[0];},0)/coords.length,cos=Math.cos(lat0*Math.PI/180);
+ var minLat=Math.min.apply(null,coords.map(function(p){return p[0];})),maxLat=Math.max.apply(null,coords.map(function(p){return p[0];}));
+ var minLon=Math.min.apply(null,coords.map(function(p){return p[1];})),maxLon=Math.max.apply(null,coords.map(function(p){return p[1];}));
+ var padX=Math.max(26,width*.065),padY=Math.max(30,height*.09),sx=(width-2*padX)/Math.max(1e-8,(maxLon-minLon)*cos),sy=(height-2*padY)/Math.max(1e-8,(maxLat-minLat)),scale=Math.min(sx,sy);
+ var raw=coords.map(function(p){return{x:padX+(p[1]-minLon)*cos*scale,y:height-padY-(p[0]-minLat)*scale};});
+ var xs=raw.map(function(p){return p.x;}),ys=raw.map(function(p){return p.y;}),minX=Math.min.apply(null,xs),maxX=Math.max.apply(null,xs),minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
+ var dx=(width-(maxX-minX))/2-minX,dy=(height-(maxY-minY))/2-minY;raw.forEach(function(p){p.x+=dx;p.y+=dy;});
+ var cum=[0],total=0,R=6371000;
+ for(var i=1;i<coords.length;i++){var a=coords[i-1],b=coords[i],dLat=(b[0]-a[0])*Math.PI/180,dLon=(b[1]-a[1])*Math.PI/180,la=a[0]*Math.PI/180,h=Math.sin(dLat/2)**2+Math.cos(la)*Math.cos(b[0]*Math.PI/180)*Math.sin(dLon/2)**2,meters=2*R*Math.asin(Math.sqrt(h));total+=meters;cum.push(total);}
+ var first=coords[0],last=coords[coords.length-1],dlat=(first[0]-last[0])*Math.PI/180,dlon=(first[1]-last[1])*Math.PI/180,la=last[0]*Math.PI/180,hh=Math.sin(dlat/2)**2+Math.cos(la)*Math.cos(first[0]*Math.PI/180)*Math.sin(dlon/2)**2;total+=2*R*Math.asin(Math.sqrt(hh));
+ var pts=raw.map(function(p,i){return{x:p.x,y:p.y,t:"nature",km:cum[i]*distanceKm/total};});pts.push({x:raw[0].x,y:raw[0].y,t:"nature",km:distanceKm});
+ return{points:pts,distanceKm:distanceKm,cx:width/2,cy:height/2,isMeslay:true,isSemiMeslay:true};
+}
+
+function buildLeMans10kCourseLoop(width,height){var coords=[[48.00329,0.19281],[48.00284,0.19294],[48.0026,0.19311],[48.00151,0.1919],[48.00128,0.19154],[48.00118,0.19156],[48.00104,0.19145],[48.00074,0.1907],[47.99847,0.18891],[47.99823,0.1885],[47.99809,0.18842],[47.99806,0.18848],[47.99623,0.187],[47.99613,0.18683],[47.99537,0.18616],[47.99526,0.18592],[47.99509,0.18585],[47.99496,0.18591],[47.99341,0.18475],[47.99308,0.1844],[47.99289,0.18405],[47.9928,0.18402],[47.99265,0.18415],[47.99052,0.18254],[47.99045,0.18245],[47.99033,0.1806],[47.98873,0.17956],[47.98903,0.17917],[47.99059,0.18002],[47.99057,0.18244],[47.99034,0.1827],[47.98852,0.18394],[47.98842,0.18363],[47.98837,0.18286],[47.98803,0.18216],[47.98804,0.18175],[47.989,0.18179],[47.98924,0.1819],[47.98933,0.18135],[47.98923,0.18093],[47.98876,0.18002],[47.9887,0.17968],[47.98818,0.17898],[47.98786,0.17943],[47.98728,0.17981],[47.98726,0.17989],[47.98605,0.17894],[47.98573,0.17831],[47.98541,0.17832],[47.98393,0.1748],[47.9816,0.17113],[47.98028,0.16953],[47.9798,0.16929],[47.97916,0.16929],[47.97906,0.16657],[47.97897,0.16628],[47.97917,0.16549],[47.9797,0.1645],[47.97938,0.16392],[47.97719,0.16095],[47.97685,0.16061],[47.9763,0.16047],[47.97562,0.16053],[47.97504,0.16111],[47.97449,0.16135],[47.97278,0.16291],[47.97263,0.16336],[47.97314,0.16551],[47.97323,0.1667],[47.97334,0.16538],[47.9733,0.16515],[47.97316,0.16507],[47.97238,0.1653],[47.97223,0.16504],[47.97189,0.16493],[47.96922,0.16572],[47.96865,0.16642],[47.96828,0.16541],[47.96786,0.16476],[47.96704,0.16359],[47.96664,0.1634],[47.96494,0.16411],[47.96455,0.16446],[47.9645,0.1644],[47.9644,0.16444],[47.96379,0.16314],[47.96194,0.16488],[47.96148,0.1651],[47.96157,0.16572],[47.96154,0.16608],[47.9611,0.16592],[47.96078,0.16773],[47.95989,0.16934],[47.95962,0.17011],[47.95925,0.17064],[47.95956,0.17218],[47.95941,0.17304],[47.95944,0.17436],[47.96038,0.17435],[47.96121,0.17459],[47.96164,0.17447],[47.96205,0.17485],[47.96258,0.17501],[47.96328,0.17498],[47.96404,0.17482],[47.96619,0.17339],[47.96772,0.17184],[47.96856,0.17058],[47.96925,0.16982]],pad=24,cosLat=Math.cos(47.98*Math.PI/180),minLat=Math.min.apply(null,coords.map(function(p){return p[0];})),maxLat=Math.max.apply(null,coords.map(function(p){return p[0];})),minLon=Math.min.apply(null,coords.map(function(p){return p[1];})),maxLon=Math.max.apply(null,coords.map(function(p){return p[1];})),spanX=(maxLon-minLon)*cosLat,spanY=maxLat-minLat,scale=Math.min((width-pad*2)/spanX,(height-pad*2)/spanY),usedW=spanX*scale,usedH=spanY*scale,ox=(width-usedW)/2,oy=(height-usedH)/2,raw=coords.map(function(p){return{x:ox+(p[1]-minLon)*cosLat*scale,y:height-oy-(p[0]-minLat)*scale,t:"route"};}),cum=[0],total=0;for(var i=1;i<raw.length;i++){total+=Math.hypot(raw[i].x-raw[i-1].x,raw[i].y-raw[i-1].y);cum.push(total);}var points=raw.map(function(p,i){return{x:p.x,y:p.y,t:p.t,km:cum[i]*10.02/Math.max(1,total)};});return{points:points,distanceKm:10.02,cx:width/2,cy:height/2,isLeMans:true};}
+
+function buildLaval10kCourseLoop(width,height){var coords=[[48.13774,-0.7495],[48.13512,-0.74899],[48.13116,-0.74944],[48.12568,-0.74948],[48.12354,-0.74999],[48.12315,-0.75032],[48.12202,-0.75442],[48.12116,-0.7594],[48.11976,-0.76323],[48.11891,-0.7644],[48.11803,-0.76765],[48.11623,-0.76984],[48.11438,-0.77083],[48.11247,-0.77148],[48.1108,-0.77247],[48.1094,-0.77283],[48.10842,-0.77362],[48.10793,-0.77636],[48.10698,-0.77893],[48.10508,-0.78134],[48.10377,-0.78006],[48.10207,-0.78073],[48.10094,-0.78164],[48.10039,-0.78465],[48.10074,-0.78611],[48.09935,-0.7868],[48.09853,-0.78694],[48.09667,-0.7862],[48.09464,-0.78586],[48.09403,-0.78498],[48.09301,-0.7813],[48.09091,-0.77795],[48.08617,-0.77298],[48.08442,-0.77161],[48.07936,-0.77023],[48.07798,-0.76961],[48.07664,-0.76969],[48.07443,-0.77035],[48.07341,-0.77028],[48.07345,-0.76812],[48.07249,-0.76796],[48.07229,-0.76812],[48.07216,-0.77013],[48.07328,-0.77041],[48.07323,-0.77161]],pad=24,cosLat=Math.cos(48.10*Math.PI/180),minLat=Math.min.apply(null,coords.map(function(p){return p[0];})),maxLat=Math.max.apply(null,coords.map(function(p){return p[0];})),minLon=Math.min.apply(null,coords.map(function(p){return p[1];})),maxLon=Math.max.apply(null,coords.map(function(p){return p[1];})),spanX=(maxLon-minLon)*cosLat,spanY=maxLat-minLat,scale=Math.min((width-pad*2)/spanX,(height-pad*2)/spanY),usedW=spanX*scale,usedH=spanY*scale,ox=(width-usedW)/2,oy=(height-usedH)/2,raw=coords.map(function(p){return{x:ox+(p[1]-minLon)*cosLat*scale,y:height-oy-(p[0]-minLat)*scale,t:"route"};}),cum=[0],total=0;for(var i=1;i<raw.length;i++){total+=Math.hypot(raw[i].x-raw[i-1].x,raw[i].y-raw[i-1].y);cum.push(total);}var points=raw.map(function(p,i){return{x:p.x,y:p.y,t:p.t,km:cum[i]*10.03/Math.max(1,total)};});return{points:points,distanceKm:10.03,cx:width/2,cy:height/2,isLaval:true};}
+
+/* Trace GPS réelle du semi-marathon des Ecluses de la Mayenne : 21,20 km, D+ 199 m. */
+function buildSemiEclusesMayenneCourseLoop(width,height){
+ var coords=[
+ [48.21305,-0.70272],[48.21199,-0.7041],[48.2104,-0.70798],[48.20959,-0.7089],[48.20325,-0.71131],
+ [48.20061,-0.71105],[48.19984,-0.71141],[48.19675,-0.71745],[48.19586,-0.72013],[48.19482,-0.72111],
+ [48.19268,-0.72106],[48.19121,-0.72166],[48.19057,-0.7223],[48.18993,-0.72372],[48.18966,-0.72614],
+ [48.18826,-0.72834],[48.18649,-0.73345],[48.18627,-0.7375],[48.1854,-0.73946],[48.18458,-0.74017],
+ [48.18126,-0.74146],[48.18013,-0.74263],[48.17677,-0.74449],[48.17452,-0.74806],[48.17325,-0.74934],
+ [48.17215,-0.74968],[48.17015,-0.74915],[48.16727,-0.74603],[48.16434,-0.74363],[48.16232,-0.7408],
+ [48.16057,-0.74005],[48.15889,-0.73997],[48.15829,-0.74034],[48.15766,-0.74189],[48.15691,-0.74972],
+ [48.15599,-0.75165],[48.15514,-0.75208],[48.1526,-0.75019],[48.15011,-0.74972],[48.14677,-0.75111],
+ [48.14469,-0.75121],[48.14365,-0.751],[48.14046,-0.74943],[48.13827,-0.74968],[48.13475,-0.74899],
+ [48.13103,-0.74945],[48.12562,-0.74947],[48.12333,-0.75012],[48.1219,-0.75484],[48.12116,-0.75938],
+ [48.11997,-0.76279],[48.11878,-0.76464],[48.11813,-0.76749],[48.11627,-0.7698],[48.10883,-0.77324],
+ [48.10827,-0.77407],[48.10791,-0.77634],[48.10703,-0.7788],[48.10501,-0.7814],[48.10425,-0.78032],
+ [48.10368,-0.78011],[48.10176,-0.78089],[48.10099,-0.78161],[48.10035,-0.78472],[48.10065,-0.78614],
+ [48.09959,-0.78673],[48.09844,-0.78698],[48.09659,-0.78619],[48.09485,-0.78601],[48.09435,-0.7856],
+ [48.09297,-0.78128],[48.09122,-0.77838],[48.08624,-0.77306],[48.08432,-0.77155],[48.07947,-0.77027],
+ [48.078,-0.76958],[48.07649,-0.76969],[48.07429,-0.77041],[48.07338,-0.77035],[48.07345,-0.76813],
+ [48.07246,-0.76796],[48.07223,-0.76829],[48.07215,-0.7702],[48.07329,-0.77035],[48.07328,-0.77157]
+ ];
+ var padX=Math.max(30,width*.07),padY=Math.max(26,height*.07),cos=Math.cos(48.14*Math.PI/180);
+ var minLat=Math.min.apply(null,coords.map(function(p){return p[0];})),maxLat=Math.max.apply(null,coords.map(function(p){return p[0];}));
+ var minLon=Math.min.apply(null,coords.map(function(p){return p[1];})),maxLon=Math.max.apply(null,coords.map(function(p){return p[1];}));
+ var spanX=(maxLon-minLon)*cos,spanY=maxLat-minLat,scale=Math.min((width-2*padX)/Math.max(spanX,1e-8),(height-2*padY)/Math.max(spanY,1e-8));
+ var usedW=spanX*scale,usedH=spanY*scale,ox=(width-usedW)/2,oy=(height-usedH)/2;
+ var raw=coords.map(function(p){return{x:ox+(p[1]-minLon)*cos*scale,y:height-oy-(p[0]-minLat)*scale,t:"route"};});
+ var cum=[0],total=0;for(var i=1;i<raw.length;i++){total+=Math.hypot(raw[i].x-raw[i-1].x,raw[i].y-raw[i-1].y);cum.push(total);}
+ var points=raw.map(function(p,i){return{x:p.x,y:p.y,t:p.t,km:cum[i]*21.20/Math.max(1,total)};});
+ return{points:points,distanceKm:21.20,cx:width/2,cy:height/2,isEclusesSemi:true};
+}
+
+function buildMarathonEclusesMayenneCourseLoop(width,height){
+ var coords=[
+ [48.19384,-0.65995],[48.19369,-0.66217],[48.1961,-0.66234],[48.19645,-0.66005],[48.19476,-0.65972],
+ [48.19369,-0.66217],[48.19667,-0.6621],[48.19664,-0.66083],[48.19806,-0.65895],[48.19923,-0.65438],
+ [48.20256,-0.64565],[48.20415,-0.63669],[48.20543,-0.63139],[48.207565,-0.627606],[48.211,-0.6257],
+ [48.23079,-0.61706],[48.23729,-0.61316],[48.23839,-0.61457],[48.23889,-0.61806],[48.24016,-0.62209],
+ [48.241819,-0.622882],[48.24337,-0.62645],[48.24529,-0.63154],[48.24691,-0.63666],[48.25052,-0.6415],
+ [48.25575,-0.63946],[48.25963,-0.63693],[48.26043,-0.63865],[48.26117,-0.64118],[48.26038,-0.64595],
+ [48.26053,-0.65043],[48.25878,-0.65262],[48.25563,-0.65214],[48.25164,-0.65094],[48.24787,-0.65122],
+ [48.24422,-0.65174],[48.2437,-0.65386],[48.24442,-0.65636],[48.24488,-0.65788],[48.24294,-0.66237],
+ [48.240725,-0.666757],[48.23743,-0.67125],[48.234121,-0.674034],[48.23267,-0.67663],[48.23284,-0.68302],
+ [48.23066,-0.69445],[48.22827,-0.6964],[48.22575,-0.69943],[48.223389,-0.698076],[48.21927,-0.69698],
+ [48.21482,-0.69916],[48.213755,-0.701949],[48.2115,-0.70516],[48.208552,-0.709389],[48.20554,-0.71034],
+ [48.201419,-0.711197],[48.19871,-0.71376],[48.19603,-0.71979],[48.19417,-0.72127],[48.19199,-0.72143],
+ [48.1898,-0.72538],[48.187424,-0.731183],[48.18637,-0.73434],[48.1854,-0.73946],[48.18335,-0.74069],
+ [48.18013,-0.74263],[48.17813,-0.74374],[48.175886,-0.745885],[48.17325,-0.74934],[48.170132,-0.749136],
+ [48.16727,-0.74603],[48.16434,-0.74363],[48.16057,-0.74005],[48.15829,-0.74034],[48.157165,-0.747012],
+ [48.15514,-0.75208],[48.15209,-0.74998],[48.14899,-0.75002],[48.14429,-0.75116],[48.143541,-0.750943],
+ [48.13827,-0.74968],[48.13348,-0.74919],[48.129273,-0.74939],[48.12562,-0.74947],[48.122296,-0.753478],
+ [48.12086,-0.76034],[48.11838,-0.76655],[48.11627,-0.7698],[48.11359,-0.77108],[48.10819,-0.77442],
+ [48.10715,-0.778429],[48.10504,-0.78137],[48.10269,-0.78041],[48.100574,-0.785581],[48.09844,-0.78698],
+ [48.09485,-0.78601],[48.09274,-0.78082],[48.09026,-0.77737],[48.08628,-0.77312],[48.08316,-0.77111],
+ [48.081071,-0.770645],[48.0781,-0.76975],[48.07649,-0.76969],[48.07463,-0.77035],[48.07328,-0.7716]
+ ];
+ var padX=Math.max(30,width*.07),padY=Math.max(26,height*.07),cos=Math.cos(48.13*Math.PI/180);
+ var minLat=Math.min.apply(null,coords.map(function(p){return p[0];})),maxLat=Math.max.apply(null,coords.map(function(p){return p[0];}));
+ var minLon=Math.min.apply(null,coords.map(function(p){return p[1];})),maxLon=Math.max.apply(null,coords.map(function(p){return p[1];}));
+ var spanX=(maxLon-minLon)*cos,spanY=maxLat-minLat,scale=Math.min((width-2*padX)/Math.max(spanX,1e-8),(height-2*padY)/Math.max(spanY,1e-8));
+ var usedW=spanX*scale,usedH=spanY*scale,ox=(width-usedW)/2,oy=(height-usedH)/2;
+ var raw=coords.map(function(p){return{x:ox+(p[1]-minLon)*cos*scale,y:height-oy-(p[0]-minLat)*scale,t:"route"};});
+ var cum=[0],total=0;for(var i=1;i<raw.length;i++){total+=Math.hypot(raw[i].x-raw[i-1].x,raw[i].y-raw[i-1].y);cum.push(total);}
+ var points=raw.map(function(p,i){return{x:p.x,y:p.y,t:p.t,km:cum[i]*42.195/Math.max(1,total)};});
+ return{points:points,distanceKm:42.195,cx:width/2,cy:height/2,isEclusesMarathon:true};
+}
+
+function buildRealisticCourseLoop(width,height,distanceKm,seed){
+ if(currentRace && /ecluses.*mayenne|mayenne.*ecluses/i.test(String(currentRace.name||'')) && /marathon/i.test(String(currentRace.name||'')+' '+String(currentRace.dist||''))) return buildMarathonEclusesMayenneCourseLoop(width,height);
+
+ if(currentRace && /maine libre|10.?km.*mans|mans.*10.?km/i.test(String(currentRace.name||''))) return buildLeMans10kCourseLoop(width,height);
+ if(currentRace && /ecluses.*mayenne|mayenne.*ecluses/i.test(String(currentRace.name||'')) && (/semi/i.test(String(currentRace.dist||'')) || /semi|21[,.]?2|21.?km/i.test(String(currentRace.name||'')) || (distanceKm>=20&&distanceKm<=22))) return buildSemiEclusesMayenneCourseLoop(width,height);
+ if(currentRace && /ecluses.*mayenne|10.?km.*ecluses|ecluses.*10.?km/i.test(String(currentRace.name||'')) && distanceKm>=9.5 && distanceKm<=10.5) return buildLaval10kCourseLoop(width,height);
+  if(currentRace && /meslay/i.test(String(currentRace.name||''))){
+    var meslayName=String(currentRace.name||''),meslayDistance=Number(currentRace.distance)||distanceKm;
+    if(/semi|21[,.]?1|21.?km/i.test(meslayName)||(meslayDistance>=20&&meslayDistance<=22)) return buildSemiMeslayCourseLoop(width,height,distanceKm);
+    return buildMeslayCourseLoop(width,height,distanceKm);
+  }
+ var padX=Math.max(40,width*.085),padY=Math.max(44,height*.125),boxW=Math.max(140,width-padX*2),boxH=Math.max(120,height-padY*2),cx=width*.5,cy=height*.5;
+ var s1=Math.sin(seed*.41),s2=Math.cos(seed*.67),s3=Math.sin(seed*1.13);
+ var pts=[
+ {x:cx-boxW*.22,y:cy-boxH*.36,t:"boulevard"},{x:cx+boxW*.04,y:cy-boxH*.36,t:"boulevard"},{x:cx+boxW*.28,y:cy-boxH*.36,t:"arrivee"},
+ {x:cx+boxW*.45,y:cy-boxH*.24+s1*boxH*.04,t:"route"},{x:cx+boxW*.42,y:cy+s2*boxH*.05,t:"parc"},{x:cx+boxW*.46,y:cy+boxH*.22+s3*boxH*.04,t:"parc"},
+ {x:cx+boxW*.24,y:cy+boxH*.40,t:"montee"},{x:cx-boxW*.03,y:cy+boxH*.35,t:"montee"},{x:cx-boxW*.29,y:cy+boxH*.40+s1*boxH*.03,t:"route"},
+ {x:cx-boxW*.46,y:cy+boxH*.22+s2*boxH*.04,t:"parc"},{x:cx-boxW*.41,y:cy+s3*boxH*.05,t:"parc"},{x:cx-boxW*.44,y:cy-boxH*.24-s1*boxH*.04,t:"route"}];
+ var dense=[],N=pts.length,steps=40;
+ for(var i=0;i<N;i++){var p0=pts[(i-1+N)%N],p1=pts[i],p2=pts[(i+1)%N],p3=pts[(i+2)%N],factor=(i===0||i===1)?.2:.5;
+  for(var j=0;j<steps;j++){var t=j/steps,t2=t*t,t3=t2*t;
+   var x=factor*(2*p1.x+(-p0.x+p2.x)*t+(2*p0.x-5*p1.x+4*p2.x-p3.x)*t2+(-p0.x+3*p1.x-3*p2.x+p3.x)*t3);
+   var y=factor*(2*p1.y+(-p0.y+p2.y)*t+(2*p0.y-5*p1.y+4*p2.y-p3.y)*t2+(-p0.y+3*p1.y-3*p2.y+p3.y)*t3);
+   dense.push({x:x,y:y,t:t<.5?p1.t:p2.t});
+  }
+ }
+ var cum=[0],total=0;for(var k=1;k<=dense.length;k++){var a=dense[k-1],b=dense[k%dense.length];total+=Math.hypot(b.x-a.x,b.y-a.y);cum.push(total);}
+ var points=dense.map(function(p,i){return{x:p.x,y:p.y,t:p.t,km:cum[i]*distanceKm/Math.max(1,total)};});
+ points.push({x:dense[0].x,y:dense[0].y,t:dense[0].t,km:distanceKm});
+ return{points:points,distanceKm:distanceKm,cx:cx,cy:cy};
+}
+function pointAtKm(loop,km){
+ km=Math.max(0,Math.min(loop.distanceKm,km));var p=loop.points,lo=0,hi=p.length-1;
+ while(lo<hi-1){var mid=(lo+hi)>>1;if(p[mid].km<=km)lo=mid;else hi=mid;}
+ var a=p[lo],b=p[hi],span=Math.max(1e-9,b.km-a.km),t=Math.max(0,Math.min(1,(km-a.km)/span));
+ return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t};
+}
+function resizeVirtualCanvas(){
+ var rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);
+ if(rect.width<1)return;
+ canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);drawTrack();
+}
+function drawTrack(){
+ var w=canvas.clientWidth||900,h=canvas.clientHeight||410;if(!w||!h)return;
+ var dpr=Math.min(window.devicePixelRatio||1,2);if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);}
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ var distance=getDistance()||10,seed=currentRace?String(currentRace.id).split("").reduce(function(a,c){return a+c.charCodeAt(0);},0):101;
+ var loop=buildRealisticCourseLoop(w,h,distance,seed);
+ ctx.fillStyle="#0b1724";ctx.fillRect(0,0,w,h);
+ loop.points.forEach(function(p,i){if(i%6===0&&p.t==="parc"){ctx.beginPath();ctx.arc(p.x,p.y,Math.max(18,Math.min(34,w*.036)),0,Math.PI*2);ctx.fillStyle="rgba(29,95,167,.08)";ctx.fill();}});
+ ctx.beginPath();loop.points.forEach(function(p,i){if(!i)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});ctx.closePath();ctx.lineJoin="round";ctx.lineCap="round";ctx.strokeStyle="#456176";ctx.lineWidth=15;ctx.stroke();
+ for(var i=0;i<loop.points.length-1;i++){var a=loop.points[i],b=loop.points[i+1];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.lineCap="round";ctx.strokeStyle=a.t==="parc"?"#278a50":a.t==="montee"?"#278a50":(a.t==="boulevard"||a.t==="arrivee")?"#f3f6fa":"#278a50";ctx.lineWidth=a.t==="montee"?5.5:5;ctx.stroke();}
+ if(!loop.isEclusesMarathon&&!loop.isEclusesSemi){for(var half=1;half<Math.floor(distance/.5);half++){var hv=half*.5;if(Math.abs(hv%1)>.01){var hp=pointAtKm(loop,hv);ctx.beginPath();ctx.arc(hp.x,hp.y,2.5,0,Math.PI*2);ctx.fillStyle="#64748b";ctx.fill();}}}
+ var kmLabels=loop.isEclusesMarathon?[5,10,15,20,25,30,35,40,distance]:(loop.isEclusesSemi?[5,10,15,20,distance]:Array.from({length:Math.floor(distance)},function(_,i){return i+1;}));
+ kmLabels.forEach(function(km){var kp=pointAtKm(loop,km),finish=Math.abs(km-distance)<.001;ctx.beginPath();ctx.arc(kp.x,kp.y,finish?6.5:4.5,0,Math.PI*2);ctx.fillStyle=finish?"#059669":"#fff";ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=finish?"#065f46":"#0f172a";ctx.stroke();ctx.font="700 9.5px sans-serif";var label=finish?"ARRIVÉE":km+" km",tw=ctx.measureText(label).width+8,lx=Math.min(w-tw/2-4,Math.max(tw/2+4,kp.x)),ly=Math.min(h-12,Math.max(12,kp.y+13));ctx.fillStyle="rgba(23,43,61,.96)";ctx.beginPath();ctx.roundRect(lx-tw/2,ly-7,tw,14,4);ctx.fill();ctx.strokeStyle="#cbd5e1";ctx.stroke();ctx.fillStyle="#f3f6fa";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(label,lx,ly+.5);});
+ var start=pointAtKm(loop,0);ctx.beginPath();ctx.arc(start.x,start.y,7.5,0,Math.PI*2);ctx.fillStyle="#f3f6fa";ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle="#fff";ctx.stroke();
+ ctx.font="800 10px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";var departLabel="DÉPART",finishLabel="ARRIVÉE",departW=ctx.measureText(departLabel).width+18,finishW=ctx.measureText(finishLabel).width+18,labelGap=18,departX=Math.max(departW/2+6,start.x-departW/2-labelGap),finishX=Math.min(w-finishW/2-6,start.x+finishW/2+labelGap),labelY=Math.max(16,Math.min(h-16,start.y-22));function drawStartFinishLabel(label,x,width,stroke){ctx.fillStyle="#172b3d";ctx.beginPath();ctx.roundRect(x-width/2,labelY-9,width,18,6);ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle=stroke;ctx.stroke();ctx.fillStyle="#f3f6fa";ctx.fillText(label,x,labelY+.5);}drawStartFinishLabel(departLabel,departX,departW,"#278a50");drawStartFinishLabel(finishLabel,finishX,finishW,"#ffd166");ctx.beginPath();ctx.arc(start.x,start.y,3,0,Math.PI*2);ctx.fillStyle="#ffd166";ctx.fill();
+ ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#f3f6fa";ctx.font="800 "+(w<480?12:14)+"px sans-serif";ctx.fillText((currentRace?currentRace.name:"Course virtuelle")+" — "+distance.toFixed(3)+" km",loop.cx,loop.cy-14);ctx.fillStyle="#cbd5e1";ctx.font="600 "+(w<480?10:11)+"px sans-serif";ctx.fillText(loop.isLeMans?"Trace GPS reelle - 10 km Maine Libre, Le Mans":loop.isLaval?"Trace GPS reelle - 10 km des Ecluses de la Mayenne, Laval":loop.isSemiMeslay?"Trace GPS reelle - Semi-Marathon Courir a Meslay":loop.isMeslay?"Trace GPX reelle - Course nature de Meslay-du-Maine":"Boucle de course - Parc, relances & faux-plats",loop.cx,loop.cy+4);ctx.fillStyle="#aab8c7";ctx.font="600 9.5px sans-serif";ctx.fillText(loop.isLeMans?"109 points GPS - 10,02 km":loop.isLaval?"45 points GPS - 10,03 km":loop.isSemiMeslay?"38 points GPS - +119 m D+":loop.isMeslay?"77 points GPS - depart et arrivee":"1 km - 500 m - Parc / Relance",loop.cx,loop.cy+22);
+ var standings=selected.map(function(r,i){var t=Math.max(1,Number(r.time)||1),p=Math.min(1,Math.max(0,elapsed/t));return{r:r,i:i,p:p,dist:p*distance,finished:elapsed>=t};});
+ standings.forEach(function(o){var pt=pointAtKm(loop,o.dist),color=colors[o.i%colors.length],rad=w<480?7.5:9;ctx.beginPath();ctx.arc(pt.x,pt.y,rad,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle="#fff";ctx.stroke();var tag=o.r.name+" • "+o.dist.toFixed(1)+" km";ctx.font="700 10px sans-serif";var tw=ctx.measureText(tag).width+12,tx=Math.min(w-tw/2-4,Math.max(tw/2+4,pt.x)),ty=Math.max(14,pt.y-rad-13);ctx.fillStyle="#172b3d";ctx.beginPath();ctx.roundRect(tx-tw/2,ty-9,tw,18,9);ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle="#F3F6FA";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(tag,tx,ty);});
+}
+
+function updateRaceView(){
+ drawTrack();
+ var standings=selected.map(function(r,i){var t=Math.max(1,Number(r.time)||1),p=Math.min(1,Math.max(0,elapsed/t));return{r:r,i:i,p:p,dist:p*getDistance(),finished:elapsed>=t};});
+ standings.sort(function(a,b){if(a.finished&&b.finished)return Number(a.r.time)-Number(b.r.time);if(a.finished)return -1;if(b.finished)return 1;if(Math.abs(b.dist-a.dist)>.0005)return b.dist-a.dist;return Number(a.r.time)-Number(b.r.time);});
+ var finished=standings.filter(function(x){return x.finished;}).length;
+ document.getElementById("gv-clock").textContent=timeText(elapsed);document.getElementById("gv-duration").textContent=duration?timeText(duration):"—";document.getElementById("gv-progress").textContent=selected.length?(finished+"/"+selected.length+" arrivé(s)"):"En attente";
+ timeline.max=Math.max(1,Math.round(duration));timeline.value=Math.min(Math.round(elapsed),Math.round(duration));timeline.disabled=!selected.length;
+ var rankBox=document.getElementById("gv-ranking");rankBox.innerHTML="";
+ if(!standings.length){rankBox.innerHTML='<div class="gv-empty">Le classement apparaîtra après la sélection des coureurs.</div>';return;}
+ var leader=standings[0];
+ standings.forEach(function(o,i){var r=o.r,meters=Math.round(o.dist*1000),gap="";
+  if(i===0)gap="En tête";else if(o.finished&&leader.finished)gap="+"+timeText(Number(r.time)-Number(leader.r.time));else gap="-"+Math.max(0,leader.dist-o.dist).toFixed(2)+" km";
+  var row=document.createElement("div");row.className="gv-rank-row";
+  row.innerHTML='<span class="gv-rank-no">'+(i+1)+'</span><div><div class="gv-rank-name"><span class="gv-dot" style="display:inline-block;vertical-align:middle;background:'+colors[o.i%colors.length]+';margin-right:6px"></span>'+esc(r.name)+'</div><div class="gv-rank-meta">'+esc(r.club||"")+' · '+(o.finished?"Arrivé":"En course")+" · "+meters.toLocaleString("fr-FR")+' m · '+esc(gap)+'</div></div><span class="gv-rank-time">'+esc(timeText(r.time))+'</span>';
+  rankBox.appendChild(row);
+ });
+}
+function pause(){running=false;if(raf)cancelAnimationFrame(raf);raf=0;lastFrame=0;playBtn.textContent="▶ Reprendre";}
+function tick(now){if(!running)return;if(!lastFrame)lastFrame=now;var delta=Math.min(.25,(now-lastFrame)/1000);lastFrame=now;elapsed=Math.min(duration,elapsed+delta*speed);updateRaceView();if(elapsed>=duration){pause();playBtn.textContent="✓ Terminée";return;}raf=requestAnimationFrame(tick);}
+function play(){if(!selected.length||!duration)return;if(elapsed>=duration)elapsed=0;running=true;lastFrame=0;playBtn.textContent="Ⅱ Pause";raf=requestAnimationFrame(tick);}
+function reset(){pause();elapsed=0;duration=selected.reduce(function(m,r){return Math.max(m,Number(r.time)||0);},0);timeline.max=Math.max(1,Math.round(duration));timeline.value=0;timeline.disabled=!selected.length;playBtn.disabled=!selected.length;resetBtn.disabled=!selected.length;playBtn.textContent="▶ Démarrer";updateRaceView();}
+function selectRace(id){pause();currentRace=races.find(function(r){return String(r.id)===String(id);})||null;selected=[];participants=[];search.value="";search.disabled=!currentRace;renderSelected();reset();if(!currentRace){raceInfo.textContent="Aucune course sélectionnée.";status.textContent="Choisis une course.";return;}document.getElementById("gv-canvas-title").textContent=currentRace.name;var selectedDistance=Number(currentRace.distance)>0?Number(currentRace.distance):(/marathon/i.test(String(currentRace.dist||""))?42.195:(/semi/i.test(String(currentRace.dist||""))?21.2:0));document.getElementById("gv-distance-label").textContent=(selectedDistance>0?String(selectedDistance).replace(".",","):"Distance à préciser")+" km";customWrap.hidden=selectedDistance>0;customDistance.value=selectedDistance>0?String(selectedDistance):"";raceInfo.textContent=(currentRace.date||"Date inconnue")+" · "+(currentRace.participantCount||0)+" résultats publiés";status.textContent="Chargement des participants de "+currentRace.name+"…";requestParticipants("");}
+raceSelect.addEventListener("change",function(){selectRace(raceSelect.value);});
+search.addEventListener("input",function(){if(!currentRace)return;clearTimeout(searchTimer);searchTimer=setTimeout(function(){requestParticipants(search.value.trim());},220);});
+resultsBox.addEventListener("click",function(e){var b=e.target.closest("[data-gv-add]");if(!b||b.disabled)return;var id=String(b.getAttribute("data-gv-add")),r=participants.find(function(x){return String(x.id)===id;});if(!r||selected.length>=5||selected.some(function(x){return String(x.id)===id;}))return;selected.push(r);renderSelected();renderSearchResults(participants,Number(raceInfo.dataset.total)||participants.length,search.value.trim());reset();status.textContent=r.name+" ajouté à la course virtuelle.";});
+selectedBox.addEventListener("click",function(e){var b=e.target.closest("[data-gv-remove]");if(!b)return;var id=String(b.getAttribute("data-gv-remove"));selected=selected.filter(function(x){return String(x.id)!==id;});renderSelected();renderSearchResults(participants,Number(raceInfo.dataset.total)||participants.length,search.value.trim());reset();});
+clearBtn.addEventListener("click",function(){selected=[];renderSelected();renderSearchResults(participants,Number(raceInfo.dataset.total)||participants.length,search.value.trim());reset();status.textContent="Sélection effacée.";});
+customDistance.addEventListener("input",function(){document.getElementById("gv-distance-label").textContent=(getDistance()>0?String(getDistance()).replace(".",","):"Distance à préciser")+" km";drawTrack();});
+startBtn.addEventListener("click",function(){if(!selected.length)return;if(!(getDistance()>0)){status.textContent="Renseigne la distance de cette course pour lancer la simulation.";customDistance.focus();return;}duration=selected.reduce(function(m,r){return Math.max(m,Number(r.time)||0);},0);if(!duration){status.textContent="Les chronos réels de ces coureurs sont indisponibles.";return;}elapsed=0;updateRaceView();playBtn.disabled=false;resetBtn.disabled=false;status.textContent="Simulation prête : les coureurs avancent selon leurs chronos officiels.";play();});
+playBtn.addEventListener("click",function(){if(running)pause();else play();});resetBtn.addEventListener("click",reset);
+timeline.addEventListener("input",function(){pause();elapsed=Number(timeline.value)||0;updateRaceView();});
+root.querySelectorAll("[data-gv-speed]").forEach(function(b){b.addEventListener("click",function(){speed=Number(b.getAttribute("data-gv-speed"))||1;root.querySelectorAll("[data-gv-speed]").forEach(function(x){x.classList.toggle("active",x===b);});});});
+window.addEventListener("message",function(event){if(event.source!==window.parent||!event.data)return;var d=event.data;if(d.type==="elo-ghost-virtual-races"){populateRaces(d.races);return;}if(d.type==="elo-ghost-virtual-race-data"){if(Number(d.requestId)!==requestSerial||!currentRace||String(d.raceId)!==String(currentRace.id))return;if(d.error){resultsBox.innerHTML='<div class="gv-empty">'+esc(d.error)+'</div>';status.textContent=d.error;return;}raceInfo.dataset.total=String(d.totalParticipants||0);renderSearchResults(d.participants,d.totalParticipants,search.value.trim());status.textContent=(d.totalParticipants||0)+" participants réels disponibles dans cette course. Sélectionne ceux que tu veux simuler."; }});
+var duelTab=document.querySelector('[data-tab="duel"]');if(duelTab)duelTab.addEventListener("click",function(){window.parent.postMessage({type:"elo-ghost-request-elo"},"*");});
+var raceTab=document.querySelector('[data-tab="virtual"]');if(raceTab)raceTab.addEventListener("click",function(){if(!races.length)requestRaces();});
+window.addEventListener("resize",resizeVirtualCanvas);if(window.ResizeObserver){new ResizeObserver(resizeVirtualCanvas).observe(canvas.parentElement);}resizeVirtualCanvas();updateRaceView();
+}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",initGhostVirtual,{once:true});}else{initGhostVirtual();}
+</script>
+
+</body>
+</html>
