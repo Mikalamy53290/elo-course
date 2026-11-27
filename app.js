@@ -718,7 +718,8 @@ function trashHTML(){
     var r=item.runner||{},n=r.name||'Nom inconnu',count=(item.results||[]).length;
     return '<div class="card" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div style="min-width:0;flex:1"><strong>'+esc(n)+'</strong><div class="meta">'+count+' résultat(s) conservé(s) · '+(item.deletedAt?new Date(item.deletedAt).toLocaleDateString('fr-FR'):'date inconnue')+'</div></div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="ghost" data-act="restorerunner" data-v="'+esc(item.id)+'">Restaurer le profil</button><button class="pf-delete" data-act="purgerunner" data-v="'+esc(item.id)+'">Supprimer définitivement</button></div></div>';
   }).join(''):'<p class="empty">La corbeille est vide.</p>';
-  return '<section class="card" id="admintrash" style="margin:18px 0;border:1px solid #8e3d46!important"><h2>Corbeille administrateur ('+items.length+')</h2><p class="meta">Les profils placés ici ne figurent plus dans le classement. Leurs résultats sont conservés jusqu’à restauration ou suppression définitive.</p>'+body+'</section>';
+  var emptyButton=items.length?'<div style="display:flex;justify-content:flex-end;margin:0 0 12px"><button class="pf-delete" data-act="purgetrash">Vider la corbeille entièrement ('+items.length+')</button></div>':'';
+  return '<section class="card" id="admintrash" style="margin:18px 0;border:1px solid #8e3d46!important"><h2>Corbeille administrateur ('+items.length+')</h2><p class="meta">Les profils placés ici ne figurent plus dans le classement. Leurs résultats sont conservés jusqu’à restauration ou suppression définitive.</p>'+emptyButton+body+'</section>';
 }
 function accueilHTML(st){
   var homeSeo='<section class="seo-intro" aria-labelledby="seo-home-title"><h1 id="seo-home-title">Classement Elo des coureurs en Maine-et-Loire, Mayenne et Sarthe</h1><p>ELO COURSE rassemble les résultats des courses à pied sur route et des courses nature en Maine-et-Loire (49), Mayenne (53) et Sarthe (72).</p><p>Consultez les classements, les chronos, les résultats des épreuves et les profils des coureurs. Les classements sont établis à partir des résultats de course publiés.</p></section>';
@@ -1797,6 +1798,16 @@ document.addEventListener("click",function(e){
     var typed=prompt("SECONDE CONFIRMATION\n\nPour confirmer la suppression définitive de "+name+", saisis exactement : SUPPRIMER");
     if(typed!=="SUPPRIMER"){alert("Suppression définitive annulée.");return;}
     S.trash=S.trash.filter(function(x){return x.id!==v});save();msg.sync="Le profil de "+name+" a été supprimé définitivement de la corbeille.";render();
+  }
+  else if(a==="purgetrash"){
+    if(!S.admin){alert("Action réservée à l’administrateur.");return;}
+    var trashItems=Array.isArray(S.trash)?S.trash:[];
+    if(!trashItems.length){alert("La corbeille est déjà vide.");return;}
+    var trashProfiles=trashItems.length,trashResults=trashItems.reduce(function(n,item){return n+(Array.isArray(item.results)?item.results.length:0)},0);
+    if(!confirm("PREMIÈRE CONFIRMATION\\n\\nVider entièrement la corbeille ?\\n\\n"+trashProfiles+" profil(s) et "+trashResults+" résultat(s) conservé(s) seront supprimés définitivement. Cette action est irréversible."))return;
+    var typed=prompt("SECONDE CONFIRMATION\\n\\nPour confirmer, saisis exactement : VIDER LA CORBEILLE");
+    if(typed!=="VIDER LA CORBEILLE"){alert("Vidage de la corbeille annulé.");return;}
+    S.trash=[];save();msg.sync="Corbeille entièrement vidée : "+trashProfiles+" profil(s) et "+trashResults+" résultat(s) supprimés définitivement.";render();
   }
   else if(a==="resolvepending"){
     if(!S.admin){alert("Action réservée à l’administrateur.");return;}
