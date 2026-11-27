@@ -857,7 +857,7 @@ function refreshUpcomingSearchResults(){
 
 function duplicateRunnerCandidatesHTML(query){
   var q=norm(query||"").trim(),groups={},counts={};
-  if(!q)return '<p class="meta">Saisis le nom ou le prénom du coureur pour rechercher les profils en double.</p>';
+  if(q.replace(/\s/g,"").length<3)return '<p class="meta">Tape au moins 3 caractères pour lancer la recherche. Les résultats seront limités aux 12 premiers groupes.</p>';
   S.races.forEach(function(race){(Array.isArray(race.results)?race.results:[]).forEach(function(result){if(result&&result.id)counts[String(result.id)]=(counts[String(result.id)]||0)+1;});});
   S.runners.forEach(function(runner){
     if(!runner||runner.id===undefined||runner.id===null||isAnonymousRunnerName(runner.name))return;
@@ -872,9 +872,9 @@ function duplicateRunnerCandidatesHTML(query){
     return group;
   }).filter(function(g){return g.profiles.length>1;}).sort(function(a,b){
     return (b.hasM6M7?1:0)-(a.hasM6M7?1:0)||b.profiles.length-a.profiles.length||a.name.localeCompare(b.name,"fr");
-  }).slice(0,100);
+  }).slice(0,12);
   if(!candidates.length)return '<p class="meta">Aucun doublon potentiel trouvé pour cette recherche. Essaie le nom complet ou une autre orthographe.</p>';
-  return '<p class="meta">'+candidates.length+' groupe(s) de profils portant le même nom. Les rapprochements M6/M7 sont affichés en priorité.</p>'+
+  return '<p class="meta">'+candidates.length+' groupe(s) affiché(s), maximum 12. Les rapprochements M6/M7 sont affichés en priorité.</p>'+
     candidates.map(function(g){
       return '<div class="card" style="margin:8px 0;border:1px solid '+(g.hasM6M7?'#b88b2e':'var(--line)')+'">'+
         '<strong>'+esc(g.name)+'</strong> '+(g.hasM6M7?'<span class="gem-result-pill">Piste M6 → M7</span>':'')+
