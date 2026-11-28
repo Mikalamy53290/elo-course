@@ -967,39 +967,14 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
   var props=[
     {id:"medals",label:"Tableau de médailles",min:1},
     {id:"treadmill",label:"Tapis de course",min:2},
-    {id:"desk",label:"Bureau et suivi ELO",min:3},
-    {id:"map",label:"Carte 49 · 53 · 72",min:4},
-    {id:"bike",label:"Vélo de préparation",min:5},
-    {id:"shoes",label:"Chaussures de compétition",min:6},
-    {id:"photo",label:"Photo souvenir",min:7},
-    {id:"trophy",label:"Trophée personnel",min:8},
-    {id:"bib",label:"Dossard encadré",min:9},
-    {id:"bottle",label:"Gourde sportive",min:10},
-    {id:"clock",label:"Horloge du coureur",min:11},
-    {id:"shelf",label:"Étagère à souvenirs",min:12},
-    {id:"cap",label:"Casquette ELO COURSE",min:13},
-    {id:"heart",label:"Badge régularité",min:14},
-    {id:"medal2",label:"Médaille supplémentaire",min:15},
-    {id:"lamp",label:"Lampe de bureau",min:16},
-    {id:"calendar",label:"Calendrier des courses",min:17},
-    {id:"shoe2",label:"Paire de chaussures collector",min:18},
-    {id:"flag",label:"Drapeau de club",min:19},
-    {id:"headphones",label:"Casque audio",min:20},
-    {id:"star",label:"Étoile de progression",min:21},
-    {id:"frame",label:"Cadre de record personnel",min:22},
-    {id:"plant",label:"Plante du QG",min:23},
-    {id:"tablet",label:"Tablette de statistiques",min:24},
-    {id:"cup",label:"Coupe de saison",min:25},
-    {id:"jersey",label:"Maillot de course",min:26},
-    {id:"medal3",label:"Présentoir à médailles",min:27},
-    {id:"banner",label:"Bannière personnalisée",min:28},
-    {id:"podium",label:"Mini podium",min:29},
-    {id:"crown",label:"Couronne du finisher",min:30}
+    {id:"desk",label:"Bureau avec ordinateur ELO",min:3},
+    {id:"map",label:"Carte des départements 49 · 53 · 72",min:4},
+    {id:"bike",label:"Vélo de préparation",min:5}
   ];
   function normalized(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}
   function roomMarkup(){
     return '<section class="qg3d-card" aria-label="QG illustré 2D évolutif du coureur">'+
-      '<div class="qg3d-head"><div><h3 class="qg3d-title">🏡 Mon QG coureur</h3><p class="qg3d-sub">Ton espace évolue à chaque course terminée.</p></div><span class="qg3d-progress" data-qg-progress>0 / 5 objets</span></div>'+
+      '<div class="qg3d-head"><div><h3 class="qg3d-title">🏡 Mon QG coureur</h3><p class="qg3d-sub">Un QG sobre qui évolue au fil de tes courses.</p></div><span class="qg3d-progress" data-qg-progress>0 / 5 améliorations</span></div>'+
       '<div class="qg3d-stage"><div class="qg2d-room-bg" role="img" aria-label="Décor illustré 2D du QG coureur"></div>'+
       '<svg viewBox="0 0 1200 675" role="img" aria-label="Objets gagnés dans la pièce" preserveAspectRatio="xMidYMid meet">'+
       '<defs><linearGradient id="qg3d-wood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d5a36b"/><stop offset=".48" stop-color="#8b542b"/><stop offset="1" stop-color="#4c2b19"/></linearGradient><linearGradient id="qg3d-metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset=".35" stop-color="#9eacb9"/><stop offset=".7" stop-color="#445566"/><stop offset="1" stop-color="#dce5ec"/></linearGradient><linearGradient id="qg3d-belt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#354657"/><stop offset="1" stop-color="#080f18"/></linearGradient><linearGradient id="qg3d-screen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#37a9c7"/><stop offset="1" stop-color="#102c42"/></linearGradient><linearGradient id="qg3d-frame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4d8a6"/><stop offset=".45" stop-color="#98612f"/><stop offset="1" stop-color="#3d2418"/></linearGradient><radialGradient id="qg3d-gold"><stop offset="0" stop-color="#fff5b4"/><stop offset=".45" stop-color="#f4ca50"/><stop offset="1" stop-color="#9a6416"/></radialGradient><radialGradient id="qg3d-silver"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#d7e0e8"/><stop offset="1" stop-color="#657484"/></radialGradient><radialGradient id="qg3d-bronze"><stop offset="0" stop-color="#ffe0b4"/><stop offset=".5" stop-color="#c77a3c"/><stop offset="1" stop-color="#713915"/></radialGradient><filter id="qg3d-shadow" x="-30%" y="-30%" width="170%" height="190%"><feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/><feOffset in="blur" dx="8" dy="11" result="offset"/><feComponentTransfer in="offset" result="shadow"><feFuncA type="linear" slope=".42"/></feComponentTransfer><feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge></filter><clipPath id="qg3d-runner-clip"><rect x="420" y="215" width="145" height="100" rx="4"/></clipPath><clipPath id="qg3d-race-clip"><rect x="615" y="215" width="185" height="100" rx="4"/></clipPath></defs>'+
@@ -1008,7 +983,7 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
       '<g class="qg3d-club-plaque" data-qg-club-plaque><rect x="430" y="135" width="360" height="42" rx="7" fill="#172b3d" stroke="#d2a66b" stroke-width="4"/><text data-qg-club-name x="610" y="162" text-anchor="middle" fill="#f3f6fa" font-size="19" font-weight="800"></text></g>'+
       '<g class="qg3d-prop" data-qg-prop="medals" filter="url(#qg3d-shadow)"><path d="M103 198l18-18h237l-12 18v112l12 16H121l-18-16z" fill="#382317" stroke="#21150f" stroke-width="5"/><rect x="116" y="185" width="245" height="130" rx="5" fill="url(#qg3d-frame)" stroke="#f0d3a2" stroke-width="5"/><rect x="130" y="199" width="217" height="102" rx="3" fill="#49301f" stroke="#271a12" stroke-width="5"/><path d="M139 207h199M139 292h199" stroke="#e8c38b" stroke-width="2" opacity=".65"/><text x="238" y="218" text-anchor="middle" fill="#f4d8ac" font-size="9" font-weight="800" letter-spacing="1.2">ROUTE + NATURE</text><g data-qg-medal-values><g><path d="M161 222l14 0 8 24-15 12-15-12z" fill="#b33431"/><path d="M175 222l14 0-8 24-15-12z" fill="#f2d6d2"/><circle cx="175" cy="258" r="20" fill="url(#qg3d-gold)" stroke="#fff0b0" stroke-width="3"/><circle cx="175" cy="258" r="13" fill="none" stroke="#9c6819" stroke-width="2"/><text x="175" y="264" text-anchor="middle" fill="#51370c" font-size="15" font-weight="900">0</text><text x="175" y="290" text-anchor="middle" fill="#fff1d8" font-size="10" font-weight="800">OR</text></g><g><path d="M231 222h28l-8 24-12 12-15-12z" fill="#263e6b"/><path d="M245 222h14l-8 24-12 12z" fill="#d7e3f5"/><circle cx="245" cy="258" r="20" fill="url(#qg3d-silver)" stroke="#fff" stroke-width="3"/><circle cx="245" cy="258" r="13" fill="none" stroke="#6b7885" stroke-width="2"/><text x="245" y="264" text-anchor="middle" fill="#354354" font-size="15" font-weight="900">0</text><text x="245" y="290" text-anchor="middle" fill="#fff1d8" font-size="10" font-weight="800">ARGENT</text></g><g><path d="M301 222h28l-8 24-12 12-15-12z" fill="#245b4a"/><path d="M315 222h14l-8 24-12 12z" fill="#f0c08e"/><circle cx="315" cy="258" r="20" fill="url(#qg3d-bronze)" stroke="#f4c18b" stroke-width="3"/><circle cx="315" cy="258" r="13" fill="none" stroke="#713915" stroke-width="2"/><text x="315" y="264" text-anchor="middle" fill="#fff2df" font-size="15" font-weight="900">0</text><text x="315" y="290" text-anchor="middle" fill="#fff1d8" font-size="10" font-weight="800">BRONZE</text></g></g></g>'+
       '<g class="qg3d-prop" data-qg-prop="treadmill" filter="url(#qg3d-shadow)"><ellipse cx="330" cy="565" rx="210" ry="25" fill="#07111b" opacity=".38"/><path d="M150 495l266-70 130 47-266 82z" fill="url(#qg3d-metal)" stroke="#26394a" stroke-width="8"/><path d="M175 494l238-62 103 39-244 69z" fill="url(#qg3d-belt)" stroke="#8c9aa7" stroke-width="3"/><path d="M194 494l229-59m-208 70 229-59" stroke="#647484" stroke-width="2" opacity=".5"/><path d="M190 493l-4 42m240-102 21 117m-196-12-17 42m217-50 13 32" fill="none" stroke="url(#qg3d-metal)" stroke-width="13" stroke-linecap="round"/><path d="M191 490l-2-104 22-12 18 105m185-47-5-111 22-12 20 112" fill="none" stroke="#26394a" stroke-width="13" stroke-linecap="round"/><path d="M205 382l-12-13 12-15 54-12 9 12-8 16z" fill="url(#qg3d-metal)" stroke="#26394a" stroke-width="5"/><path d="M410 334l-9-13 12-15 54-12 9 12-8 16z" fill="url(#qg3d-metal)" stroke="#26394a" stroke-width="5"/><path d="M250 353l180-44 20 19-181 47z" fill="#26394a" stroke="#d7e0e8" stroke-width="5"/><path d="M268 357l145-35 4 20-145 36z" fill="url(#qg3d-screen)" stroke="#0b1724" stroke-width="4"/><path d="M280 363l30-8m12 5 35-9m-29 21 43-11" stroke="#83e3c2" stroke-width="3" stroke-linecap="round"/><circle cx="450" cy="370" r="7" fill="#ef6b45" stroke="#fff" stroke-width="2"/></g>'+
-      '<g class="qg3d-prop" data-qg-prop="desk" filter="url(#qg3d-shadow)"><ellipse cx="690" cy="555" rx="185" ry="22" fill="#07111b" opacity=".32"/><path d="M545 408l286-53 53 36-292 57z" fill="#3e2618"/><path d="M535 396l292-54 57 34-296 58z" fill="url(#qg3d-wood)" stroke="#3b2518" stroke-width="7"/><path d="M555 399l267-49" stroke="#f2d0a0" stroke-width="3" opacity=".65"/><path d="M565 431l-5 107m250-151 10 151m-225-101v101" stroke="#3b4651" stroke-width="19" stroke-linecap="round"/><path d="M555 538h25m232 0h25" stroke="#9aa8b4" stroke-width="7" stroke-linecap="round"/><path d="M620 334l105-20 12 83-106 20z" fill="#152536" stroke="url(#qg3d-metal)" stroke-width="8"/><path d="M632 344l83-16 8 57-83 16z" fill="url(#qg3d-screen)"/><path d="M641 378l16-15 13 7 28-29m-54 49 24-10 14 2 24-17" fill="none" stroke="#7ce5a4" stroke-width="4"/><path d="M674 418l-3 15m-31 0h67" stroke="url(#qg3d-metal)" stroke-width="7"/><path d="M752 357l65-12 7 53-65 12z" fill="#0b1724" stroke="#aab8c7" stroke-width="5"/><path d="M761 383l12-10 10 4 22-22" fill="none" stroke="#71d69a" stroke-width="4"/><rect x="574" y="370" width="35" height="25" rx="4" fill="#c94f35" stroke="#f4c18b" stroke-width="3"/><path d="M580 374h23" stroke="#ffe2b7" stroke-width="2"/></g>'+
+      '<g class="qg3d-prop" data-qg-prop="desk" filter="url(#qg3d-shadow)"><ellipse cx="690" cy="555" rx="185" ry="22" fill="#07111b" opacity=".32"/><path d="M545 408l286-53 53 36-292 57z" fill="#3e2618"/><path d="M535 396l292-54 57 34-296 58z" fill="url(#qg3d-wood)" stroke="#3b2518" stroke-width="7"/><path d="M555 399l267-49" stroke="#f2d0a0" stroke-width="3" opacity=".65"/><path d="M565 431l-5 107m250-151 10 151m-225-101v101" stroke="#3b4651" stroke-width="19" stroke-linecap="round"/><path d="M555 538h25m232 0h25" stroke="#9aa8b4" stroke-width="7" stroke-linecap="round"/><path d="M620 260l105-20 12 83-106 20z" fill="#152536" stroke="url(#qg3d-metal)" stroke-width="8"/><path d="M632 270l83-16 8 57-83 16z" fill="url(#qg3d-screen)"/><path d="M641 304l16-15 13 7 28-29m-54 49 24-10 14 2 24-17" fill="none" stroke="#7ce5a4" stroke-width="4"/><path d="M674 343l-3 25m-31 0h67" stroke="url(#qg3d-metal)" stroke-width="7"/><path d="M752 357l65-12 7 53-65 12z" fill="#0b1724" stroke="#aab8c7" stroke-width="5"/><path d="M761 383l12-10 10 4 22-22" fill="none" stroke="#71d69a" stroke-width="4"/><rect x="574" y="370" width="35" height="25" rx="4" fill="#c94f35" stroke="#f4c18b" stroke-width="3"/><path d="M580 374h23" stroke="#ffe2b7" stroke-width="2"/></g>'+
       '<g class="qg3d-prop" data-qg-prop="map" filter="url(#qg3d-shadow)"><path d="M866 205l19-20h175l-15 20v171l15 18H885l-19-18z" fill="#0b1c2a"/><rect x="879" y="190" width="175" height="190" rx="5" fill="url(#qg3d-frame)" stroke="#f1d8b0" stroke-width="6"/><rect x="893" y="204" width="147" height="162" fill="#d9e8d9" stroke="#52391f" stroke-width="4"/><path d="M902 350l24-38 17-9 12-39 24-5 20-42 22 17 20 4" fill="none" stroke="#8cb79a" stroke-width="15" opacity=".7"/><path d="M904 344l31-47 23 14 28-63 28 24 24-29" fill="none" stroke="#367d59" stroke-width="6"/><path d="M902 225l125 116m-113-4 104-117" stroke="#fff" stroke-width="2" opacity=".45"/><path d="M926 280l-8-18 17-8 16 11-7 18z" fill="#f0bd3d" stroke="#fff" stroke-width="3"/><path d="M1000 315l-8-18 17-8 16 11-7 18z" fill="#e87536" stroke="#fff" stroke-width="3"/><text x="966" y="359" text-anchor="middle" fill="#102b3d" font-size="17" font-weight="900">53 · 72 · 49</text></g>'+
       '<g class="qg3d-prop" data-qg-prop="bike" filter="url(#qg3d-shadow)"><ellipse cx="965" cy="610" rx="135" ry="17" fill="#07111b" opacity=".35"/><g fill="none" stroke="#111c27" stroke-width="13"><circle cx="875" cy="545" r="53"/><circle cx="1050" cy="545" r="53"/></g><g fill="none" stroke="#dce5ec" stroke-width="2" opacity=".8"><circle cx="875" cy="545" r="47"/><circle cx="1050" cy="545" r="47"/><path d="M875 492v106m-53-53h106m-90-37 74 74m0-74-74 74M1050 492v106m-53-53h106m-90-37 74 74m0-74-74 74"/></g><path d="M875 545l68-77 62 0 45 77-108 0-67 0 68-77 20 77" fill="none" stroke="#e66a32" stroke-width="11" stroke-linejoin="round"/><path d="M943 468l-8-22m-10 22h35m47 0 20-16h26m-166 16h-25" stroke="#1c2c3a" stroke-width="10" stroke-linecap="round"/><path d="M925 463l-20-13m127 14 20-14" stroke="url(#qg3d-metal)" stroke-width="7" stroke-linecap="round"/><circle cx="943" cy="468" r="9" fill="#f2a13c" stroke="#fff" stroke-width="2"/><circle cx="1050" cy="545" r="5" fill="#e66a32"/></g>'+
       '</svg></div><div class="qg3d-list" data-qg-list></div></section>';
@@ -1069,26 +1044,7 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
       item.classList.toggle("is-unlocked",unlocked);
     });
     card.querySelector("[data-qg-progress]").textContent=count+" / "+props.length+" objets";
-    var svg=card.querySelector(".qg3d-stage svg");
-    if(svg){
-      var extraLayer=svg.querySelector("[data-qg-extra-layer]");
-      if(!extraLayer){extraLayer=document.createElementNS("http://www.w3.org/2000/svg","g");extraLayer.setAttribute("data-qg-extra-layer","");svg.appendChild(extraLayer);}
-      props.slice(5).forEach(function(p,index){
-        var node=extraLayer.querySelector('[data-qg-extra="'+p.id+'"]');
-        if(!node){
-          var col=index%5,row=Math.floor(index/5);
-          var x=52+col*67,y=48+row*27;
-          var symbols=["👟","📸","🏆","🎽","💧","⏱","📚","🧢","💚","🥇","💡","📅","👟","🚩","🎧","⭐","🖼","🌱","📊","🏆","👕","🏅","🎖","🏁","👑"];
-          var ns="http://www.w3.org/2000/svg";
-          node=document.createElementNS(ns,"g");node.setAttribute("data-qg-extra",p.id);node.setAttribute("class","qg2d-extra");
-          var bg=document.createElementNS(ns,"rect");bg.setAttribute("x",x);bg.setAttribute("y",y);bg.setAttribute("width","56");bg.setAttribute("height","22");bg.setAttribute("rx","6");bg.setAttribute("fill","#10283a");bg.setAttribute("stroke","#f2a13c");bg.setAttribute("stroke-width","1.5");node.appendChild(bg);
-          var symbol=document.createElementNS(ns,"text");symbol.setAttribute("x",x+11);symbol.setAttribute("y",y+16);symbol.setAttribute("font-size","13");symbol.textContent=symbols[index%symbols.length];node.appendChild(symbol);
-          var num=document.createElementNS(ns,"text");num.setAttribute("x",x+27);num.setAttribute("y",y+15);num.setAttribute("font-size","9");num.setAttribute("font-weight","800");num.setAttribute("fill","#f3f6fa");num.textContent=String(p.min);node.appendChild(num);
-          extraLayer.appendChild(node);
-        }
-        node.classList.toggle("is-unlocked",races>=p.min);
-      });
-    }
+    card.querySelector("[data-qg-progress]").textContent=count+" / "+props.length+" améliorations";
   }
   function refresh(){
     var root=document.querySelector("#v-me .pf");
