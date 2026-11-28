@@ -1000,7 +1000,8 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
     var races=countEl?parseInt(String(countEl.textContent).replace(/[^0-9]/g,""),10):0;
     updateRoom(root,Number.isFinite(races)?races:0);
   }
-  var observer=new MutationObserver(refresh);
+  function insideQG(node){var el=node&&node.nodeType===1?node:node&&node.parentElement;return !!(el&&el.closest&&el.closest(".qg3d-card"));}
+  var observer=new MutationObserver(function(records){if(records.some(function(record){return !insideQG(record.target);}))refresh();});
   observer.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",refresh,{once:true});else refresh();
 })();
