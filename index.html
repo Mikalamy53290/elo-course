@@ -690,6 +690,135 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 .upcoming-discipline.discipline-nature{background:rgba(54,190,126,.16);color:#83e0ae;border-color:rgba(75,207,145,.48)}
 .upcoming-department-tabs{display:flex;flex-wrap:wrap;gap:9px}
 .upcoming-department-tabs button{min-width:110px}
+
+/* ELO COURSE — stabilité CLS du bandeau coureur */
+#topinfo{
+  min-height:176px;
+  align-content:start;
+  contain:layout;
+}
+#topinfo:empty::before{
+  content:"";
+  display:block;
+  width:100%;
+  min-height:148px;
+  border:1px solid #294155;
+  border-radius:12px;
+  background:
+    linear-gradient(90deg,rgba(170,184,199,.07) 25%,rgba(170,184,199,.13) 37%,rgba(170,184,199,.07) 63%) 0 0/220% 100%,
+    #172B3D;
+  animation:elo-home-skeleton 1.8s ease-in-out infinite;
+}
+@keyframes elo-home-skeleton{
+  0%{background-position:100% 0,0 0}
+  100%{background-position:-120% 0,0 0}
+}
+#topinfo .top-account-group,
+#topinfo .top-account-summary,
+#topinfo .top-account-category-row,
+#topinfo .top-account-identity,
+#topinfo .top-account-elo{min-width:0}
+#topinfo .top-account-summary{overflow-wrap:anywhere}
+#topinfo .top-account-category{overflow-wrap:anywhere}
+#topinfo button,
+#topinfo a.elocoins-wallet{
+  min-height:48px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1.25;
+  touch-action:manipulation;
+}
+#topinfo .toplogin{
+  background:#278A50;
+  color:#071B14;
+  border-color:#278A50;
+  font-weight:800;
+}
+#topinfo .top-account-organizer{
+  color:#d5f5e2;
+  background:#102b2d;
+  border-color:#3c9b68;
+}
+@media(max-width:768px){
+  #topinfo{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:stretch;
+    gap:8px;
+    min-height:332px;
+    padding-left:12px;
+    padding-right:12px;
+    width:100%;
+    max-width:100%;
+  }
+  #topinfo:empty::before{
+    grid-column:1/-1;
+    min-height:300px;
+  }
+  #topinfo>.topcount{
+    min-width:0;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  #topinfo>.elocoins-wallet{
+    justify-self:end;
+    align-self:start;
+    min-height:44px;
+    max-width:100%;
+  }
+  #topinfo>.top-account-group{
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:stretch;
+    justify-content:stretch;
+    gap:8px;
+    width:100%;
+    margin:0;
+  }
+  #topinfo .top-account-summary{
+    grid-column:1/-1;
+    width:100%;
+    max-width:none;
+    min-width:0;
+    padding:10px 12px;
+  }
+  #topinfo .top-account-identity-text,
+  #topinfo .top-account-identity-text>strong{min-width:0;overflow-wrap:anywhere}
+  #topinfo .top-account-elo{
+    flex-wrap:wrap;
+    width:100%;
+  }
+  #topinfo .top-account-category-row{
+    align-items:flex-start;
+    justify-content:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+  #topinfo .top-account-login,
+  #topinfo .top-account-profile,
+  #topinfo .top-account-organizer,
+  #topinfo .toplogin{
+    width:100%;
+    min-width:0;
+    min-height:48px;
+    padding:10px 8px;
+    white-space:normal;
+    text-align:center;
+    overflow-wrap:anywhere;
+    font-size:12px;
+  }
+  #topinfo .top-account-group>.toplogin:last-child{
+    grid-column:1/-1;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #topinfo:empty::before{animation:none}
+}
+
 </style>
 <meta name="elo-course-build" content="2026-11-20-corrections-selection-profil-duel-v2">
 </head>
