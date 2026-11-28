@@ -947,23 +947,60 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 #v-me .qg3d-item.is-unlocked strong{color:#8ce0aa}
 @media(max-width:520px){#v-me .qg3d-card{padding:11px}#v-me .qg3d-stage{min-height:0}#v-me .qg3d-list{grid-template-columns:1fr}#v-me .qg3d-item{min-height:42px}}
 @media(prefers-reduced-motion:reduce){#v-me .qg3d-prop{transition:none}}
+
+#v-me .qg3d-stage{background:#d7c5a5;border-color:#536b7d}
+#v-me .qg2d-room-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#233e55 0%,#1a3044 70%,#d4b68b 70%,#b88d61 100%)}
+#v-me .qg2d-room-bg:before{content:"";position:absolute;left:0;right:0;top:69%;height:2px;background:#f2a13c;opacity:.9}
+#v-me .qg2d-room-bg:after{content:"";position:absolute;left:4%;right:4%;top:8%;height:57%;border:2px solid rgba(231,239,244,.12);border-radius:8px;box-shadow:inset 0 0 0 5px rgba(8,20,31,.08)}
+#v-me .qg3d-stage svg{z-index:1}
+#v-me .qg3d-prop{filter:none}
+#v-me .qg2d-extra{opacity:0;visibility:hidden;transform:scale(.75);transform-origin:center;transition:opacity .25s ease,transform .25s ease,visibility .25s ease}
+#v-me .qg2d-extra.is-unlocked{opacity:1;visibility:visible;transform:scale(1)}
+#v-me .qg3d-title{color:#fff}
+#v-me .qg3d-progress{border-color:#f2a13c;color:#ffe0b0;background:#172b3d}
+@media(prefers-reduced-motion:reduce){#v-me .qg2d-extra{transition:none}}
 </style>
 <script id="elo-qg3d-integration">
 (function(){
   if(window.__eloQG3DInstalled)return;
   window.__eloQG3DInstalled=true;
   var props=[
-    {id:"medals",label:"Tableau médailles",min:1},
-    {id:"treadmill",label:"Tapis de course",min:3},
-    {id:"desk",label:"Bureau & suivi ELO",min:6},
-    {id:"map",label:"Carte 53 / 72 / 49",min:10},
-    {id:"bike",label:"Vélo de préparation",min:15}
+    {id:"medals",label:"Tableau de médailles",min:1},
+    {id:"treadmill",label:"Tapis de course",min:2},
+    {id:"desk",label:"Bureau et suivi ELO",min:3},
+    {id:"map",label:"Carte 49 · 53 · 72",min:4},
+    {id:"bike",label:"Vélo de préparation",min:5},
+    {id:"shoes",label:"Chaussures de compétition",min:6},
+    {id:"photo",label:"Photo souvenir",min:7},
+    {id:"trophy",label:"Trophée personnel",min:8},
+    {id:"bib",label:"Dossard encadré",min:9},
+    {id:"bottle",label:"Gourde sportive",min:10},
+    {id:"clock",label:"Horloge du coureur",min:11},
+    {id:"shelf",label:"Étagère à souvenirs",min:12},
+    {id:"cap",label:"Casquette ELO COURSE",min:13},
+    {id:"heart",label:"Badge régularité",min:14},
+    {id:"medal2",label:"Médaille supplémentaire",min:15},
+    {id:"lamp",label:"Lampe de bureau",min:16},
+    {id:"calendar",label:"Calendrier des courses",min:17},
+    {id:"shoe2",label:"Paire de chaussures collector",min:18},
+    {id:"flag",label:"Drapeau de club",min:19},
+    {id:"headphones",label:"Casque audio",min:20},
+    {id:"star",label:"Étoile de progression",min:21},
+    {id:"frame",label:"Cadre de record personnel",min:22},
+    {id:"plant",label:"Plante du QG",min:23},
+    {id:"tablet",label:"Tablette de statistiques",min:24},
+    {id:"cup",label:"Coupe de saison",min:25},
+    {id:"jersey",label:"Maillot de course",min:26},
+    {id:"medal3",label:"Présentoir à médailles",min:27},
+    {id:"banner",label:"Bannière personnalisée",min:28},
+    {id:"podium",label:"Mini podium",min:29},
+    {id:"crown",label:"Couronne du finisher",min:30}
   ];
   function normalized(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}
   function roomMarkup(){
-    return '<section class="qg3d-card" aria-label="QG 3D évolutif du coureur">'+
-      '<div class="qg3d-head"><div><h3 class="qg3d-title">🏡 Mon QG coureur 3D</h3><p class="qg3d-sub">La pièce évolue au fil de tes courses enregistrées.</p></div><span class="qg3d-progress" data-qg-progress>0 / 5 objets</span></div>'+
-      '<div class="qg3d-stage"><img src="/assets/qg/room-empty.jpg" width="640" height="360" alt="Pièce 3D vide du QG coureur" loading="eager" decoding="async">'+
+    return '<section class="qg3d-card" aria-label="QG illustré 2D évolutif du coureur">'+
+      '<div class="qg3d-head"><div><h3 class="qg3d-title">🏡 Mon QG coureur</h3><p class="qg3d-sub">Ton espace évolue à chaque course terminée.</p></div><span class="qg3d-progress" data-qg-progress>0 / 5 objets</span></div>'+
+      '<div class="qg3d-stage"><div class="qg2d-room-bg" role="img" aria-label="Décor illustré 2D du QG coureur"></div>'+
       '<svg viewBox="0 0 1200 675" role="img" aria-label="Objets gagnés dans la pièce" preserveAspectRatio="xMidYMid meet">'+
       '<defs><linearGradient id="qg3d-wood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d5a36b"/><stop offset=".48" stop-color="#8b542b"/><stop offset="1" stop-color="#4c2b19"/></linearGradient><linearGradient id="qg3d-metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset=".35" stop-color="#9eacb9"/><stop offset=".7" stop-color="#445566"/><stop offset="1" stop-color="#dce5ec"/></linearGradient><linearGradient id="qg3d-belt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#354657"/><stop offset="1" stop-color="#080f18"/></linearGradient><linearGradient id="qg3d-screen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#37a9c7"/><stop offset="1" stop-color="#102c42"/></linearGradient><linearGradient id="qg3d-frame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4d8a6"/><stop offset=".45" stop-color="#98612f"/><stop offset="1" stop-color="#3d2418"/></linearGradient><radialGradient id="qg3d-gold"><stop offset="0" stop-color="#fff5b4"/><stop offset=".45" stop-color="#f4ca50"/><stop offset="1" stop-color="#9a6416"/></radialGradient><radialGradient id="qg3d-silver"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#d7e0e8"/><stop offset="1" stop-color="#657484"/></radialGradient><radialGradient id="qg3d-bronze"><stop offset="0" stop-color="#ffe0b4"/><stop offset=".5" stop-color="#c77a3c"/><stop offset="1" stop-color="#713915"/></radialGradient><filter id="qg3d-shadow" x="-30%" y="-30%" width="170%" height="190%"><feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/><feOffset in="blur" dx="8" dy="11" result="offset"/><feComponentTransfer in="offset" result="shadow"><feFuncA type="linear" slope=".42"/></feComponentTransfer><feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge></filter><clipPath id="qg3d-runner-clip"><rect x="420" y="215" width="145" height="100" rx="4"/></clipPath><clipPath id="qg3d-race-clip"><rect x="615" y="215" width="185" height="100" rx="4"/></clipPath></defs>'+
       '<g class="qg3d-photo-frame" data-qg-wall-photo="runner"><rect x="410" y="195" width="165" height="142" rx="7" fill="#57391f" stroke="#d2a66b" stroke-width="8"/><rect x="420" y="215" width="145" height="100" fill="#0b1724"/><image data-qg-runner-image x="420" y="215" width="145" height="100" preserveAspectRatio="xMidYMid slice" clip-path="url(#qg3d-runner-clip)"/><text x="492" y="329" text-anchor="middle" fill="#fff1d8" font-size="12" font-weight="800">MON PROFIL</text></g>'+
@@ -1031,7 +1068,27 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
       item.querySelector("strong").textContent=unlocked?"Débloqué":p.min+" courses";
       item.classList.toggle("is-unlocked",unlocked);
     });
-    card.querySelector("[data-qg-progress]").textContent=count+" / 5 objets";
+    card.querySelector("[data-qg-progress]").textContent=count+" / "+props.length+" objets";
+    var svg=card.querySelector(".qg3d-stage svg");
+    if(svg){
+      var extraLayer=svg.querySelector("[data-qg-extra-layer]");
+      if(!extraLayer){extraLayer=document.createElementNS("http://www.w3.org/2000/svg","g");extraLayer.setAttribute("data-qg-extra-layer","");svg.appendChild(extraLayer);}
+      props.slice(5).forEach(function(p,index){
+        var node=extraLayer.querySelector('[data-qg-extra="'+p.id+'"]');
+        if(!node){
+          var col=index%5,row=Math.floor(index/5);
+          var x=52+col*67,y=48+row*27;
+          var symbols=["👟","📸","🏆","🎽","💧","⏱","📚","🧢","💚","🥇","💡","📅","👟","🚩","🎧","⭐","🖼","🌱","📊","🏆","👕","🏅","🎖","🏁","👑"];
+          var ns="http://www.w3.org/2000/svg";
+          node=document.createElementNS(ns,"g");node.setAttribute("data-qg-extra",p.id);node.setAttribute("class","qg2d-extra");
+          var bg=document.createElementNS(ns,"rect");bg.setAttribute("x",x);bg.setAttribute("y",y);bg.setAttribute("width","56");bg.setAttribute("height","22");bg.setAttribute("rx","6");bg.setAttribute("fill","#10283a");bg.setAttribute("stroke","#f2a13c");bg.setAttribute("stroke-width","1.5");node.appendChild(bg);
+          var symbol=document.createElementNS(ns,"text");symbol.setAttribute("x",x+11);symbol.setAttribute("y",y+16);symbol.setAttribute("font-size","13");symbol.textContent=symbols[index%symbols.length];node.appendChild(symbol);
+          var num=document.createElementNS(ns,"text");num.setAttribute("x",x+27);num.setAttribute("y",y+15);num.setAttribute("font-size","9");num.setAttribute("font-weight","800");num.setAttribute("fill","#f3f6fa");num.textContent=String(p.min);node.appendChild(num);
+          extraLayer.appendChild(node);
+        }
+        node.classList.toggle("is-unlocked",races>=p.min);
+      });
+    }
   }
   function refresh(){
     var root=document.querySelector("#v-me .pf");
