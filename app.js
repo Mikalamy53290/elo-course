@@ -1852,6 +1852,8 @@ document.addEventListener("click",function(e){
       else {query=await sb.from('elo_upcoming_courses').insert(row).select().single();}
       if(query.error)throw query.error;
       var savedCourse=query.data;
+      window.editingUpcoming=savedCourse.id;
+      var savedIndex=upcomingCourses.findIndex(function(x){return x.id===savedCourse.id;});if(savedIndex>=0)upcomingCourses[savedIndex]=savedCourse;else upcomingCourses.push(savedCourse);
       if(posterFile){
         var posterExt=posterFile.type==='image/png'?'png':posterFile.type==='image/webp'?'webp':'jpg';
         var posterPath=savedCourse.id+'/'+authUser.id+'/'+Date.now()+'.'+posterExt;
