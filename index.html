@@ -924,5 +924,87 @@ header.brand{width:calc(100% - 178px);max-width:1100px;margin:0 0 0 178px;paddin
 </script>
 
 <script defer src="/bandeau-annonces.js"></script>
+
+<style id="elo-qg3d-style">
+#v-me .qg3d-card{margin:18px 0 14px;padding:14px;background:#172b3d;color:#f3f6fa;border:1px solid #294155;border-radius:16px;max-width:100%;overflow:hidden}
+#v-me .qg3d-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px}
+#v-me .qg3d-title{margin:0;font-size:1.08rem;font-weight:800}
+#v-me .qg3d-sub{margin:4px 0 0;color:#aab8c7;font-size:.88rem}
+#v-me .qg3d-progress{flex:0 0 auto;padding:6px 10px;border:1px solid #3c9b68;border-radius:999px;color:#d5f5e2;font-size:.8rem;font-weight:800}
+#v-me .qg3d-stage{position:relative;width:100%;aspect-ratio:16/9;min-height:180px;overflow:hidden;border:1px solid #40576b;border-radius:12px;background:#c9cbd0;isolation:isolate}
+#v-me .qg3d-stage img,#v-me .qg3d-stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#v-me .qg3d-stage img{object-fit:cover}
+#v-me .qg3d-prop{opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s ease}
+#v-me .qg3d-prop.is-unlocked{opacity:1;visibility:visible}
+#v-me .qg3d-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+#v-me .qg3d-item{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 11px;border:1px solid #294155;border-radius:9px;background:#0b1724;font-size:.82rem}
+#v-me .qg3d-item span{min-width:0}
+#v-me .qg3d-item strong{white-space:nowrap;color:#aab8c7;font-size:.76rem}
+#v-me .qg3d-item.is-unlocked{border-color:#278a50;background:#102b25}
+#v-me .qg3d-item.is-unlocked strong{color:#8ce0aa}
+@media(max-width:520px){#v-me .qg3d-card{padding:11px}#v-me .qg3d-stage{min-height:0}#v-me .qg3d-list{grid-template-columns:1fr}#v-me .qg3d-item{min-height:42px}}
+@media(prefers-reduced-motion:reduce){#v-me .qg3d-prop{transition:none}}
+</style>
+<script id="elo-qg3d-integration">
+(function(){
+  if(window.__eloQG3DInstalled)return;
+  window.__eloQG3DInstalled=true;
+  var props=[
+    {id:"medals",label:"Tableau médailles",min:1},
+    {id:"treadmill",label:"Tapis de course",min:3},
+    {id:"desk",label:"Bureau & suivi ELO",min:6},
+    {id:"map",label:"Carte 53 / 72 / 49",min:10},
+    {id:"bike",label:"Vélo de préparation",min:15}
+  ];
+  function normalized(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}
+  function roomMarkup(){
+    return '<section class="qg3d-card" aria-label="QG 3D évolutif du coureur">'+
+      '<div class="qg3d-head"><div><h3 class="qg3d-title">🏡 Mon QG coureur 3D</h3><p class="qg3d-sub">La pièce évolue au fil de tes courses enregistrées.</p></div><span class="qg3d-progress" data-qg-progress>0 / 5 objets</span></div>'+
+      '<div class="qg3d-stage"><img src="/assets/qg/room-empty.jpg" width="640" height="360" alt="Pièce 3D vide du QG coureur" loading="eager" decoding="async">'+
+      '<svg viewBox="0 0 1200 675" role="img" aria-label="Objets gagnés dans la pièce" preserveAspectRatio="xMidYMid meet">'+
+      '<g class="qg3d-prop" data-qg-prop="medals"><rect x="110" y="185" width="245" height="130" rx="7" fill="#57391f" stroke="#d2a66b" stroke-width="8"/><rect x="125" y="200" width="215" height="100" rx="3" fill="#8a6038" stroke="#e5c28e" stroke-width="3"/><circle cx="175" cy="248" r="25" fill="#f3c64e" stroke="#fff0b0" stroke-width="4"/><circle cx="245" cy="248" r="25" fill="#dce4eb" stroke="#fff" stroke-width="4"/><circle cx="315" cy="248" r="25" fill="#b96a31" stroke="#f4c18b" stroke-width="4"/><path d="M165 273l10 23 10-23M235 273l10 23 10-23M305 273l10 23 10-23" fill="none" stroke="#d9e2ec" stroke-width="8"/></g>'+
+      '<g class="qg3d-prop" data-qg-prop="treadmill"><path d="M155 500l260-55 115 45-260 72z" fill="#26394a" stroke="#d4dce4" stroke-width="8"/><path d="M190 501l222-47 75 35-235 58z" fill="#101c29"/><path d="M208 495V390m44 96V375m-49 14h58" fill="none" stroke="#273847" stroke-width="12"/><path d="M195 382h82v19h-82z" fill="#278a50" stroke="#d7f5e1" stroke-width="4"/></g>'+
+      '<g class="qg3d-prop" data-qg-prop="desk"><path d="M550 410h285l38 35H520z" fill="#98602f" stroke="#57391f" stroke-width="6"/><path d="M570 445v93m245-93v93" stroke="#4b5563" stroke-width="18"/><rect x="610" y="325" width="115" height="78" rx="6" fill="#142331" stroke="#a9bac8" stroke-width="7"/><rect x="624" y="339" width="87" height="49" fill="#1e5d7b"/><path d="M665 403v10m-29 0h58" stroke="#cbd5e1" stroke-width="6"/><rect x="744" y="348" width="70" height="54" rx="4" fill="#0b1724" stroke="#278a50" stroke-width="6"/><path d="M754 387l15-14 12 6 18-21" fill="none" stroke="#71d69a" stroke-width="4"/></g>'+
+      '<g class="qg3d-prop" data-qg-prop="map"><rect x="880" y="190" width="170" height="185" rx="7" fill="#16324a" stroke="#e1e9ef" stroke-width="8"/><rect x="894" y="204" width="142" height="157" fill="#d8e5d9"/><path d="M905 338l38-63 25 20 24-57 33 33" fill="none" stroke="#278a50" stroke-width="8"/><circle cx="944" cy="247" r="15" fill="#f0bd3d"/><circle cx="1000" cy="292" r="15" fill="#e87536"/><text x="965" y="352" text-anchor="middle" fill="#102b3d" font-size="17" font-weight="800">53 · 72 · 49</text></g>'+
+      '<g class="qg3d-prop" data-qg-prop="bike"><circle cx="875" cy="545" r="52" fill="none" stroke="#e8edf2" stroke-width="8"/><circle cx="1050" cy="545" r="52" fill="none" stroke="#e8edf2" stroke-width="8"/><path d="M875 545l67-75 63 0 45 75-108 0-63 0 63-75 20 75" fill="none" stroke="#278a50" stroke-width="10" stroke-linejoin="round"/><path d="M930 465h-35m98 0h35" stroke="#26394a" stroke-width="9" stroke-linecap="round"/></g>'+
+      '</svg></div><div class="qg3d-list" data-qg-list></div></section>';
+  }
+  function updateRoom(root,races){
+    var card=root.querySelector(".qg3d-card");
+    if(!card){root.insertAdjacentHTML("beforeend",roomMarkup());card=root.querySelector(".qg3d-card");}
+    if(!card)return;
+    var count=0,list=card.querySelector("[data-qg-list]");
+    props.forEach(function(p){
+      var unlocked=races>=p.min;
+      if(unlocked)count++;
+      var layer=card.querySelector('[data-qg-prop="'+p.id+'"]');
+      if(layer)layer.classList.toggle("is-unlocked",unlocked);
+      var item=list.querySelector('[data-qg-item="'+p.id+'"]');
+      if(!item){item=document.createElement("div");item.className="qg3d-item";item.setAttribute("data-qg-item",p.id);var label=document.createElement("span"),status=document.createElement("strong");item.appendChild(label);item.appendChild(status);list.appendChild(item);}
+      item.querySelector("span").textContent=p.label;
+      item.querySelector("strong").textContent=unlocked?"Débloqué":p.min+" courses";
+      item.classList.toggle("is-unlocked",unlocked);
+    });
+    card.querySelector("[data-qg-progress]").textContent=count+" / 5 objets";
+  }
+  function refresh(){
+    var root=document.querySelector("#v-me .pf");
+    if(!root){return;}
+    var name=root.querySelector(".pf-name");
+    var key=normalized(name&&name.textContent);
+    if(!(key.indexOf("mickael")>=0&&key.indexOf("lamy")>=0)){
+      var old=root.querySelector(".qg3d-card");if(old)old.remove();
+      return;
+    }
+    var countEl=root.querySelector(".pf-quick .pf-q:first-child b");
+    var races=countEl?parseInt(String(countEl.textContent).replace(/[^0-9]/g,""),10):0;
+    updateRoom(root,Number.isFinite(races)?races:0);
+  }
+  var observer=new MutationObserver(refresh);
+  observer.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",refresh,{once:true});else refresh();
+})();
+</script>
+
 </body>
 </html>
